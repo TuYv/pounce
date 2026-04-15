@@ -2,7 +2,7 @@
 
 /* CSS Variables for theming - 完全由JavaScript控制，不使用媒体查询 */
 :root {
-  --qf-radius: 0.625rem;
+  --qf-radius: 0.875rem; /* 14px — more intentional floating dialog feel */
 }
 
 /* Light Theme - 亮色主题 */
@@ -80,7 +80,7 @@
     0 4px 20px var(--qf-shadow),
     0 16px 64px var(--qf-shadow-strong);
   overflow: hidden;
-  animation: quickfind-fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: quickfind-fadeIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
@@ -112,21 +112,19 @@
   stroke: var(--qf-muted-foreground);
 }
 
-/* Search input */
+/* Search input — transparent, fused into container */
 .quickfind-search-input {
   flex: 1;
-  height: 36px;
-  border: 1px solid var(--qf-border);
+  height: 100%;
+  border: none;
   outline: none;
-  padding: 0;
-  font-size: 14px;
+  padding: 0 12px 0 0;
+  font-size: 15px;
   font-weight: 400;
-  background: var(--qf-input-background);
+  background: transparent;
   color: var(--qf-foreground);
   box-sizing: border-box;
   line-height: 1.4;
-  padding: 0 12px;
-  border-radius: 8px;
 }
 
 .quickfind-search-input::placeholder {
@@ -139,22 +137,30 @@
 }
 
 .quickfind-search-input-container:focus-within {
-  border-bottom-color: var(--qf-primary);
+  border-bottom-color: var(--qf-border);
 }
 
 .quickfind-search-input-container:focus-within .quickfind-search-icon {
-  opacity: 1;
-}
-
-.quickfind-search-input-container:focus-within .quickfind-search-icon svg {
-  fill: var(--qf-primary);
-  stroke: var(--qf-primary);
+  opacity: 0.7;
 }
 
 .quickfind-close-icon {
-  margin-left: 16px;
-  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
   cursor: pointer;
+  color: var(--qf-muted-foreground);
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+}
+
+.quickfind-close-icon:hover {
+  color: var(--qf-foreground);
+  background: var(--qf-muted);
 }
 
 /* Results container */
@@ -182,14 +188,12 @@
 .quickfind-search-result:hover {
   background-color: var(--qf-accent);
   border-color: var(--qf-border);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px var(--qf-shadow);
 }
 
 .quickfind-search-result.selected {
   background-color: var(--qf-accent);
-  border-color: var(--qf-primary);
-  box-shadow: 0 0 0 1px var(--qf-primary);
+  border-color: transparent;
+  box-shadow: inset 3px 0 0 var(--qf-primary);
 }
 
 .quickfind-search-result:last-child {
@@ -221,23 +225,15 @@
   fill: var(--qf-muted-foreground);
 }
 
-/* 只有在没有图片时才显示背景色 */
-.quickfind-result-icon.tab:not(:has(img)) {
-  background-color: var(--qf-primary);
-}
-
-.quickfind-result-icon.bookmark:not(:has(img)) {
-  background-color: #ff9800;
-}
-
-.quickfind-result-icon.history:not(:has(img)) {
-  background-color: #0ea5e9;
-  color: #ffffff;
-}
-
+/* favicon fallback — unified neutral, no type-specific colors */
+.quickfind-result-icon.tab:not(:has(img)),
+.quickfind-result-icon.bookmark:not(:has(img)),
+.quickfind-result-icon.history:not(:has(img)),
 .quickfind-result-icon.topSite:not(:has(img)) {
-  background-color: #22c55e;
-  color: #ffffff;
+  background-color: var(--qf-muted);
+  color: var(--qf-muted-foreground);
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .quickfind-result-icon.search {
@@ -284,60 +280,27 @@
   font-weight: 400;
 }
 
-/* Result badge */
+/* Result badge — unified muted style, no colorful noise */
 .quickfind-result-badge {
-  color: var(--qf-primary-foreground);
-  background: var(--qf-primary);
-  border-radius: 999px;
-  padding: 4px 8px;
+  background: var(--qf-muted);
+  color: var(--qf-muted-foreground);
+  border-radius: 4px;
+  padding: 2px 6px;
   font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  margin-left: 12px;
+  margin-left: 10px;
   flex-shrink: 0;
   white-space: nowrap;
+  opacity: 0.8;
 }
 
-.quickfind-result-badge-bookmark {
-  background: #ff9800;
-  color: #1f1300;
-}
-
-.quickfind-result-badge-history {
-  background: #0ea5e9;
-  color: #06283d;
-}
-
-.quickfind-result-badge-topSite {
-  background: #22c55e;
-  color: #052e16;
-}
-
-.quickfind-result-badge-search {
-  background: var(--qf-muted);
-  color: var(--qf-foreground);
-}
-
+/* "Open" gets a primary tint since it's a direct action */
 .quickfind-result-badge-open {
-  background: var(--qf-primary);
-  color: var(--qf-primary-foreground);
-}
-
-.qf-theme-dark .quickfind-result-badge-bookmark {
-  color: #fff7ed;
-}
-
-.qf-theme-dark .quickfind-result-badge-history {
-  color: #e0f2fe;
-}
-
-.qf-theme-dark .quickfind-result-badge-topSite {
-  color: #dcfce7;
-}
-
-.qf-theme-dark .quickfind-result-badge-open {
-  color: #eff6ff;
+  background: color-mix(in srgb, var(--qf-primary) 14%, transparent);
+  color: var(--qf-primary);
+  opacity: 1;
 }
 
 /* Empty state */
@@ -382,23 +345,52 @@
 }
 
 .quickfind-search-bottom {
-  height: 36px;
+  height: 38px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 0 16px;
   border-top: 1px solid var(--qf-border);
-  background: var(--qf-card);
-  font-size: 12px;
+  background: var(--qf-muted);
+  font-size: 11px;
   color: var(--qf-muted-foreground);
+  gap: 12px;
+}
+
+.quickfind-hints {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.quickfind-hint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.quickfind-hint-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--qf-card);
+  border: 1px solid var(--qf-border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--qf-muted-foreground);
+  min-width: 18px;
+  line-height: 1.5;
 }
 
 /* Animations */
 @keyframes quickfind-fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-20px) scale(0.95);
+    transform: translateY(-8px) scale(0.97);
   }
   to {
     opacity: 1;
@@ -450,8 +442,7 @@
 }
 
 .quickfind-search-result:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 4px var(--qf-shadow);
+  background-color: var(--qf-accent);
 }
 
 /* Responsive design for smaller screens */
@@ -655,6 +646,38 @@
 .quickfind-search-result {
   will-change: transform, background-color;
   contain: layout style paint;
+}
+
+/* Dark mode — stronger selected & icon contrast */
+.qf-theme-dark .quickfind-search-result.selected {
+  background-color: oklch(0.19 0.03 252.88);
+  box-shadow: inset 3px 0 0 var(--qf-primary);
+}
+
+.qf-theme-dark .quickfind-search-result:hover {
+  background-color: oklch(0.16 0.025 252.88);
+}
+
+.qf-theme-dark .quickfind-result-icon.tab:not(:has(img)),
+.qf-theme-dark .quickfind-result-icon.bookmark:not(:has(img)),
+.qf-theme-dark .quickfind-result-icon.history:not(:has(img)),
+.qf-theme-dark .quickfind-result-icon.topSite:not(:has(img)) {
+  background-color: oklch(0.26 0.03 252.88);
+  color: oklch(0.72 0.02 252.88);
+}
+
+/* Dark mode — subtle depth gradient on container */
+.qf-theme-dark .quickfind-search-container {
+  background: linear-gradient(
+    170deg,
+    oklch(0.13 0.025 252.88) 0%,
+    oklch(0.09 0.015 252.88) 100%
+  );
+  border-color: oklch(0.22 0.025 252.88);
+}
+
+.qf-theme-dark .quickfind-search-bottom {
+  background: oklch(0.08 0.015 252.88);
 }
 
 /* Bookmark badge styles */

@@ -50,12 +50,13 @@
       const inputContainer = document.createElement('div');
       inputContainer.className = 'quickfind-search-input-container';
       
-      // Create search icon (this was missing!)
+      // Create search icon — proper currentColor SVG
       const searchIcon = document.createElement('div');
       searchIcon.className = 'quickfind-search-icon';
       searchIcon.innerHTML = `
-        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="18" height="18" viewBox="0 0 18 18" enable-background="new 0 0 19 19" xml:space="preserve">  <image id="image0" width="19" height="19" x="0" y="0"
-            href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAG/SURBVHgBzVM9TwJBEJ3dEyoL/AVeoSZqYtDG0qMzSrGFX52nNnZcZ6l2lpQWItARpMAEEjqwNDGBwoLC4n4CURsPbseZSzBGDsREE19y2budnXdvZt8A/FeIYYGNbTsupbEGiFPBhtSNSiHXgJ+Qqb1js+d3sxSxQg67GuCsWszkw8jkAJHuNkFgnFLPXz1/qlLMCH5Ai4QGZMJccufwdKQypZyYH31pcoLv6UStnHPDEpLbR2nKSjF5pXTVCFXmRZ4VApijiBiVm4xDfWyR+tOhZUqQKRLVGEXUBwrIc0+Vss1QsqBPAu9gDPhSl4M1Iq1wsl/ABxkCugLF9DhJE9TbIAelG0omEG+pF8pSduw7MtSGzT8feps9A9O8TkaN7Cii5O5Rivy0L0AOGNfovzw9tjqz88tvQghnbnElvjC7et9uP3T6cfbhzNLCCdVwEZTqRQ4+x4PqvrJvbh06Qgr2UIytwiNE5XPpFu+RF0kRrklKNbxIoly+dAfK7KNauk73pL9MZx3+1gIt6rRJxHl2Pc2lTdYIRsuPdutKHZtDlY2L9T3bNLSskwNcmopEqLJxUSvkXFZI43AOf4F3l8SzvPpN0ygAAAAASUVORK5CYII=" ></image>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="11" cy="11" r="7.5" stroke="currentColor" stroke-width="1.75"/>
+          <path d="M20 20L16.5 16.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
         </svg>
       `;
       
@@ -67,13 +68,13 @@
       this.searchInput.autocomplete = 'off';
       this.searchInput.spellcheck = false;
 
-      // create close icon
+      // create close icon — proper currentColor SVG
       const closeIcon = document.createElement('div');
       closeIcon.className = 'quickfind-close-icon';
       closeIcon.id = 'quickfind-close-icon';
       closeIcon.innerHTML = `
-        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="17" height="17" viewBox="0 0 17 17" enable-background="new 0 0 17 17" xml:space="preserve">  <image id="image0" width="17" height="17" x="0" y="0"
-            href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADeSURBVHgB7ZK7DcIwEIbtvJTSI4QNYAQ2cElJurRMQkuX0FG6pAsbwAgZIRKp4tiHgxTk+BF6xN9Yvjt9vvt9CP1lCusXSvdkSMIy6uMDY6fGLKa7IhskP3a9yG+saqd4YGEBMpHwmtIiMwFC8nrM6wALwlQy4nILAK0OmgBjvFN5tDTObKw4qDHGBAKRYxmWE8DswgvRQQjjtRrh4QNY48yUpmTs5P2SOglKia/UCdE9GAKxMj36CjFNvF6qxmW2LmtPRBLeXSbqZj97sVncE0Bwdpn4+X6V9xn8I3oBzT+tz19tiJ8AAAAASUVORK5CYII=" ></image>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       `;
       
@@ -91,7 +92,18 @@
       this.resultsCounter = leftContainer; // 保存引用以便后续更新
       bottomContainer.appendChild(leftContainer);
       const rightContainer = document.createElement('div');
-      rightContainer.textContent = `↑↓ Navigate ${ String.fromCharCode(160) }${ String.fromCharCode(160) } Enter Select ${ String.fromCharCode(160) }${ String.fromCharCode(160) } Esc Close`;
+      rightContainer.className = 'quickfind-hints';
+      rightContainer.innerHTML = `
+        <span class="quickfind-hint">
+          <span class="quickfind-hint-key">↑</span><span class="quickfind-hint-key">↓</span> Navigate
+        </span>
+        <span class="quickfind-hint">
+          <span class="quickfind-hint-key">↵</span> Select
+        </span>
+        <span class="quickfind-hint">
+          <span class="quickfind-hint-key">Esc</span> Close
+        </span>
+      `;
       bottomContainer.appendChild(rightContainer);
       
       // Assemble the overlay with correct structure
