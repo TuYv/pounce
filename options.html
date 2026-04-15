@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>QuickFind Settings</title>
+  <style>
+    :root {
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --fg: #111111;
+      --muted: #888888;
+      --border: #e8e8e8;
+      --primary: #1a6ef5;
+      --primary-fg: #ffffff;
+      --hover: #f4f4f4;
+      --destructive: #e5484d;
+      --success: #30a46c;
+      --input-bg: #f5f5f5;
+      --kbd-bg: #f0f0f0;
+      --kbd-border: #d8d8d8;
+      --section-gap: 32px;
+    }
+
+    [data-theme="dark"] {
+      --bg: #111111;
+      --surface: #1a1a1a;
+      --fg: #efefef;
+      --muted: #666666;
+      --border: #2a2a2a;
+      --primary: #3b82f6;
+      --hover: #222222;
+      --destructive: #f2555a;
+      --success: #4cc38a;
+      --input-bg: #222222;
+      --kbd-bg: #252525;
+      --kbd-border: #383838;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #111111;
+        --surface: #1a1a1a;
+        --fg: #efefef;
+        --muted: #666666;
+        --border: #2a2a2a;
+        --primary: #3b82f6;
+        --hover: #222222;
+        --destructive: #f2555a;
+        --success: #4cc38a;
+        --input-bg: #222222;
+        --kbd-bg: #252525;
+        --kbd-border: #383838;
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 24px 60px;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 40px;
+    }
+
+    .header img {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+    }
+
+    .header-title {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .header-sep {
+      width: 1px;
+      height: 14px;
+      background: var(--border);
+      margin: 0 2px;
+    }
+
+    .header-sub {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ── Section ── */
+    .section {
+      margin-bottom: var(--section-gap);
+    }
+
+    .section + .section {
+      padding-top: var(--section-gap);
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* ── Input row ── */
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .url-input {
+      flex: 1;
+      padding: 9px 12px;
+      background: var(--input-bg);
+      border: 1px solid transparent;
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--fg);
+      transition: border-color 0.15s;
+      outline: none;
+    }
+
+    .url-input::placeholder { color: var(--muted); }
+
+    .url-input:focus {
+      border-color: var(--primary);
+      background: var(--surface);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--primary-fg);
+    }
+
+    .btn-primary:hover { opacity: 0.88; }
+
+    .btn-ghost {
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover { background: var(--hover); }
+
+    .btn-danger {
+      background: none;
+      color: var(--destructive);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      border: none;
+    }
+
+    .btn-danger:hover { background: color-mix(in srgb, var(--destructive) 10%, transparent); }
+
+    .msg {
+      font-size: 12px;
+      margin-top: 6px;
+      min-height: 16px;
+    }
+
+    .msg-error { color: var(--destructive); }
+    .msg-success { color: var(--success); }
+
+    /* ── URL list meta row ── */
+    .list-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 14px 0 10px;
+    }
+
+    .list-count {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .list-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* ── URL list ── */
+    .url-list {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .url-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 14px;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.12s;
+    }
+
+    .url-item:last-child { border-bottom: none; }
+    .url-item:hover { background: var(--hover); }
+
+    .url-index {
+      font-size: 11px;
+      color: var(--muted);
+      min-width: 18px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .url-text {
+      flex: 1;
+      font-size: 13px;
+      word-break: break-all;
+      color: var(--fg);
+    }
+
+    .open-btn,
+    .delete-btn {
+      opacity: 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      padding: 3px 5px;
+      border-radius: 5px;
+      line-height: 1;
+      transition: opacity 0.12s, color 0.12s, background 0.12s;
+    }
+
+    .url-item:hover .open-btn,
+    .url-item:hover .delete-btn { opacity: 1; }
+
+    .open-btn:hover {
+      color: var(--primary);
+      background: color-mix(in srgb, var(--primary) 8%, transparent);
+    }
+
+    .delete-btn:hover {
+      color: var(--destructive);
+      background: color-mix(in srgb, var(--destructive) 8%, transparent);
+    }
+
+    .empty-state {
+      padding: 32px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    /* ── Shortcuts grid ── */
+    .shortcut-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .shortcut-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+    }
+
+    .shortcut-name {
+      font-size: 13px;
+      color: var(--fg);
+    }
+
+    kbd {
+      font-family: inherit;
+      font-size: 11px;
+      background: var(--kbd-bg);
+      border: 1px solid var(--kbd-border);
+      border-radius: 5px;
+      padding: 2px 8px;
+      color: var(--fg);
+      letter-spacing: 0.01em;
+    }
+
+    .shortcut-arrows {
+      display: flex;
+      gap: 3px;
+    }
+
+    /* ── Theme picker ── */
+    .theme-options {
+      display: flex;
+      gap: 10px;
+    }
+
+    .theme-option {
+      flex: 1;
+      position: relative;
+    }
+
+    .theme-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .theme-option label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      background: var(--surface);
+    }
+
+    .theme-option input:checked + label {
+      border-color: var(--primary);
+      background: color-mix(in srgb, var(--primary) 6%, transparent);
+    }
+
+    .theme-option label:hover {
+      border-color: color-mix(in srgb, var(--primary) 50%, var(--border));
+    }
+
+    .theme-preview {
+      width: 48px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+    }
+
+    .theme-preview-light {
+      background: linear-gradient(135deg, #ffffff 50%, #f0f0f0 50%);
+      width: 100%;
+    }
+
+    .theme-preview-dark {
+      background: linear-gradient(135deg, #1a1a1a 50%, #2a2a2a 50%);
+      width: 100%;
+    }
+
+    .theme-preview-system {
+      background: linear-gradient(135deg, #ffffff 50%, #1a1a1a 50%);
+      width: 100%;
+    }
+
+    .theme-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--fg);
+    }
+
+    /* hidden select kept for JS compat */
+    #themeSelect { display: none; }
+
+    /* ── Footer ── */
+    .footer-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: var(--section-gap);
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .footer-card div:first-child {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <img src="./icons/logo.svg" alt="">
+    <span class="header-title">QuickFind</span>
+    <div class="header-sep"></div>
+    <span class="header-sub">Settings</span>
+  </div>
+
+  <!-- URL Management -->
+  <div class="section">
+    <div class="section-label">Batch Open URLs</div>
+
+    <div class="input-row">
+      <input type="text" id="urlInput" class="url-input" placeholder="github.com or https://example.com">
+      <button id="addBtn" class="btn btn-primary">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        Add
+      </button>
+    </div>
+    <div id="inputError" class="msg msg-error" style="display:none;"></div>
+    <div id="inputSuccess" class="msg msg-success" style="display:none;"></div>
+
+    <div class="list-meta">
+      <span class="list-count"><span id="urlCount">0</span> saved URLs</span>
+      <div class="list-actions">
+        <button id="openAllBtn" class="btn btn-ghost" style="font-size:12px; padding:6px 10px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+          <span>Open All</span>
+        </button>
+        <button id="clearAllBtn" class="btn btn-ghost" style="font-size:12px; padding:6px 10px; color:var(--destructive);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+          </svg>
+          Clear All
+        </button>
+      </div>
+    </div>
+
+    <div class="url-list" id="urlList">
+      <div class="empty-state" id="emptyState">
+        No URLs yet<br>Add a URL above to get started
+      </div>
+    </div>
+  </div>
+
+  <!-- Keyboard Shortcuts -->
+  <div class="section">
+    <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;">
+      Keyboard Shortcuts
+      <button id="manageShortcutsBtn" style="font-size:11px;font-weight:500;color:var(--primary);background:none;border:none;cursor:pointer;letter-spacing:0.01em;">Manage →</button>
+    </div>
+    <div class="shortcut-grid">
+      <div class="shortcut-item">
+        <span class="shortcut-name">Open search</span>
+        <kbd id="shortcut-search">—</kbd>
+      </div>
+      <div class="shortcut-item">
+        <span class="shortcut-name">Batch open</span>
+        <kbd id="shortcut-batch">—</kbd>
+      </div>
+      <div class="shortcut-item">
+        <span class="shortcut-name">Navigate</span>
+        <div class="shortcut-arrows"><kbd>↑</kbd><kbd>↓</kbd></div>
+      </div>
+      <div class="shortcut-item">
+        <span class="shortcut-name">Select / Close</span>
+        <div class="shortcut-arrows"><kbd>↵</kbd><kbd>Esc</kbd></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Appearance -->
+  <div class="section">
+    <div class="section-label">Appearance</div>
+    <div class="theme-options">
+      <div class="theme-option">
+        <input type="radio" name="theme" id="theme-system" value="system" checked>
+        <label for="theme-system">
+          <div class="theme-preview"><div class="theme-preview-system"></div></div>
+          <span class="theme-label">System</span>
+        </label>
+      </div>
+      <div class="theme-option">
+        <input type="radio" name="theme" id="theme-light" value="light">
+        <label for="theme-light">
+          <div class="theme-preview"><div class="theme-preview-light"></div></div>
+          <span class="theme-label">Light</span>
+        </label>
+      </div>
+      <div class="theme-option">
+        <input type="radio" name="theme" id="theme-dark" value="dark">
+        <label for="theme-dark">
+          <div class="theme-preview"><div class="theme-preview-dark"></div></div>
+          <span class="theme-label">Dark</span>
+        </label>
+      </div>
+    </div>
+    <!-- hidden select for JS compatibility -->
+    <select id="themeSelect">
+      <option value="system">Follow System</option>
+      <option value="light">Light Mode</option>
+      <option value="dark">Dark Mode</option>
+    </select>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-card">
+    <div>
+      <div>QuickFind</div>
+      <div>Loading...</div>
+    </div>
+    <div>© 2025 QuickFind</div>
+  </div>
+
+</div>
+
+<script src="theme-manager.js"></script>
+<script src="options-theme-sync.js"></script>
+<script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #111111;
+      --muted: #888888;
+      --border: #e8e8e8;
+      --primary: #1a6ef5;
+      --primary-fg: #ffffff;
+      --hover-bg: #f5f5f5;
+      --badge-bg: rgba(26,110,245,0.08);
+      --badge-fg: #1a6ef5;
+    }
+
+    [data-theme="dark"] {
+      --bg: #141414;
+      --fg: #efefef;
+      --muted: #666666;
+      --border: #2a2a2a;
+      --primary: #3b82f6;
+      --primary-fg: #ffffff;
+      --hover-bg: #1e1e1e;
+      --badge-bg: rgba(59,130,246,0.12);
+      --badge-fg: #3b82f6;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #141414;
+        --fg: #efefef;
+        --muted: #666666;
+        --border: #2a2a2a;
+        --primary: #3b82f6;
+        --primary-fg: #ffffff;
+        --hover-bg: #1e1e1e;
+        --badge-bg: rgba(59,130,246,0.12);
+        --badge-fg: #3b82f6;
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 300px;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px 0;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+    }
+
+    .app-name {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .settings-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      padding: 4px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .settings-btn:hover {
+      background: var(--hover-bg);
+      color: var(--fg);
+    }
+
+    /* Search button */
+    .search-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: calc(100% - 32px);
+      margin: 12px 16px 0;
+      padding: 10px 14px;
+      background: var(--primary);
+      color: var(--primary-fg);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: opacity 0.15s;
+    }
+
+    .search-btn:hover { opacity: 0.9; }
+
+    .search-btn-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .kbd-hint {
+      font-size: 11px;
+      opacity: 0.65;
+      background: rgba(255,255,255,0.18);
+      border-radius: 5px;
+      padding: 2px 7px;
+      letter-spacing: 0.01em;
+    }
+
+    /* Batch button */
+    .batch-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: calc(100% - 32px);
+      margin: 7px 16px 0;
+      padding: 9px 14px;
+      background: none;
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.15s;
+    }
+
+    .batch-btn:hover { background: var(--hover-bg); }
+
+    .batch-btn-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--fg);
+    }
+
+    .batch-icon {
+      color: var(--muted);
+    }
+
+    .count-badge {
+      font-size: 11px;
+      color: var(--badge-fg);
+      background: var(--badge-bg);
+      border-radius: 5px;
+      padding: 2px 7px;
+      font-weight: 500;
+    }
+
+    /* Empty hint */
+    .empty-hint {
+      margin: 7px 16px 0;
+      padding: 9px 14px;
+      font-size: 12px;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      text-align: center;
+    }
+
+    .empty-hint:hover {
+      background: var(--hover-bg);
+      color: var(--fg);
+      border-color: currentColor;
+    }
+
+    /* Footer */
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px 13px;
+      margin-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .version {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .shortcut-hint {
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .shortcut-hint kbd {
+      font-family: inherit;
+      font-size: 10px;
+      background: var(--hover-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      color: var(--fg);
+    }
+
+    #loading {
+      padding: 20px 16px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <img class="logo" src="icons/icon128.png" alt="">
+      <span class="app-name">QuickFind</span>
+    </div>
+    <button class="settings-btn" id="settingsLink" title="Settings">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div id="loading">Loading...</div>
+
+  <!-- Has URLs state -->
+  <div id="hasUrls" style="display:none;">
+    <button class="search-btn" id="searchBtn">
+      <div class="search-btn-left">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        Search Tabs & Bookmarks
+      </div>
+      <span class="kbd-hint">⌘K</span>
+    </button>
+
+    <button class="batch-btn" id="openAllBtn">
+      <div class="batch-btn-left">
+        <svg class="batch-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+          <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+        <span class="batch-label">Batch Open URLs</span>
+      </div>
+      <span class="count-badge" id="urlCount"></span>
+    </button>
+  </div>
+
+  <!-- Empty state -->
+  <div id="emptyState" style="display:none;">
+    <button class="search-btn" id="searchBtnEmpty">
+      <div class="search-btn-left">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        Search Tabs & Bookmarks
+      </div>
+      <span class="kbd-hint">⌘K</span>
+    </button>
+
+    <div class="empty-hint" id="emptyHintBtn">+ Add URLs for batch open</div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span class="version" id="versionText">—</span>
+    <span class="shortcut-hint">anywhere <kbd>Alt+K</kbd></span>
+  </div>
+
+  <script src="theme-manager.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

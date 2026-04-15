@@ -1,0 +1,630 @@
+// QuickFind Search Overlay - Content Script
+(function() {
+  'use strict';
+  
+  // Prevent multiple injections
+  if (window.quickFindSearchOverlay) {
+    return;
+  }
+  
+  class QuickFindSearchOverlay {
+    constructor() {
+      this.overlay = null;
+      this.searchInput = null;
+      this.resultsContainer = null;
+      this.resultsCounter = null;
+      this.currentResults = [];
+      this.selectedIndex = -1;
+      this.isVisible = false;
+      this.themeManager = null;
+      this.bridgeTabId = null;
+      
+      this.init();
+    }
+    
+    init() {
+      this.createOverlay();
+      this.bindEvents();
+      this.initTheme();
+    }
+    
+    initTheme() {
+      // 初始化内容脚本主题管理器
+      try {
+        this.themeManager = new ContentThemeManager();
+      } catch (error) {
+        console.error('Failed to initialize theme manager:', error);
+      }
+    }
+    
+    createOverlay() {
+      // Create overlay container
+      this.overlay = document.createElement('div');
+      this.overlay.className = 'quickfind-search-overlay';
+      
+      // Create search container
+      const container = document.createElement('div');
+      container.className = 'quickfind-search-container';
+      
+      // Create search input container (this was missing!)
+      const inputContainer = document.createElement('div');
+      inputContainer.className = 'quickfind-search-input-container';
+      
+      // Create search icon (this was missing!)
+      const searchIcon = document.createElement('div');
+      searchIcon.className = 'quickfind-search-icon';
+      searchIcon.innerHTML = `
+        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="18" height="18" viewBox="0 0 18 18" enable-background="new 0 0 19 19" xml:space="preserve">  <image id="image0" width="19" height="19" x="0" y="0"
+            href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAG/SURBVHgBzVM9TwJBEJ3dEyoL/AVeoSZqYtDG0qMzSrGFX52nNnZcZ6l2lpQWItARpMAEEjqwNDGBwoLC4n4CURsPbseZSzBGDsREE19y2budnXdvZt8A/FeIYYGNbTsupbEGiFPBhtSNSiHXgJ+Qqb1js+d3sxSxQg67GuCsWszkw8jkAJHuNkFgnFLPXz1/qlLMCH5Ai4QGZMJccufwdKQypZyYH31pcoLv6UStnHPDEpLbR2nKSjF5pXTVCFXmRZ4VApijiBiVm4xDfWyR+tOhZUqQKRLVGEXUBwrIc0+Vss1QsqBPAu9gDPhSl4M1Iq1wsl/ABxkCugLF9DhJE9TbIAelG0omEG+pF8pSduw7MtSGzT8feps9A9O8TkaN7Cii5O5Rivy0L0AOGNfovzw9tjqz88tvQghnbnElvjC7et9uP3T6cfbhzNLCCdVwEZTqRQ4+x4PqvrJvbh06Qgr2UIytwiNE5XPpFu+RF0kRrklKNbxIoly+dAfK7KNauk73pL9MZx3+1gIt6rRJxHl2Pc2lTdYIRsuPdutKHZtDlY2L9T3bNLSskwNcmopEqLJxUSvkXFZI43AOf4F3l8SzvPpN0ygAAAAASUVORK5CYII=" ></image>
+        </svg>
+      `;
+      
+      // Create search input
+      this.searchInput = document.createElement('input');
+      this.searchInput.className = 'quickfind-search-input';
+      this.searchInput.type = 'text';
+      this.searchInput.placeholder = 'Search tabs, history, bookmarks, and top sites...';
+      this.searchInput.autocomplete = 'off';
+      this.searchInput.spellcheck = false;
+
+      // create close icon
+      const closeIcon = document.createElement('div');
+      closeIcon.className = 'quickfind-close-icon';
+      closeIcon.id = 'quickfind-close-icon';
+      closeIcon.innerHTML = `
+        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="17" height="17" viewBox="0 0 17 17" enable-background="new 0 0 17 17" xml:space="preserve">  <image id="image0" width="17" height="17" x="0" y="0"
+            href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADeSURBVHgB7ZK7DcIwEIbtvJTSI4QNYAQ2cElJurRMQkuX0FG6pAsbwAgZIRKp4tiHgxTk+BF6xN9Yvjt9vvt9CP1lCusXSvdkSMIy6uMDY6fGLKa7IhskP3a9yG+saqd4YGEBMpHwmtIiMwFC8nrM6wALwlQy4nILAK0OmgBjvFN5tDTObKw4qDHGBAKRYxmWE8DswgvRQQjjtRrh4QNY48yUpmTs5P2SOglKia/UCdE9GAKxMj36CjFNvF6qxmW2LmtPRBLeXSbqZj97sVncE0Bwdpn4+X6V9xn8I3oBzT+tz19tiJ8AAAAASUVORK5CYII=" ></image>
+        </svg>
+      `;
+      
+      // Create results container
+      this.resultsContainer = document.createElement('div');
+      this.resultsContainer.className = 'quickfind-search-results';
+
+      // 底部区域
+      const bottomContainer = document.createElement('div');
+      bottomContainer.className = 'quickfind-search-bottom';
+
+      const leftContainer = document.createElement('div');
+      leftContainer.className = 'quickfind-search-bottom-left';
+      leftContainer.textContent = '0 results';
+      this.resultsCounter = leftContainer; // 保存引用以便后续更新
+      bottomContainer.appendChild(leftContainer);
+      const rightContainer = document.createElement('div');
+      rightContainer.textContent = `↑↓ Navigate ${ String.fromCharCode(160) }${ String.fromCharCode(160) } Enter Select ${ String.fromCharCode(160) }${ String.fromCharCode(160) } Esc Close`;
+      bottomContainer.appendChild(rightContainer);
+      
+      // Assemble the overlay with correct structure
+      inputContainer.appendChild(searchIcon);
+      inputContainer.appendChild(this.searchInput);
+      inputContainer.appendChild(closeIcon);
+      container.appendChild(inputContainer);
+      container.appendChild(this.resultsContainer);
+      container.appendChild(bottomContainer);
+      this.overlay.appendChild(container);
+      
+      // Add to document
+      document.body.appendChild(this.overlay);
+    }
+    
+    bindEvents() {
+      // Listen for messages from background script
+      chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message.action === 'showSearchOverlay') {
+          this.bridgeTabId = message.bridgeTabId ?? null;
+          this.show();
+          sendResponse({ success: true });
+        }
+      });
+      
+      // Search input events
+      this.searchInput.addEventListener('input', (e) => {
+        this.handleSearch(e.target.value);
+      });
+      
+      this.searchInput.addEventListener('keydown', (e) => {
+        this.handleKeyDown(e);
+      });
+      
+      // Overlay click to close
+      this.overlay.addEventListener('click', (e) => {
+        if (e.target === this.overlay) {
+          this.hide();
+        }
+      });
+      
+      // Global escape key — capture:true 确保在浏览器退出全屏之前拦截
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.isVisible) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.hide();
+        }
+      }, { capture: true });
+
+      document.getElementById('quickfind-close-icon').addEventListener('click', (e) => {
+        this.hide();
+        e.preventDefault();
+        e.stopPropagation();
+      });
+      
+      // Prevent overlay from being affected by page scripts
+      this.overlay.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+      
+      this.overlay.addEventListener('keydown', (e) => {
+        e.stopPropagation();
+      });
+    }
+    
+    show() {
+      if (this.isVisible) return;
+      
+      this.isVisible = true;
+      this.overlay.style.display = 'flex';
+      this.searchInput.value = '';
+      this.searchInput.focus();
+      this.selectedIndex = -1;
+      
+      // Load initial data
+      this.loadSearchData();
+      
+      // Prevent page scrolling
+      document.body.style.overflow = 'hidden';
+    }
+    
+    hide() {
+      if (!this.isVisible) return;
+      this.isVisible = false; // 先置 false，阻止重复触发
+
+      // 如果是跳板页且用户未选择结果，直接关闭该标签页
+      if (this.bridgeTabId) {
+        const tabId = this.bridgeTabId;
+        this.bridgeTabId = null;
+        chrome.runtime.sendMessage({ action: 'closeBridgeTab', tabId }).catch(() => {});
+        return;
+      }
+
+      this.isVisible = false;
+      this.overlay.style.display = 'none';
+      this.searchInput.blur();
+      this.currentResults = [];
+      this.selectedIndex = -1;
+      
+      // Restore page scrolling
+      document.body.style.overflow = '';
+    }
+    
+    async loadSearchData() {
+      try {
+        console.log('QuickFind: Requesting search data...');
+        // Request search data from background script
+        const response = await chrome.runtime.sendMessage({
+          action: 'getSearchData'
+        });
+        
+        console.log('QuickFind: Received response:', response);
+        
+        if (response && response.success) {
+          this.allData = response.data;
+          console.log('QuickFind: Loaded data:', this.allData.length, 'items');
+          this.handleSearch(this.searchInput.value);
+        } else {
+          console.error('QuickFind: Response indicates failure:', response);
+          this.showError('Failed to load search data: ' + (response?.error || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('QuickFind: Error loading search data:', error);
+        this.showError('Failed to load search data: ' + error.message);
+      }
+    }
+    
+    handleSearch(query) {
+      if (!this.allData) {
+        this.showLoading();
+        return;
+      }
+
+      if (window.QuickFindSearchUtils && typeof window.QuickFindSearchUtils.rankResults === 'function') {
+        this.currentResults = window.QuickFindSearchUtils.rankResults(this.allData, query, 10);
+      } else {
+        this.currentResults = this.getFallbackResults(query);
+      }
+      
+      this.selectedIndex = -1;
+      this.renderResults();
+    }
+
+    getFallbackResults(query) {
+      const trimmedQuery = String(query || '').trim();
+      const normalizedQuery = trimmedQuery.toLowerCase();
+      const sourcePriority = {
+        tab: 0,
+        history: 1,
+        topSite: 2,
+        bookmark: 3
+      };
+      const items = Array.isArray(this.allData) ? this.allData.slice() : [];
+      const filteredItems = normalizedQuery
+        ? items.filter((item) => {
+          const title = String(item.title || '').toLowerCase();
+          const url = String(item.url || '').toLowerCase();
+          return title.includes(normalizedQuery) || url.includes(normalizedQuery);
+        })
+        : items;
+
+      filteredItems.sort((a, b) => {
+        const sourceDiff = (sourcePriority[a.type] ?? 99) - (sourcePriority[b.type] ?? 99);
+        if (sourceDiff !== 0) {
+          return sourceDiff;
+        }
+
+        if (a.type === 'tab' && b.type === 'tab') {
+          return (b.lastAccessed || 0) - (a.lastAccessed || 0);
+        }
+
+        if (a.type === 'history' && b.type === 'history') {
+          const typedDiff = (b.typedCount || 0) - (a.typedCount || 0);
+          if (typedDiff !== 0) {
+            return typedDiff;
+          }
+
+          const visitDiff = (b.visitCount || 0) - (a.visitCount || 0);
+          if (visitDiff !== 0) {
+            return visitDiff;
+          }
+
+          return (b.lastVisitTime || 0) - (a.lastVisitTime || 0);
+        }
+
+        const aTitle = String(a.title || '').toLowerCase();
+        const bTitle = String(b.title || '').toLowerCase();
+        return aTitle.localeCompare(bTitle);
+      });
+
+      const results = filteredItems.slice(0, 10).map((item) => {
+        const sourceLabel = item.type === 'history'
+          ? 'History'
+          : item.type === 'topSite'
+            ? 'Top Site'
+            : item.type === 'bookmark'
+              ? 'Bookmark'
+              : '';
+        const iconFallback = item.type === 'tab'
+          ? 'T'
+          : item.type === 'history'
+            ? 'H'
+            : item.type === 'topSite'
+              ? 'S'
+              : item.type === 'bookmark'
+                ? 'B'
+                : '?';
+        let displayUrl = item.url || '';
+
+        if (item.type !== 'search' && item.url) {
+          try {
+            const parsedUrl = new URL(item.url);
+            const hostname = parsedUrl.hostname.replace(/^www\./, '').toLowerCase();
+            const pathname = parsedUrl.pathname === '/' ? '' : parsedUrl.pathname.replace(/\/+$/, '');
+            displayUrl = `${hostname}${pathname}${parsedUrl.search}`;
+          } catch (error) {
+            displayUrl = item.url;
+          }
+        }
+
+        return {
+          ...item,
+          displayTitle: item.title || item.url || 'Untitled',
+          displayUrl,
+          sourceLabel,
+          iconFallback
+        };
+      });
+
+      if (!trimmedQuery) {
+        return results;
+      }
+
+      const openResult = this.createOpenFallbackResult(trimmedQuery);
+      const searchResult = {
+        type: 'search',
+        id: 'web-search',
+        title: `Search for "${trimmedQuery}"`,
+        url: `search:${trimmedQuery}`,
+        displayTitle: `Search for "${trimmedQuery}"`,
+        displayUrl: 'Search with default search engine',
+        sourceLabel: 'Search',
+        iconFallback: 'S',
+        isSearchOption: true
+      };
+
+      return openResult ? [...results, openResult, searchResult] : [...results, searchResult];
+    }
+
+    createOpenFallbackResult(query) {
+      if (!query || /\s/.test(query)) {
+        return null;
+      }
+
+      let url = null;
+
+      if (/^https?:\/\//i.test(query)) {
+        url = query;
+      } else {
+        const hostMatch = query.match(
+          /^(localhost(?::\d+)?|(?:\d{1,3}\.){3}\d{1,3}|(?:\[[0-9a-f:.]+\]))(?:[/?#].*)?$/i
+        );
+
+        if (hostMatch) {
+          url = `http://${query}`;
+        } else {
+          const domainPattern = /^(?:[a-z0-9-]+\.)+[a-z]{2,}(?::\d+)?(?:[/?#].*)?$/i;
+          if (domainPattern.test(query)) {
+            url = `https://${query}`;
+          }
+        }
+      }
+
+      if (!url) {
+        return null;
+      }
+
+      try {
+        const parsedUrl = new URL(url);
+        const normalizedUrl = parsedUrl.href;
+        return {
+          type: 'open',
+          id: 'direct-open',
+          title: normalizedUrl,
+          url: normalizedUrl,
+          displayTitle: `Open ${normalizedUrl}`,
+          displayUrl: normalizedUrl,
+          sourceLabel: 'Open',
+          iconFallback: 'O',
+          isOpenOption: true
+        };
+      } catch (error) {
+        return null;
+      }
+    }
+    
+    renderResults() {
+      if (!this.currentResults.length) {
+        this.showEmpty();
+        return;
+      }
+      
+      this.resultsContainer.innerHTML = '';
+      
+      this.currentResults.forEach((item, index) => {
+        const resultElement = this.createResultElement(item, index);
+        this.resultsContainer.appendChild(resultElement);
+      });
+      
+      // 自动选中第一项
+      if (this.currentResults.length > 0) {
+        this.selectedIndex = 0;
+        this.updateSelection();
+      }
+      
+      // 更新结果计数显示（排除搜索选项）
+      const actualResultsCount = this.currentResults.filter(item => item.type !== 'search').length;
+      this.updateResultsCount(actualResultsCount);
+    }
+    
+    createResultElement(item, index) {
+      const element = document.createElement('div');
+      element.className = 'quickfind-search-result';
+      if (index === this.selectedIndex) {
+        element.classList.add('selected');
+      }
+      
+      // Icon
+      const icon = document.createElement('div');
+      icon.className = `quickfind-result-icon ${item.type}`;
+      
+      // Special handling for synthetic options.
+      if (item.type === 'search') {
+        icon.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        `;
+        element.classList.add('search-option');
+      } else if (item.type === 'open') {
+        icon.textContent = item.iconFallback || '?';
+        element.classList.add('open-option');
+      } else if (item.favIconUrl && item.favIconUrl !== '' && !item.favIconUrl.startsWith('chrome://')) {
+        // 使用实际的网页图标（跳过 chrome:// 图标，浏览器会阻止加载）
+        const img = document.createElement('img');
+        img.src = item.favIconUrl;
+        img.alt = item.displayTitle || item.title || 'Website icon';
+        img.onerror = function() {
+          // 如果图标加载失败，显示默认文字
+          icon.innerHTML = '';
+          icon.textContent = item.iconFallback || '?';
+        };
+        icon.appendChild(img);
+      } else {
+        // 没有图标URL时显示默认文字
+        icon.textContent = item.iconFallback || '?';
+      }
+      
+      // Content
+      const content = document.createElement('div');
+      content.className = 'quickfind-result-content';
+      
+      const title = document.createElement('div');
+      title.className = 'quickfind-result-title';
+      title.textContent = item.displayTitle || item.title || 'Untitled';
+      
+      const url = document.createElement('div');
+      url.className = 'quickfind-result-url';
+      url.textContent = item.displayUrl || item.url || '';
+      
+      content.appendChild(title);
+      content.appendChild(url);
+      
+      // Badge
+      const badge = document.createElement('div');
+      badge.className = `quickfind-result-badge quickfind-result-badge-${item.type}`;
+      badge.textContent = item.sourceLabel || '';
+      element.appendChild(icon);
+      element.appendChild(content);
+      if (item.sourceLabel) {
+        element.appendChild(badge);
+      }
+      
+      // Click handler
+      element.addEventListener('click', () => {
+        this.selectResult(index);
+      });
+      
+      return element;
+    }
+    
+    handleKeyDown(e) {
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          this.moveSelection(1);
+          break;
+          
+        case 'ArrowUp':
+          e.preventDefault();
+          this.moveSelection(-1);
+          break;
+          
+        case 'Enter':
+          e.preventDefault();
+          if (this.selectedIndex >= 0 && this.selectedIndex < this.currentResults.length) {
+            this.selectResult(this.selectedIndex);
+          }
+          break;
+          
+        case 'Escape':
+          e.preventDefault();
+          this.hide();
+          break;
+      }
+    }
+    
+    moveSelection(direction) {
+      if (!this.currentResults.length) return;
+      
+      const newIndex = this.selectedIndex + direction;
+      
+      if (newIndex >= 0 && newIndex < this.currentResults.length) {
+        this.selectedIndex = newIndex;
+      } else if (newIndex < 0) {
+        this.selectedIndex = this.currentResults.length - 1;
+      } else {
+        this.selectedIndex = 0;
+      }
+      
+      this.updateSelection();
+    }
+    
+    updateSelection() {
+      const results = this.resultsContainer.querySelectorAll('.quickfind-search-result');
+      results.forEach((result, index) => {
+        if (index === this.selectedIndex) {
+          result.classList.add('selected');
+          result.scrollIntoView({ block: 'nearest' });
+        } else {
+          result.classList.remove('selected');
+        }
+      });
+    }
+    
+    async selectResult(index) {
+      if (index < 0 || index >= this.currentResults.length) return;
+      
+      const item = this.currentResults[index];
+      
+      try {
+        if (item.type === 'search') {
+          const searchQuery = item.url.replace('search:', '');
+          await chrome.runtime.sendMessage({
+            action: 'performWebSearch',
+            query: searchQuery,
+            bridgeTabId: this.bridgeTabId
+          });
+        } else if (item.type === 'open') {
+          await chrome.runtime.sendMessage({
+            action: 'openBookmark',
+            url: item.url,
+            bridgeTabId: this.bridgeTabId
+          });
+        } else if (item.type === 'tab') {
+          // Switch to existing tab; if bridge tab exists, close it first
+          await chrome.runtime.sendMessage({
+            action: 'switchToTab',
+            tabId: item.id,
+            bridgeTabId: this.bridgeTabId
+          });
+        } else {
+          // Open bookmark/history/top site — navigate bridge tab or open new tab
+          await chrome.runtime.sendMessage({
+            action: 'openBookmark',
+            url: item.url,
+            bridgeTabId: this.bridgeTabId
+          });
+        }
+        
+        this.hide();
+      } catch (error) {
+        console.error('QuickFind: Error selecting result:', error);
+      }
+    }
+    
+    showLoading() {
+      this.resultsContainer.innerHTML = `
+        <div class="quickfind-search-loading">
+          Loading search data...
+        </div>
+      `;
+      // 加载时显示加载状态
+      if (this.resultsCounter) {
+        this.resultsCounter.textContent = 'Loading...';
+      }
+    }
+    
+    showEmpty() {
+      this.resultsContainer.innerHTML = `
+        <div class="quickfind-search-empty">
+          No matching tabs, history, bookmarks, or top sites found
+        </div>
+      `;
+      // 更新计数为0
+      this.updateResultsCount(0);
+    }
+    
+    showError(message) {
+      this.resultsContainer.innerHTML = `
+        <div class="quickfind-search-empty">
+          ${message}
+        </div>
+      `;
+      // 错误时显示0结果
+      this.updateResultsCount(0);
+    }
+    
+    updateResultsCount(count) {
+      if (this.resultsCounter) {
+        const text = count === 1 ? '1 result' : `${count} results`;
+        this.resultsCounter.textContent = text;
+      }
+    }
+  }
+  
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      window.quickFindSearchOverlay = new QuickFindSearchOverlay();
+    });
+  } else {
+    window.quickFindSearchOverlay = new QuickFindSearchOverlay();
+  }
+})();

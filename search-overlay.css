@@ -1,0 +1,725 @@
+/* QuickFind Search Overlay Styles */
+
+/* CSS Variables for theming - 完全由JavaScript控制，不使用媒体查询 */
+:root {
+  --qf-radius: 0.625rem;
+}
+
+/* Light Theme - 亮色主题 */
+.qf-theme-light {
+  --qf-background: #ffffff;
+  --qf-foreground: oklch(0.145 0 0);
+  --qf-card: #ffffff;
+  --qf-card-foreground: oklch(0.145 0 0);
+  --qf-primary: oklch(0.525 0.181 252.88);
+  --qf-primary-foreground: oklch(0.98 0 0);
+  --qf-secondary: oklch(0.95 0.0058 264.53);
+  --qf-secondary-foreground: oklch(0.525 0.181 252.88);
+  --qf-muted: oklch(0.96 0.008 252.88);
+  --qf-muted-foreground: oklch(0.45 0.025 252.88);
+  --qf-accent: oklch(0.925 0.025 252.88);
+  --qf-accent-foreground: oklch(0.525 0.181 252.88);
+  --qf-border: oklch(0.9 0.01 252.88);
+  --qf-input: #ffffff;
+  --qf-input-background: #f8f9fa;
+  --qf-ring: oklch(0.525 0.181 252.88);
+  --qf-shadow: rgba(0, 0, 0, 0.1);
+  --qf-shadow-strong: rgba(0, 0, 0, 0.25);
+  --qf-overlay-bg: rgba(0, 0, 0, 0.4);
+}
+
+/* Dark Theme - 暗色主题 */
+.qf-theme-dark {
+  --qf-background: oklch(0.08 0.015 252.88);
+  --qf-foreground: oklch(0.96 0.015 252.88);
+  --qf-card: oklch(0.1 0.02 252.88);
+  --qf-card-foreground: oklch(0.96 0.015 252.88);
+  --qf-primary: oklch(0.525 0.181 252.88);
+  --qf-primary-foreground: oklch(0.98 0 0);
+  --qf-secondary: oklch(0.15 0.02 252.88);
+  --qf-secondary-foreground: oklch(0.96 0.015 252.88);
+  --qf-muted: oklch(0.15 0.02 252.88);
+  --qf-muted-foreground: oklch(0.65 0.02 252.88);
+  --qf-accent: oklch(0.15 0.02 252.88);
+  --qf-accent-foreground: oklch(0.96 0.015 252.88);
+  --qf-border: oklch(0.2 0.02 252.88);
+  --qf-input: oklch(0.15 0.02 252.88);
+  --qf-input-background: oklch(0.12 0.02 252.88);
+  --qf-ring: oklch(0.525 0.181 252.88);
+  --qf-shadow: rgba(0, 0, 0, 0.3);
+  --qf-shadow-strong: rgba(0, 0, 0, 0.6);
+  --qf-overlay-bg: rgba(0, 0, 0, 0.7);
+}
+
+/* Overlay container - covers entire viewport */
+.quickfind-search-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--qf-overlay-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2147483647; /* Maximum z-index to ensure it's on top */
+  display: none;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 12vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Search container */
+.quickfind-search-container {
+  width: 640px;
+  max-width: 90vw;
+  background: var(--qf-card);
+  border: 1px solid var(--qf-border);
+  border-radius: var(--qf-radius);
+  box-shadow: 
+    0 4px 20px var(--qf-shadow),
+    0 16px 64px var(--qf-shadow-strong);
+  overflow: hidden;
+  animation: quickfind-fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Search input container */
+.quickfind-search-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--qf-border);
+  background: var(--qf-card);
+  height: 60px;
+}
+
+/* Search icon */
+.quickfind-search-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.quickfind-search-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: var(--qf-muted-foreground);
+  stroke: var(--qf-muted-foreground);
+}
+
+/* Search input */
+.quickfind-search-input {
+  flex: 1;
+  height: 36px;
+  border: 1px solid var(--qf-border);
+  outline: none;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 400;
+  background: var(--qf-input-background);
+  color: var(--qf-foreground);
+  box-sizing: border-box;
+  line-height: 1.4;
+  padding: 0 12px;
+  border-radius: 8px;
+}
+
+.quickfind-search-input::placeholder {
+  color: var(--qf-muted-foreground);
+  font-weight: 400;
+}
+
+.quickfind-search-input:focus {
+  outline: none;
+}
+
+.quickfind-search-input-container:focus-within {
+  border-bottom-color: var(--qf-primary);
+}
+
+.quickfind-search-input-container:focus-within .quickfind-search-icon {
+  opacity: 1;
+}
+
+.quickfind-search-input-container:focus-within .quickfind-search-icon svg {
+  fill: var(--qf-primary);
+  stroke: var(--qf-primary);
+}
+
+.quickfind-close-icon {
+  margin-left: 16px;
+  margin-top: 6px;
+  cursor: pointer;
+}
+
+/* Results container */
+.quickfind-search-results {
+  max-height: 380px;
+  overflow-y: auto;
+  background: var(--qf-card);
+  padding: 8px 0;
+}
+
+/* Individual result item */
+.quickfind-search-result {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  margin: 0 8px 4px 8px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  border: 1px solid transparent;
+  gap: 12px;
+}
+
+.quickfind-search-result:hover {
+  background-color: var(--qf-accent);
+  border-color: var(--qf-border);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px var(--qf-shadow);
+}
+
+.quickfind-search-result.selected {
+  background-color: var(--qf-accent);
+  border-color: var(--qf-primary);
+  box-shadow: 0 0 0 1px var(--qf-primary);
+}
+
+.quickfind-search-result:last-child {
+  margin-bottom: 8px;
+}
+
+/* Result icon */
+.quickfind-result-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--qf-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quickfind-result-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.quickfind-result-icon svg {
+  width: 14px;
+  height: 14px;
+  fill: var(--qf-muted-foreground);
+}
+
+/* 只有在没有图片时才显示背景色 */
+.quickfind-result-icon.tab:not(:has(img)) {
+  background-color: var(--qf-primary);
+}
+
+.quickfind-result-icon.bookmark:not(:has(img)) {
+  background-color: #ff9800;
+}
+
+.quickfind-result-icon.history:not(:has(img)) {
+  background-color: #0ea5e9;
+  color: #ffffff;
+}
+
+.quickfind-result-icon.topSite:not(:has(img)) {
+  background-color: #22c55e;
+  color: #ffffff;
+}
+
+.quickfind-result-icon.search {
+  color: var(--qf-primary);
+}
+
+.quickfind-result-icon.open {
+  color: var(--qf-primary-foreground);
+}
+
+/* 有图片时使用透明背景 */
+.quickfind-result-icon:has(img) {
+  background: transparent;
+}
+
+/* Result content */
+.quickfind-result-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.quickfind-result-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--qf-foreground);
+  margin: 0;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.quickfind-result-url {
+  font-size: 12px;
+  color: var(--qf-muted-foreground);
+  margin: 0;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 400;
+}
+
+/* Result badge */
+.quickfind-result-badge {
+  color: var(--qf-primary-foreground);
+  background: var(--qf-primary);
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-left: 12px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.quickfind-result-badge-bookmark {
+  background: #ff9800;
+  color: #1f1300;
+}
+
+.quickfind-result-badge-history {
+  background: #0ea5e9;
+  color: #06283d;
+}
+
+.quickfind-result-badge-topSite {
+  background: #22c55e;
+  color: #052e16;
+}
+
+.quickfind-result-badge-search {
+  background: var(--qf-muted);
+  color: var(--qf-foreground);
+}
+
+.quickfind-result-badge-open {
+  background: var(--qf-primary);
+  color: var(--qf-primary-foreground);
+}
+
+.qf-theme-dark .quickfind-result-badge-bookmark {
+  color: #fff7ed;
+}
+
+.qf-theme-dark .quickfind-result-badge-history {
+  color: #e0f2fe;
+}
+
+.qf-theme-dark .quickfind-result-badge-topSite {
+  color: #dcfce7;
+}
+
+.qf-theme-dark .quickfind-result-badge-open {
+  color: #eff6ff;
+}
+
+/* Empty state */
+.quickfind-search-empty {
+  padding: 48px 20px;
+  text-align: center;
+  color: var(--qf-muted-foreground);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.quickfind-search-empty::before {
+  content: "🔍";
+  display: block;
+  font-size: 32px;
+  margin-bottom: 12px;
+  opacity: 0.6;
+}
+
+/* Loading state */
+.quickfind-search-loading {
+  padding: 48px 20px;
+  text-align: center;
+  color: var(--qf-text-secondary);
+  font-size: 15px;
+  font-weight: 400;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.quickfind-search-loading::before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--qf-border);
+  border-top-color: var(--qf-primary-color);
+  border-radius: 50%;
+  animation: quickfind-spin 1s linear infinite;
+}
+
+.quickfind-search-bottom {
+  height: 36px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  border-top: 1px solid var(--qf-border);
+  background: var(--qf-card);
+  font-size: 12px;
+  color: var(--qf-muted-foreground);
+}
+
+/* Animations */
+@keyframes quickfind-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes quickfind-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes quickfind-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Scrollbar styling for results */
+.quickfind-search-results::-webkit-scrollbar {
+  width: 6px;
+}
+
+.quickfind-search-results::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.quickfind-search-results::-webkit-scrollbar-thumb {
+  background: var(--qf-border);
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.quickfind-search-results::-webkit-scrollbar-thumb:hover {
+  background: var(--qf-text-tertiary);
+}
+
+/* Focus and active states */
+.quickfind-search-result:focus {
+  outline: 2px solid var(--qf-primary-color);
+  outline-offset: -2px;
+}
+
+.quickfind-search-result:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px var(--qf-shadow);
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .quickfind-search-overlay {
+    padding-top: 8vh;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  
+  .quickfind-search-container {
+    width: 100%;
+    max-width: none;
+    border-radius: 12px;
+    box-shadow: 
+      0 2px 16px var(--qf-shadow),
+      0 8px 32px var(--qf-shadow-strong);
+  }
+  
+  .quickfind-search-input-container {
+    padding: 0 16px;
+    height: 60px;
+  }
+  
+  .quickfind-search-input {
+    height: 60px;
+    font-size: 16px; /* Prevents zoom on iOS */
+    background: #aaa !important;
+  }
+  
+  .quickfind-search-results {
+    max-height: 50vh;
+    padding: 4px 0;
+  }
+  
+  .quickfind-search-result {
+    padding: 12px 14px;
+    margin: 0 4px 2px 4px;
+    border-radius: 12px;
+  }
+  
+  .quickfind-result-title {
+    font-size: 13px;
+  }
+  
+  .quickfind-result-url {
+    font-size: 11px;
+  }
+  
+  .quickfind-result-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .quickfind-search-overlay {
+    padding-top: 5vh;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  
+  .quickfind-search-container {
+    border-radius: 8px;
+  }
+  
+  .quickfind-search-input-container {
+    padding: 0 12px;
+  }
+  
+  .quickfind-search-input {
+    height: 52px;
+    font-size: 16px;
+  }
+  
+  .quickfind-search-results {
+    max-height: 45vh;
+  }
+  
+  .quickfind-search-result {
+    padding: 10px 12px;
+    margin: 0 2px 1px 2px;
+  }
+  
+  .quickfind-result-icon {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .quickfind-result-icon svg {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .quickfind-result-title {
+    font-size: 13px;
+  }
+  
+  .quickfind-result-url {
+    font-size: 11px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --qf-primary-color: #0000FF;
+    --qf-primary-hover: #000080;
+    --qf-background: #FFFFFF;
+    --qf-surface: #FFFFFF;
+    --qf-surface-hover: #F0F0F0;
+    --qf-surface-selected: #E0E0FF;
+    --qf-text-primary: #000000;
+    --qf-text-secondary: #000000;
+    --qf-text-tertiary: #666666;
+    --qf-border: #000000;
+    --qf-border-light: #666666;
+    --qf-shadow: rgba(0, 0, 0, 0.5);
+    --qf-shadow-strong: rgba(0, 0, 0, 0.8);
+  }
+  
+  .quickfind-search-container {
+    border: 2px solid var(--qf-border);
+    box-shadow: 0 4px 8px var(--qf-shadow);
+  }
+  
+  .quickfind-search-result {
+    border: 1px solid var(--qf-border);
+  }
+  
+  .quickfind-search-result:hover,
+  .quickfind-search-result.selected {
+    border: 2px solid var(--qf-primary-color);
+  }
+}
+
+/* Dark theme high contrast */
+@media (prefers-color-scheme: dark) and (prefers-contrast: high) {
+  :root {
+    --qf-primary-color: #66B3FF;
+    --qf-background: #000000;
+    --qf-surface: #000000;
+    --qf-surface-hover: #1A1A1A;
+    --qf-surface-selected: #003366;
+    --qf-text-primary: #FFFFFF;
+    --qf-text-secondary: #FFFFFF;
+    --qf-text-tertiary: #CCCCCC;
+    --qf-border: #FFFFFF;
+    --qf-border-light: #CCCCCC;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .quickfind-search-overlay,
+  .quickfind-search-container,
+  .quickfind-search-result,
+  .quickfind-search-input-container,
+  .quickfind-result-badge,
+  .quickfind-search-loading::before {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .quickfind-search-result:hover {
+    transform: none !important;
+  }
+}
+
+/* Focus visible for keyboard navigation */
+.quickfind-search-result:focus-visible {
+  outline: 3px solid var(--qf-primary-color);
+  outline-offset: 2px;
+}
+
+/* Screen reader only content */
+.quickfind-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Performance optimizations */
+.quickfind-search-overlay {
+  will-change: opacity;
+  contain: layout style paint;
+}
+
+.quickfind-search-container {
+  will-change: transform;
+  contain: layout style paint;
+}
+
+.quickfind-search-result {
+  will-change: transform, background-color;
+  contain: layout style paint;
+}
+
+/* Bookmark badge styles */
+.quickfind-bookmark-badge {
+  background: var(--qf-muted);
+  color: var(--qf-muted-foreground);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 8px;
+  opacity: 0.7;
+}
+
+/* Synthetic option special styles */
+.quickfind-search-result.open-option {
+  margin-top: 4px;
+}
+
+.quickfind-search-result.open-option .quickfind-result-icon {
+  background-color: var(--qf-primary);
+  color: var(--qf-primary-foreground);
+}
+
+.quickfind-search-result.open-option:hover {
+  background-color: var(--qf-accent);
+  border-color: var(--qf-primary);
+}
+
+.quickfind-search-result.open-option.selected {
+  background-color: var(--qf-accent);
+  border-color: var(--qf-primary);
+  box-shadow: 0 0 0 1px var(--qf-primary);
+}
+
+.quickfind-search-result.search-option {
+  border-top: 1px solid var(--qf-border);
+  margin-top: 4px;
+}
+
+.quickfind-search-result.search-option .quickfind-result-icon {
+  background-color: var(--qf-primary);
+  color: var(--qf-primary-foreground);
+}
+
+.quickfind-search-result.search-option .quickfind-result-icon svg {
+  stroke: var(--qf-primary-foreground);
+}
+
+.quickfind-search-result.search-option:hover {
+  background-color: var(--qf-accent);
+  border-color: var(--qf-primary);
+}
+
+.quickfind-search-result.search-option.selected {
+  background-color: var(--qf-accent);
+  border-color: var(--qf-primary);
+  box-shadow: 0 0 0 1px var(--qf-primary);
+}
+
+/* Print styles */
+@media print {
+  .quickfind-search-overlay {
+    display: none !important;
+  }
+}
