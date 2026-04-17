@@ -1,20 +1,23 @@
+<div align="center">
+
 # QuickFind
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/clgpmlhecjlekgipngaopglbfdkonjdf?label=Chrome%20Web%20Store&color=4285F4)](https://chromewebstore.google.com/detail/quickfind-tab-bookmark-se/clgpmlhecjlekgipngaopglbfdkonjdf)
 [![GitHub stars](https://img.shields.io/github/stars/TuYv/quickFind?style=flat&color=yellow)](https://github.com/TuYv/quickFind/stargazers)
 [![License](https://img.shields.io/github/license/TuYv/quickFind)](LICENSE)
 
-> 🌐 **English** · [中文](README.zh-CN.md)
+🌐 **English** · [中文](README.zh-CN.md)
 
-**One keystroke to find anything in your browser.**
+### One keystroke to find anything in your browser.
 
-Press `⌘K` to open a unified search overlay across your open tabs, bookmarks, history, and top sites. Keyboard-first, doesn't leave your current page.
+Press `⌘K` to open a unified search overlay across your open tabs, bookmarks, history, and top sites.<br>
+Keyboard-first, doesn't leave your current page.
 
-![QuickFind demo](demo.gif)
-
-## Install
+<img src="demo.gif" alt="QuickFind demo" width="680">
 
 **[→ Install from Chrome Web Store](https://chromewebstore.google.com/detail/quickfind-tab-bookmark-se/clgpmlhecjlekgipngaopglbfdkonjdf)**
+
+</div>
 
 ## Features
 

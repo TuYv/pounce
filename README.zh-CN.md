@@ -1,20 +1,23 @@
+<div align="center">
+
 # QuickFind
 
 [![Chrome 应用商店](https://img.shields.io/chrome-web-store/v/clgpmlhecjlekgipngaopglbfdkonjdf?label=Chrome%20%E5%95%86%E5%BA%97&color=4285F4)](https://chromewebstore.google.com/detail/quickfind-tab-bookmark-se/clgpmlhecjlekgipngaopglbfdkonjdf)
 [![GitHub stars](https://img.shields.io/github/stars/TuYv/quickFind?style=flat&color=yellow)](https://github.com/TuYv/quickFind/stargazers)
 [![License](https://img.shields.io/github/license/TuYv/quickFind)](LICENSE)
 
-> 🌐 [English](README.md) · **中文**
+🌐 [English](README.md) · **中文**
 
-**一个快捷键，找到浏览器里的任何东西。**
+### 一个快捷键，找到浏览器里的任何东西。
 
-按 `⌘K` 弹出搜索框，同时搜你的标签页、书签、历史和常用站点——全键盘操作，不打断当前页面。
+按 `⌘K` 弹出搜索框，同时搜你的标签页、书签、历史和常用站点。<br>
+全键盘操作，不打断当前页面。
 
-![QuickFind 演示](demo.gif)
-
-## 安装
+<img src="demo.gif" alt="QuickFind 演示" width="680">
 
 **[→ 从 Chrome 应用商店安装](https://chromewebstore.google.com/detail/quickfind-tab-bookmark-se/clgpmlhecjlekgipngaopglbfdkonjdf)**
+
+</div>
 
 ## 核心功能
 
