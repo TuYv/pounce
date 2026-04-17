@@ -1,73 +1,53 @@
-# QuickFind — Tab & Bookmark Search
+# QuickFind
 
-A Chrome extension that lets you instantly search open tabs, bookmarks, history, and top sites with a keyboard shortcut — without leaving your current page.
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/clgpmlhecjlekgipngaopglbfdkonjdf?label=Chrome%20Web%20Store&color=4285F4)](https://chromewebstore.google.com/detail/quickfind-tab-bookmark-se/clgpmlhecjlekgipngaopglbfdkonjdf)
+[![GitHub stars](https://img.shields.io/github/stars/TuYv/quickFind?style=flat&color=yellow)](https://github.com/TuYv/quickFind/stargazers)
+[![License](https://img.shields.io/github/license/TuYv/quickFind)](LICENSE)
+
+> 🌐 **English** · [中文](README.zh-CN.md)
+
+**One keystroke to find anything in your browser.**
+
+Press `⌘K` to open a unified search overlay across your open tabs, bookmarks, history, and top sites. Keyboard-first, doesn't leave your current page.
+
+![QuickFind demo](demo.gif)
+
+## Install
+
+**[→ Install from Chrome Web Store](https://chromewebstore.google.com/detail/quickfind-tab-bookmark-se/clgpmlhecjlekgipngaopglbfdkonjdf)**
 
 ## Features
 
-- **Instant search overlay** — press `⌘K` (Mac) / `Alt+K` (Windows/Linux) on any page to open a fuzzy search overlay
-- **Unified search** — searches across open tabs, bookmarks, browser history, and top sites simultaneously
-- **Batch open URLs** — save a list of URLs and open them all at once with `⌘⇧U` / `Ctrl+Shift+U`
-- **Keyboard-first navigation** — `↑↓` to move, `Enter` to jump, `Esc` to close
-- **Theme toggle in popup** — switch Light / Dark / System directly from the popup header; syncs in real-time with the settings page
+- 🔍 **Unified search** — one `⌘K`, search open tabs + bookmarks + history + top sites at once
+- ⌨️ **Keyboard-first navigation** — arrows to move, Enter to jump, Esc to close; no mouse needed
+- 🎨 **Built-in dark mode** — Light / Dark / System, switchable from the popup or settings
+- 📚 **Batch open URLs** *(bonus)* — save a list of URLs, press `⌘⇧U` to open them all
 
 ## Keyboard Shortcuts
 
 | Action | Mac | Windows / Linux |
 |--------|-----|-----------------|
 | Open search overlay | `⌘K` | `Alt+K` |
-| Batch open URLs | `⌘⇧U` | `Ctrl+Shift+U` |
+| Batch open saved URLs | `⌘⇧U` | `Ctrl+Shift+U` |
 | Navigate results | `↑` / `↓` | `↑` / `↓` |
 | Open selected result | `Enter` | `Enter` |
 | Close overlay | `Esc` | `Esc` |
 
-> **Note:** The search overlay cannot be injected into `chrome://`, `chrome-extension://`, or `about:` pages. This is a Chrome security restriction that applies to all extensions.
-
-## Installation
-
-### From Chrome Web Store
-Install directly from the Chrome Web Store listing.
-
-### Load Unpacked (Development)
-1. Open `chrome://extensions` in Chrome
-2. Enable **Developer Mode** (top-right toggle)
-3. Click **Load unpacked** and select this directory
-4. Reload the extension after any source changes
-
-## Project Structure
-
-```
-quickFind/
-├── manifest.json          # Extension manifest (MV3)
-├── background.js          # Service worker — handles shortcuts & data fetching
-├── search-overlay.js      # Content script — search UI injected into pages
-├── search-overlay.css     # Styles for the search overlay
-├── search-ranking.js      # Fuzzy search and result scoring logic
-├── theme-manager.js       # Light/dark theme management
-├── popup.html / popup.js  # Extension popup
-├── options.html / options.js  # Settings page (URL management, theme)
-└── icons/                 # SVG and PNG icons
-```
-
-## Development
-
-No build step required. Edit source files directly.
-
-- Preview popup UI: open `popup.html` in a browser (`popup.js` includes a mock `chrome` fallback)
-- Preview settings page: open `options.html` in a browser
-- After editing: go to `chrome://extensions` and click the reload button for QuickFind
+> The overlay cannot be injected into `chrome://`, `chrome-extension://`, or `about:` pages. This is a Chrome-wide security restriction that applies to every extension.
 
 ## Permissions
 
+All permissions are used only for core search functionality. **No data ever leaves your browser.**
+
 | Permission | Purpose |
 |------------|---------|
-| `tabs` | Read open tab titles and URLs for search |
+| `tabs` | Read open tab titles and URLs |
 | `bookmarks` | Search bookmark titles and URLs |
-| `history` | Include browser history in search results |
+| `history` | Include browser history in results |
 | `topSites` | Include frequently visited sites |
-| `storage` | Persist saved URLs and theme preference |
-| `scripting` | Inject search overlay into pages |
-| `activeTab` | Access the current tab when triggered |
-| `notifications` | (Reserved for future use) |
+| `storage` | Save your URL list and theme preference |
+| `scripting` | Inject the search overlay into the current page |
+| `activeTab` | Access the current tab when you trigger the overlay |
 
 ## License
 
@@ -76,10 +56,10 @@ MIT — see [LICENSE](LICENSE)
 ## Changelog
 
 ### 1.3.1
-- **feat:** theme toggle button in popup header (☀️ Light / 🌙 Dark / ⊙ System), syncs in real-time with settings page
-- **fix:** tab switching now falls back to opening a new tab when the target tab was closed since the search data was fetched
-- **fix:** popup and settings page theme now stay in sync when both are open simultaneously (switched to `chrome.storage.onChanged` for reliable cross-page sync)
-- **fix:** settings page theme radio always showed "System" on first open regardless of saved preference
+- Theme toggle in popup header (Light / Dark / System), real-time sync with settings
+- Fix: tab switching falls back to opening a new tab when the target was closed
+- Fix: popup and settings theme stay in sync when both are open
+- Fix: settings theme radio now shows the correct saved preference on first open
 
 ### 1.3.0
 - Search overlay UI and icon improvements
