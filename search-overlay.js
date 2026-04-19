@@ -513,6 +513,10 @@
     }
     
     handleKeyDown(e) {
+      // IME 组词中：Enter/方向键属于输入法候选操作，不应被识别为搜索确认/选择。
+      // keyCode === 229 兼容部分浏览器对 isComposing 的缺失上报。
+      if (e.isComposing || e.keyCode === 229) return;
+
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
