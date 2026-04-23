@@ -13,7 +13,7 @@
 按 `⌘K` 弹出搜索框，同时搜你的标签页、书签、历史和常用站点。<br>
 全键盘操作，不打断当前页面。
 
-<img src="demo.gif" alt="Pounce 演示" width="680">
+<img src="demo-v2.gif" alt="Pounce 演示" width="680">
 
 **[→ 从 Chrome 应用商店安装](https://chromewebstore.google.com/detail/clgpmlhecjlekgipngaopglbfdkonjdf)**
 
