@@ -25,6 +25,7 @@
       this.historyFetchTimer = null;
       this.historyFetchRequestId = 0;
       this.bridgeTabId = null;
+      this.visibleResultIndices = [];
 
       this.init();
     }
@@ -122,6 +123,9 @@
           <span class="pounce-hint-key">↵</span> Select
         </span>
         <span class="pounce-hint">
+          <span class="pounce-hint-key">1-9</span> Quick pick
+        </span>
+        <span class="pounce-hint">
           <span class="pounce-hint-key">Esc</span> Close
         </span>
       `;
@@ -206,6 +210,10 @@
 
       this.overlay.addEventListener('keydown', (e) => {
         e.stopPropagation();
+      });
+
+      this.resultsContainer.addEventListener('scroll', () => {
+        this.updateNumberBadges();
       });
     }
     
@@ -516,6 +524,9 @@
         this.selectedIndex = 0;
         this.updateSelection();
       }
+
+      // 初始编号（异步等 layout 稳定后再算）
+      requestAnimationFrame(() => this.updateNumberBadges());
       
       // 更新结果计数显示（排除搜索选项）
       const actualResultsCount = this.currentResults.filter(item => item.type !== 'search').length;
@@ -579,6 +590,9 @@
       const badge = document.createElement('div');
       badge.className = `pounce-result-badge pounce-result-badge-${item.type}`;
       badge.textContent = item.sourceLabel || '';
+      const num = document.createElement('div');
+      num.className = 'pounce-result-number';
+      element.appendChild(num);
       element.appendChild(icon);
       element.appendChild(content);
       if (item.sourceLabel) {
@@ -626,6 +640,15 @@
           // 不要在 keydown 里 hide() —— 见文件里 keyup 分支的注释。
           e.preventDefault();
           break;
+
+        default:
+          if (!e.altKey && !e.ctrlKey && !e.metaKey && e.key >= '1' && e.key <= '9') {
+            const pos = parseInt(e.key, 10) - 1;
+            if (this.visibleResultIndices && pos < this.visibleResultIndices.length) {
+              e.preventDefault();
+              this.selectResult(this.visibleResultIndices[pos]);
+            }
+          }
       }
     }
     
@@ -655,8 +678,29 @@
           result.classList.remove('selected');
         }
       });
+      // scrollIntoView 可能改变可视区域，等 layout 后重算编号
+      requestAnimationFrame(() => this.updateNumberBadges());
     }
     
+    updateNumberBadges() {
+      const containerRect = this.resultsContainer.getBoundingClientRect();
+      const results = Array.from(this.resultsContainer.querySelectorAll('.pounce-search-result'));
+      this.visibleResultIndices = [];
+
+      results.forEach((result, index) => {
+        const numEl = result.querySelector('.pounce-result-number');
+        if (!numEl) return;
+        const rect = result.getBoundingClientRect();
+        const visible = rect.top < containerRect.bottom && rect.bottom > containerRect.top;
+        if (visible && this.visibleResultIndices.length < 9) {
+          this.visibleResultIndices.push(index);
+          numEl.textContent = String(this.visibleResultIndices.length);
+        } else {
+          numEl.textContent = '';
+        }
+      });
+    }
+
     async selectResult(index) {
       if (index < 0 || index >= this.currentResults.length) return;
       

@@ -199,6 +199,22 @@
   margin-bottom: 8px;
 }
 
+/* Result number shortcut badge */
+.pounce-result-number {
+  width: 16px;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--pn-muted-foreground);
+  text-align: center;
+  opacity: 0.45;
+  line-height: 1;
+}
+
+.pounce-search-result.selected .pounce-result-number {
+  opacity: 0.7;
+}
+
 /* Result icon */
 .pounce-result-icon {
   width: 20px;

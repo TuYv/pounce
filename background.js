@@ -204,10 +204,11 @@ let historyDataCache = {
 let historyDataPromise = null;
 
 async function getTabsData() {
+  const bridgeUrl = chrome.runtime.getURL('bridge.html');
   const tabs = await chrome.tabs.query({});
 
   return tabs
-    .filter((tab) => tab.url)
+    .filter((tab) => tab.url && tab.url !== bridgeUrl)
     .map((tab) => ({
       type: 'tab',
       id: tab.id,

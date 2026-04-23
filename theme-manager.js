@@ -206,11 +206,7 @@ class ContentThemeManager {
   }
 }
 
-// 根据环境选择合适的管理器
-if (typeof window !== 'undefined' && window.chrome && window.chrome.extension) {
-  // Extension context (popup, options)
+if (typeof window !== 'undefined') {
   window.ThemeManager = ThemeManager;
-} else if (typeof window !== 'undefined') {
-  // Content script context
   window.ContentThemeManager = ContentThemeManager;
 }
