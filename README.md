@@ -61,6 +61,7 @@ MIT — see [LICENSE](LICENSE)
 
 ### 1.4.5
 - Change: digit keys `1`–`9` now type into the search box; use `Alt + 1–9` (`⌥1–⌥9` on macOS) to quick-pick a result. Fixes [#1](https://github.com/TuYv/pounce/issues/1)
+- Fix: extension updates now replace the stale overlay on already-open tabs instead of stranding the old keyboard behavior until reload
 
 ### 1.4.4
 - Press 1–9 to instantly jump to a search result without using arrow keys

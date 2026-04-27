@@ -2,9 +2,27 @@
 (function() {
   'use strict';
 
-  // Prevent multiple injections
+  // 版本守卫：扩展更新后旧的 content script 仍残留在页面上，重新注入会被早退守卫卡死，
+  // 老 keyboard 行为继续生效到用户刷新页面为止。这里用 manifest 版本对比，
+  // 同版本短路返回；不同版本先 destroy 旧实例再重新初始化。
+  let POUNCE_OVERLAY_VERSION = 'unknown';
+  try {
+    POUNCE_OVERLAY_VERSION = chrome.runtime.getManifest().version;
+  } catch (e) {
+    // chrome.runtime 在某些边缘场景可能失效；fallback 使版本检查失败 → 强制替换
+  }
+
   if (window.pounceSearchOverlay) {
-    return;
+    const existing = window.pounceSearchOverlay;
+    if (existing.version === POUNCE_OVERLAY_VERSION) {
+      return;
+    }
+    try {
+      if (typeof existing.destroy === 'function') existing.destroy();
+    } catch (err) {
+      console.warn('Pounce: failed to destroy stale overlay instance', err);
+    }
+    window.pounceSearchOverlay = null;
   }
 
   // compositionend 之后 Chrome/macOS IME 偶发多发一次 Enter keydown（isComposing=false），
@@ -26,6 +44,14 @@
       this.historyFetchRequestId = 0;
       this.bridgeTabId = null;
       this.visibleResultIndices = [];
+
+      // 版本标记 + destroy 状态，供扩展更新时旧实例替换逻辑使用
+      this.version = POUNCE_OVERLAY_VERSION;
+      this.isDestroyed = false;
+      this.shadowHost = null;
+      this.docKeyDownHandler = null;
+      this.docKeyUpHandler = null;
+      this.runtimeMessageHandler = null;
 
       // Mac 用 ⌥ 符号，其他平台用 Alt+ 前缀
       const isMac = navigator.platform.toUpperCase().includes('MAC') ||
@@ -57,6 +83,7 @@
       shadowHost.id = 'pounce-shadow-host';
       // 0 尺寸 host：不占位、不拦截交互；overlay 自己 position:fixed 盖满视窗。
       shadowHost.style.cssText = 'position:fixed;top:0;left:0;width:0;height:0;z-index:2147483647;';
+      this.shadowHost = shadowHost;
       this.shadowRoot = shadowHost.attachShadow({ mode: 'open' });
 
       const cssLink = document.createElement('link');
@@ -152,13 +179,16 @@
     
     bindEvents() {
       // Listen for messages from background script
-      chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      // 用实例属性保存 handler 引用，destroy() 时才能 removeListener
+      this.runtimeMessageHandler = (message, sender, sendResponse) => {
+        if (this.isDestroyed) return;
         if (message.action === 'showSearchOverlay') {
           this.bridgeTabId = message.bridgeTabId ?? null;
           this.show();
           sendResponse({ success: true });
         }
-      });
+      };
+      chrome.runtime.onMessage.addListener(this.runtimeMessageHandler);
       
       // Search input events
       this.searchInput.addEventListener('input', (e) => {
@@ -195,18 +225,21 @@
       // 的 "press and hold ESC to exit fullscreen" 保护被 bypass，单按 ESC
       // 就退 macOS Space。改到 keyup 之后，Chrome 已经判定过"短按、不退"，
       // 此时再 tabs.remove 和全屏状态无关。
-      document.addEventListener('keydown', (e) => {
+      // handler 存为实例属性，扩展更新替换旧实例时 destroy() 才能清掉。
+      this.docKeyDownHandler = (e) => {
         if (e.key === 'Escape' && this.isVisible) {
           // keydown 只拦截默认行为，不做关闭动作
           e.preventDefault();
           e.stopPropagation();
         }
-      }, { capture: true });
-      document.addEventListener('keyup', (e) => {
+      };
+      this.docKeyUpHandler = (e) => {
         if (e.key === 'Escape' && this.isVisible) {
           this.hide();
         }
-      }, { capture: true });
+      };
+      document.addEventListener('keydown', this.docKeyDownHandler, { capture: true });
+      document.addEventListener('keyup', this.docKeyUpHandler, { capture: true });
 
       this.shadowRoot.getElementById('pounce-close-icon').addEventListener('click', (e) => {
         this.hide();
@@ -269,6 +302,52 @@
       document.body.style.overflow = '';
     }
     
+    destroy() {
+      // 扩展更新后，旧实例若被 background 重新注入路径碰到，需要先彻底清理：
+      // - 标记 isDestroyed，让残存回调短路
+      // - 清 timer / 解绑文档级 listeners / 摘除 shadow host / 复原 body 滚动
+      // 缺一不可：少摘 shadow host 会留两份 overlay，少解 listener 老 ESC 仍会触发旧逻辑。
+      if (this.isDestroyed) return;
+      this.isDestroyed = true;
+
+      if (this.historyFetchTimer) {
+        clearTimeout(this.historyFetchTimer);
+        this.historyFetchTimer = null;
+      }
+
+      if (this.docKeyDownHandler) {
+        document.removeEventListener('keydown', this.docKeyDownHandler, { capture: true });
+        this.docKeyDownHandler = null;
+      }
+      if (this.docKeyUpHandler) {
+        document.removeEventListener('keyup', this.docKeyUpHandler, { capture: true });
+        this.docKeyUpHandler = null;
+      }
+
+      try {
+        if (this.runtimeMessageHandler && chrome.runtime?.onMessage?.removeListener) {
+          chrome.runtime.onMessage.removeListener(this.runtimeMessageHandler);
+        }
+      } catch (e) {
+        // chrome.runtime 可能已失效（extension context invalidated），忽略
+      }
+      this.runtimeMessageHandler = null;
+
+      if (this.shadowHost && this.shadowHost.parentNode) {
+        this.shadowHost.parentNode.removeChild(this.shadowHost);
+      }
+      this.shadowHost = null;
+      this.shadowRoot = null;
+      this.overlay = null;
+      this.searchInput = null;
+      this.resultsContainer = null;
+
+      if (this.isVisible) {
+        document.body.style.overflow = '';
+      }
+      this.isVisible = false;
+    }
+
     async loadSearchData() {
       try {
         console.log('Pounce: Requesting search data...');
