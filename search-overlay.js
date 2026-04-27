@@ -27,6 +27,12 @@
       this.bridgeTabId = null;
       this.visibleResultIndices = [];
 
+      // Mac 用 ⌥ 符号，其他平台用 Alt+ 前缀
+      const isMac = navigator.platform.toUpperCase().includes('MAC') ||
+        navigator.userAgent.toUpperCase().includes('MAC');
+      this.shortcutPrefix = isMac ? '⌥' : 'Alt+';
+      this.shortcutKeyLabel = isMac ? '⌥' : 'Alt';
+
       this.init();
     }
 
@@ -123,7 +129,7 @@
           <span class="pounce-hint-key">↵</span> Select
         </span>
         <span class="pounce-hint">
-          <span class="pounce-hint-key">1-9</span> Quick pick
+          <span class="pounce-hint-key">${this.shortcutKeyLabel}</span><span class="pounce-hint-key">1-9</span> Quick pick
         </span>
         <span class="pounce-hint">
           <span class="pounce-hint-key">Esc</span> Close
@@ -642,10 +648,14 @@
           break;
 
         default:
-          if (!e.altKey && !e.ctrlKey && !e.metaKey && e.key >= '1' && e.key <= '9') {
-            const pos = parseInt(e.key, 10) - 1;
+          // Alt+1..9 触发快速跳转。用 e.code 而非 e.key —— Mac 上 Alt+1 的 e.key 是 ¡ 等特殊字符，
+          // 只有 e.code='Digit1' 跨平台稳定。同时排除 Ctrl/Meta 组合，避免误触浏览器原生快捷键。
+          // preventDefault 提到外层：即使对应位置没有结果（比如只搜到 3 条但按 Alt+5），
+          // 也要吞掉默认行为，否则 Mac 上 Option+5 的 ∞ 等特殊字符会污染搜索框。
+          if (e.altKey && !e.ctrlKey && !e.metaKey && /^Digit[1-9]$/.test(e.code)) {
+            e.preventDefault();
+            const pos = parseInt(e.code.slice(5), 10) - 1;
             if (this.visibleResultIndices && pos < this.visibleResultIndices.length) {
-              e.preventDefault();
               this.selectResult(this.visibleResultIndices[pos]);
             }
           }
@@ -694,7 +704,7 @@
         const visible = rect.top < containerRect.bottom && rect.bottom > containerRect.top;
         if (visible && this.visibleResultIndices.length < 9) {
           this.visibleResultIndices.push(index);
-          numEl.textContent = String(this.visibleResultIndices.length);
+          numEl.textContent = `${this.shortcutPrefix}${this.visibleResultIndices.length}`;
         } else {
           numEl.textContent = '';
         }

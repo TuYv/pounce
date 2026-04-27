@@ -34,6 +34,7 @@ Keyboard-first, doesn't leave your current page.
 | Batch open saved URLs | `⌘⇧U` | `Ctrl+Shift+U` |
 | Navigate results | `↑` / `↓` | `↑` / `↓` |
 | Open selected result | `Enter` | `Enter` |
+| Quick-pick result 1–9 | `⌥1`–`⌥9` | `Alt+1`–`Alt+9` |
 | Close overlay | `Esc` | `Esc` |
 
 > The overlay cannot be injected into `chrome://`, `chrome-extension://`, or `about:` pages. This is a Chrome-wide security restriction that applies to every extension.
@@ -57,6 +58,9 @@ All permissions are used only for core search functionality. **No data ever leav
 MIT — see [LICENSE](LICENSE)
 
 ## Changelog
+
+### 1.4.5
+- Change: digit keys `1`–`9` now type into the search box; use `Alt + 1–9` (`⌥1–⌥9` on macOS) to quick-pick a result. Fixes [#1](https://github.com/TuYv/pounce/issues/1)
 
 ### 1.4.4
 - Press 1–9 to instantly jump to a search result without using arrow keys
