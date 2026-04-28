@@ -13,6 +13,8 @@
 Press `⌘K` to open a unified search overlay across your open tabs, bookmarks, history, and top sites.<br>
 Keyboard-first, doesn't leave your current page.
 
+<img src="hero.png" alt="Pounce — search everything with ⌘K" width="820">
+
 <img src="demo-v2.gif" alt="Pounce demo" width="680">
 
 **[→ Install from Chrome Web Store](https://chromewebstore.google.com/detail/clgpmlhecjlekgipngaopglbfdkonjdf)**
