@@ -763,3 +763,10 @@
     display: none !important;
   }
 }
+
+/* Highlighted query matches inside result title / URL */
+.pounce-result-title .pounce-highlight,
+.pounce-result-url .pounce-highlight {
+  font-weight: 600;
+  color: var(--pn-primary);
+}
