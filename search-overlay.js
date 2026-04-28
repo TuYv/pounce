@@ -28,7 +28,8 @@
   // compositionend 之后 Chrome/macOS IME 偶发多发一次 Enter keydown（isComposing=false），
   // 此窗口内收到的 Enter 一律视为 IME trailing，避免误触发 selectResult。
   const IME_TRAILING_ENTER_GUARD_MS = 120;
-  
+  const HIGHLIGHTABLE_TYPES = ['tab', 'history', 'topSite', 'bookmark'];
+
   class PounceSearchOverlay {
     constructor() {
       this.overlay = null;
@@ -691,7 +692,6 @@
       const content = document.createElement('div');
       content.className = 'pounce-result-content';
       
-      const HIGHLIGHTABLE_TYPES = ['tab', 'history', 'topSite', 'bookmark'];
       const titleText = item.displayTitle || item.title || 'Untitled';
       const urlText = item.displayUrl || item.url || '';
       const isHighlightable = HIGHLIGHTABLE_TYPES.includes(item.type) && typeof query === 'string' && query.trim().length > 0;
