@@ -401,7 +401,7 @@
       }
 
       this.selectedIndex = -1;
-      this.renderResults();
+      this.renderResults(query);
     }
 
     cancelHistoryFetch() {
@@ -622,16 +622,16 @@
       }
     }
 
-    renderResults() {
+    renderResults(query = '') {
       if (!this.currentResults.length) {
         this.showEmpty();
         return;
       }
-      
+
       this.resultsContainer.innerHTML = '';
-      
+
       this.currentResults.forEach((item, index) => {
-        const resultElement = this.createResultElement(item, index);
+        const resultElement = this.createResultElement(item, index, query);
         this.resultsContainer.appendChild(resultElement);
       });
       
@@ -649,7 +649,7 @@
       this.updateResultsCount(actualResultsCount);
     }
     
-    createResultElement(item, index) {
+    createResultElement(item, index, query = '') {
       const element = document.createElement('div');
       element.className = 'pounce-search-result';
       if (index === this.selectedIndex) {
@@ -691,13 +691,27 @@
       const content = document.createElement('div');
       content.className = 'pounce-result-content';
       
+      const HIGHLIGHTABLE_TYPES = ['tab', 'history', 'topSite', 'bookmark'];
+      const titleText = item.displayTitle || item.title || 'Untitled';
+      const urlText = item.displayUrl || item.url || '';
+      const isHighlightable = HIGHLIGHTABLE_TYPES.includes(item.type) && typeof query === 'string' && query.trim().length > 0;
+      const ranger = (typeof globalThis !== 'undefined' && globalThis.PounceSearchUtils && globalThis.PounceSearchUtils.getHighlightRanges) || null;
+
       const title = document.createElement('div');
       title.className = 'pounce-result-title';
-      title.textContent = item.displayTitle || item.title || 'Untitled';
-      
+      if (isHighlightable && ranger) {
+        this.renderHighlightedText(title, titleText, ranger(titleText, query));
+      } else {
+        title.textContent = titleText;
+      }
+
       const url = document.createElement('div');
       url.className = 'pounce-result-url';
-      url.textContent = item.displayUrl || item.url || '';
+      if (isHighlightable && ranger) {
+        this.renderHighlightedText(url, urlText, ranger(urlText, query));
+      } else {
+        url.textContent = urlText;
+      }
       
       content.appendChild(title);
       content.appendChild(url);
