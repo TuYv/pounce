@@ -591,6 +591,37 @@
       }
     }
     
+    renderHighlightedText(textEl, text, ranges) {
+      // Always reset the element first.
+      textEl.textContent = '';
+
+      const safeText = typeof text === 'string' ? text : '';
+      const safeRanges = Array.isArray(ranges) ? ranges : [];
+
+      if (safeRanges.length === 0) {
+        textEl.textContent = safeText;
+        return;
+      }
+
+      let cursor = 0;
+      for (const range of safeRanges) {
+        const start = range[0];
+        const end = range[1];
+        if (start > cursor) {
+          textEl.appendChild(document.createTextNode(safeText.slice(cursor, start)));
+        }
+        const span = document.createElement('span');
+        span.className = 'pounce-highlight';
+        span.textContent = safeText.slice(start, end);
+        textEl.appendChild(span);
+        cursor = end;
+      }
+
+      if (cursor < safeText.length) {
+        textEl.appendChild(document.createTextNode(safeText.slice(cursor)));
+      }
+    }
+
     renderResults() {
       if (!this.currentResults.length) {
         this.showEmpty();
