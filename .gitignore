@@ -31,3 +31,4 @@ npm-debug.log*
 
 # Personal working notes (launch drafts, briefs, audits) — never ship
 notes/
+.superpowers/
