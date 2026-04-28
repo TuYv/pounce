@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const { rankResults, getDisplayTitle } = require('../search-ranking.js');
+const { rankResults, getDisplayTitle, getHighlightRanges } = require('../search-ranking.js');
 
 test('browser export attaches the helper on globalThis', () => {
   assert.equal(globalThis.PounceSearchUtils.rankResults, rankResults);
@@ -548,4 +548,53 @@ test('empty-port url-like inputs do not create synthetic open results', () => {
     );
     assert.deepEqual(results.map((item) => item.type), ['search']);
   });
+});
+
+test('getHighlightRanges is exposed on the helper api', () => {
+  assert.equal(globalThis.PounceSearchUtils.getHighlightRanges, getHighlightRanges);
+});
+
+test('getHighlightRanges returns single range for single occurrence', () => {
+  assert.deepEqual(getHighlightRanges('GitHub', 'git'), [[0, 3]]);
+});
+
+test('getHighlightRanges returns all occurrences in order', () => {
+  assert.deepEqual(getHighlightRanges('Google Docs - Google', 'go'), [[0, 2], [14, 16]]);
+});
+
+test('getHighlightRanges is case-insensitive but preserves source positions', () => {
+  assert.deepEqual(getHighlightRanges('GitHub', 'GIT'), [[0, 3]]);
+});
+
+test('getHighlightRanges treats regex meta characters literally', () => {
+  assert.deepEqual(getHighlightRanges('a.b.c', '.'), [[1, 2], [3, 4]]);
+});
+
+test('getHighlightRanges handles overlapping matches without infinite loop', () => {
+  assert.deepEqual(getHighlightRanges('aaaa', 'aa'), [[0, 2], [2, 4]]);
+});
+
+test('getHighlightRanges returns [] for empty query', () => {
+  assert.deepEqual(getHighlightRanges('GitHub', ''), []);
+});
+
+test('getHighlightRanges returns [] for whitespace-only query', () => {
+  assert.deepEqual(getHighlightRanges('GitHub', '   '), []);
+});
+
+test('getHighlightRanges returns [] for null/undefined text', () => {
+  assert.deepEqual(getHighlightRanges(null, 'git'), []);
+  assert.deepEqual(getHighlightRanges(undefined, 'git'), []);
+});
+
+test('getHighlightRanges returns [] when query is longer than text', () => {
+  assert.deepEqual(getHighlightRanges('git', 'github'), []);
+});
+
+test('getHighlightRanges returns [] when query is not found', () => {
+  assert.deepEqual(getHighlightRanges('GitHub', 'foo'), []);
+});
+
+test('getHighlightRanges supports CJK substrings', () => {
+  assert.deepEqual(getHighlightRanges('支付宝官网', '官网'), [[3, 5]]);
 });

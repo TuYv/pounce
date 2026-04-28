@@ -501,6 +501,33 @@
     return rankedResults;
   }
 
+  function getHighlightRanges(text, query) {
+    if (typeof text !== 'string' || text.length === 0) {
+      return [];
+    }
+    if (typeof query !== 'string') {
+      return [];
+    }
+    const trimmedQuery = query.trim();
+    if (trimmedQuery.length === 0 || trimmedQuery.length > text.length) {
+      return [];
+    }
+
+    const haystack = text.toLowerCase();
+    const needle = trimmedQuery.toLowerCase();
+    const ranges = [];
+    let pos = 0;
+
+    while (pos <= haystack.length - needle.length) {
+      const idx = haystack.indexOf(needle, pos);
+      if (idx === -1) break;
+      ranges.push([idx, idx + needle.length]);
+      pos = idx + needle.length;
+    }
+
+    return ranges;
+  }
+
   function rankResults(items, query = '', limit = 10) {
     const normalizedQuery = String(query || '').trim().toLowerCase();
     const sourceItems = Array.isArray(items) ? items : [];
@@ -527,7 +554,8 @@
 
   const api = {
     rankResults,
-    getDisplayTitle
+    getDisplayTitle,
+    getHighlightRanges
   };
 
   if (typeof globalThis !== 'undefined') {
