@@ -1,6 +1,21 @@
 (function() {
   'use strict';
 
+  // Pinyin matching is opt-out; toggle is wired from search-overlay.js based on user preference.
+  let pinyinMatchingEnabled = true;
+
+  function setPinyinMatchingEnabled(value) {
+    pinyinMatchingEnabled = !!value;
+  }
+
+  function getPinyinHelpers() {
+    if (typeof globalThis === 'undefined') return null;
+    const indexApi = globalThis.PouncePinyinIndex;
+    const matcherApi = globalThis.PouncePinyinMatcher;
+    if (!indexApi || !matcherApi) return null;
+    return { indexApi, matcherApi };
+  }
+
   const SOURCE_PRIORITY = {
     tab: 0,
     history: 1,
@@ -352,6 +367,33 @@
       return 5;
     }
 
+    // Pinyin fallback (tiers 6–10). Only invoked when:
+    //   1) setting on
+    //   2) query has at least one ASCII letter
+    //   3) title contains at least one CJK character (verified by the index)
+    if (!pinyinMatchingEnabled) {
+      return Number.POSITIVE_INFINITY;
+    }
+    const helpers = getPinyinHelpers();
+    if (!helpers) {
+      return Number.POSITIVE_INFINITY;
+    }
+    if (!helpers.matcherApi.hasAsciiLetter(queryData.lowerRaw)) {
+      return Number.POSITIVE_INFINITY;
+    }
+    const titleSource = getDisplayTitle(item);
+    const idx = helpers.indexApi.getPinyinIndex(titleSource);
+    if (!idx || !idx.hasCjk) {
+      return Number.POSITIVE_INFINITY;
+    }
+
+    const q = queryData.lowerRaw;
+    if (helpers.matcherApi.matchFullStartsWith(q, idx))     return 6;
+    if (helpers.matcherApi.matchInitialsStartsWith(q, idx)) return 7;
+    if (helpers.matcherApi.matchFullIncludes(q, idx))       return 8;
+    if (helpers.matcherApi.matchInitialsIncludes(q, idx))   return 9;
+    if (helpers.matcherApi.matchMixed(queryData.raw, idx))  return 10;
+
     return Number.POSITIVE_INFINITY;
   }
 
@@ -502,31 +544,40 @@
   }
 
   function getHighlightRanges(text, query) {
-    if (typeof text !== 'string' || text.length === 0) {
-      return [];
-    }
-    if (typeof query !== 'string') {
-      return [];
-    }
+    if (typeof text !== 'string' || text.length === 0) return [];
+    if (typeof query !== 'string') return [];
     const trimmedQuery = query.trim();
-    if (trimmedQuery.length === 0 || trimmedQuery.length > text.length) {
-      return [];
+    if (trimmedQuery.length === 0) return [];
+
+    // Literal pass — same as before.
+    const literalRanges = [];
+    if (trimmedQuery.length <= text.length) {
+      const haystack = text.toLowerCase();
+      const needle = trimmedQuery.toLowerCase();
+      let pos = 0;
+      while (pos <= haystack.length - needle.length) {
+        const idx = haystack.indexOf(needle, pos);
+        if (idx === -1) break;
+        literalRanges.push([idx, idx + needle.length]);
+        pos = idx + needle.length;
+      }
     }
+    if (literalRanges.length > 0) return literalRanges;
 
-    const haystack = text.toLowerCase();
-    const needle = trimmedQuery.toLowerCase();
-    const ranges = [];
-    let pos = 0;
+    // Pinyin fallback — same gates as getMatchTier.
+    if (!pinyinMatchingEnabled) return [];
+    const helpers = getPinyinHelpers();
+    if (!helpers) return [];
+    if (!helpers.matcherApi.hasAsciiLetter(trimmedQuery)) return [];
+    const idx = helpers.indexApi.getPinyinIndex(text);
+    if (!idx || !idx.hasCjk) return [];
 
-    while (pos <= haystack.length - needle.length) {
-      const idx = haystack.indexOf(needle, pos);
-      if (idx === -1) break;
-      ranges.push([idx, idx + needle.length]);
-      // Non-overlapping advance: skip past this match instead of stepping by 1.
-      pos = idx + needle.length;
-    }
-
-    return ranges;
+    const m = helpers.matcherApi.matchFullStartsWith(trimmedQuery, idx)
+           || helpers.matcherApi.matchInitialsStartsWith(trimmedQuery, idx)
+           || helpers.matcherApi.matchFullIncludes(trimmedQuery, idx)
+           || helpers.matcherApi.matchInitialsIncludes(trimmedQuery, idx)
+           || helpers.matcherApi.matchMixed(trimmedQuery, idx);
+    return m ? m.ranges : [];
   }
 
   function rankResults(items, query = '', limit = 10) {
@@ -556,7 +607,8 @@
   const api = {
     rankResults,
     getDisplayTitle,
-    getHighlightRanges
+    getHighlightRanges,
+    setPinyinMatchingEnabled
   };
 
   if (typeof globalThis !== 'undefined') {

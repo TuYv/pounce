@@ -439,6 +439,9 @@ async function injectAndShow(tabId, bridgeTabId) {
   try {
     await chrome.scripting.executeScript({ target: { tabId }, files: ['theme-manager.js'] });
     await chrome.scripting.executeScript({ target: { tabId }, files: ['preferences.js'] });
+    await chrome.scripting.executeScript({ target: { tabId }, files: ['vendor/tiny-pinyin.js'] });
+    await chrome.scripting.executeScript({ target: { tabId }, files: ['pinyin-index.js'] });
+    await chrome.scripting.executeScript({ target: { tabId }, files: ['pinyin-matcher.js'] });
     await chrome.scripting.executeScript({ target: { tabId }, files: ['search-ranking.js'] });
     await chrome.scripting.executeScript({ target: { tabId }, files: ['search-overlay.js'] });
     // CSS 不再注入宿主页：overlay 已迁至 Shadow DOM，search-overlay.js 内部自己 link 样式表

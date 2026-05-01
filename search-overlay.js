@@ -32,7 +32,8 @@
   const PREFERENCES = globalThis.PouncePreferences || {};
   const DEFAULT_SEARCH_PREFERENCES = PREFERENCES.DEFAULT_SEARCH_PREFERENCES || {
     quickPickEnabled: true,
-    highlightMatchesEnabled: true
+    highlightMatchesEnabled: true,
+    pinyinMatchingEnabled: true
   };
   const SEARCH_PREFERENCE_KEYS = PREFERENCES.SEARCH_PREFERENCE_KEYS || Object.keys(DEFAULT_SEARCH_PREFERENCES);
   const normalizeSearchPreferences = PREFERENCES.normalizeSearchPreferences || ((values) => {
@@ -281,7 +282,8 @@
 
         this.searchPreferences = normalizeSearchPreferences({
           quickPickEnabled: changes.quickPickEnabled ? changes.quickPickEnabled.newValue : this.searchPreferences.quickPickEnabled,
-          highlightMatchesEnabled: changes.highlightMatchesEnabled ? changes.highlightMatchesEnabled.newValue : this.searchPreferences.highlightMatchesEnabled
+          highlightMatchesEnabled: changes.highlightMatchesEnabled ? changes.highlightMatchesEnabled.newValue : this.searchPreferences.highlightMatchesEnabled,
+          pinyinMatchingEnabled: changes.pinyinMatchingEnabled ? changes.pinyinMatchingEnabled.newValue : this.searchPreferences.pinyinMatchingEnabled
         });
         this.applySearchPreferences();
       };
@@ -402,6 +404,10 @@
     }
 
     applySearchPreferences() {
+      if (window.PounceSearchUtils && typeof window.PounceSearchUtils.setPinyinMatchingEnabled === 'function') {
+        window.PounceSearchUtils.setPinyinMatchingEnabled(this.searchPreferences.pinyinMatchingEnabled);
+      }
+
       if (this.overlay) {
         this.overlay.classList.toggle('pounce-quick-pick-disabled', !this.searchPreferences.quickPickEnabled);
       }

@@ -61,6 +61,11 @@ MIT — see [LICENSE](LICENSE)
 
 ## Changelog
 
+### 1.4.7
+- Search Chinese-titled tabs / bookmarks / history by pinyin: type `bd` or `baidu` to find 百度. Mixed Chinese + Latin queries (`百d搜`) also work.
+- Setting toggle to turn pinyin matching off (default on). English titles never enter the pinyin path, so non-Chinese users pay no runtime cost.
+- Pinyin-matched characters in titles get the same primary-color highlight as literal matches.
+
 ### 1.4.6
 - Add match highlighting in search results, with a setting to turn it off.
 - Add a setting to turn quick-pick shortcuts on or off.
