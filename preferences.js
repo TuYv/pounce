@@ -3,7 +3,8 @@
 
   const DEFAULT_SEARCH_PREFERENCES = Object.freeze({
     quickPickEnabled: true,
-    highlightMatchesEnabled: true
+    highlightMatchesEnabled: true,
+    pinyinMatchingEnabled: true
   });
 
   const SEARCH_PREFERENCE_KEYS = Object.freeze(Object.keys(DEFAULT_SEARCH_PREFERENCES));
