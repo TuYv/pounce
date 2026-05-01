@@ -20,6 +20,9 @@ FILES=(
   search-overlay.js
   search-overlay.css
   search-ranking.js
+  pinyin-index.js
+  pinyin-matcher.js
+  vendor
   bridge.html
   icons
 )
