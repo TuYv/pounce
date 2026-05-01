@@ -1,6 +1,21 @@
 (function() {
   'use strict';
 
+  // Pinyin matching is opt-out; toggle is wired from search-overlay.js based on user preference.
+  let pinyinMatchingEnabled = true;
+
+  function setPinyinMatchingEnabled(value) {
+    pinyinMatchingEnabled = !!value;
+  }
+
+  function getPinyinHelpers() {
+    if (typeof globalThis === 'undefined') return null;
+    const indexApi = globalThis.PouncePinyinIndex;
+    const matcherApi = globalThis.PouncePinyinMatcher;
+    if (!indexApi || !matcherApi) return null;
+    return { indexApi, matcherApi };
+  }
+
   const SOURCE_PRIORITY = {
     tab: 0,
     history: 1,
@@ -352,6 +367,33 @@
       return 5;
     }
 
+    // Pinyin fallback (tiers 6–10). Only invoked when:
+    //   1) setting on
+    //   2) query has at least one ASCII letter
+    //   3) title contains at least one CJK character (verified by the index)
+    if (!pinyinMatchingEnabled) {
+      return Number.POSITIVE_INFINITY;
+    }
+    const helpers = getPinyinHelpers();
+    if (!helpers) {
+      return Number.POSITIVE_INFINITY;
+    }
+    if (!helpers.matcherApi.hasAsciiLetter(queryData.lowerRaw)) {
+      return Number.POSITIVE_INFINITY;
+    }
+    const titleSource = getDisplayTitle(item);
+    const idx = helpers.indexApi.getPinyinIndex(titleSource);
+    if (!idx || !idx.hasCjk) {
+      return Number.POSITIVE_INFINITY;
+    }
+
+    const q = queryData.lowerRaw;
+    if (helpers.matcherApi.matchFullStartsWith(q, idx))     return 6;
+    if (helpers.matcherApi.matchInitialsStartsWith(q, idx)) return 7;
+    if (helpers.matcherApi.matchFullIncludes(q, idx))       return 8;
+    if (helpers.matcherApi.matchInitialsIncludes(q, idx))   return 9;
+    if (helpers.matcherApi.matchMixed(queryData.raw, idx))  return 10;
+
     return Number.POSITIVE_INFINITY;
   }
 
@@ -556,7 +598,8 @@
   const api = {
     rankResults,
     getDisplayTitle,
-    getHighlightRanges
+    getHighlightRanges,
+    setPinyinMatchingEnabled
   };
 
   if (typeof globalThis !== 'undefined') {
