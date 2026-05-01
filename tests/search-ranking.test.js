@@ -602,3 +602,37 @@ test('getHighlightRanges supports CJK substrings', () => {
 test('getHighlightRanges trims surrounding whitespace before matching', () => {
   assert.deepEqual(getHighlightRanges('GitHub', '  git  '), [[0, 3]]);
 });
+
+// --- Pinyin highlight fallback ---
+const TinyPinyinForHighlight = require('../vendor/tiny-pinyin.js');
+globalThis.TinyPinyin = TinyPinyinForHighlight;
+require('../pinyin-index.js');
+require('../pinyin-matcher.js');
+const { setPinyinMatchingEnabled: setPyForHighlight } = require('../search-ranking.js');
+
+test('getHighlightRanges falls back to pinyin initials when literal misses', () => {
+  setPyForHighlight(true);
+  assert.deepEqual(getHighlightRanges('百度搜索', 'bd'), [[0, 2]]);
+});
+
+test('getHighlightRanges falls back to full pinyin when literal misses', () => {
+  setPyForHighlight(true);
+  assert.deepEqual(getHighlightRanges('百度搜索', 'baidu'), [[0, 2]]);
+});
+
+test('getHighlightRanges prefers literal CJK match over pinyin', () => {
+  setPyForHighlight(true);
+  // '百度' is a literal substring of '百度搜索' → returns literal range, not pinyin range.
+  assert.deepEqual(getHighlightRanges('百度搜索', '百度'), [[0, 2]]);
+});
+
+test('getHighlightRanges returns [] for ASCII query against all-ASCII title with no literal hit', () => {
+  setPyForHighlight(true);
+  assert.deepEqual(getHighlightRanges('GitHub', 'bd'), []);
+});
+
+test('getHighlightRanges respects setPinyinMatchingEnabled(false)', () => {
+  setPyForHighlight(false);
+  assert.deepEqual(getHighlightRanges('百度搜索', 'bd'), []);
+  setPyForHighlight(true); // restore
+});

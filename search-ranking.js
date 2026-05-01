@@ -544,31 +544,40 @@
   }
 
   function getHighlightRanges(text, query) {
-    if (typeof text !== 'string' || text.length === 0) {
-      return [];
-    }
-    if (typeof query !== 'string') {
-      return [];
-    }
+    if (typeof text !== 'string' || text.length === 0) return [];
+    if (typeof query !== 'string') return [];
     const trimmedQuery = query.trim();
-    if (trimmedQuery.length === 0 || trimmedQuery.length > text.length) {
-      return [];
+    if (trimmedQuery.length === 0) return [];
+
+    // Literal pass — same as before.
+    const literalRanges = [];
+    if (trimmedQuery.length <= text.length) {
+      const haystack = text.toLowerCase();
+      const needle = trimmedQuery.toLowerCase();
+      let pos = 0;
+      while (pos <= haystack.length - needle.length) {
+        const idx = haystack.indexOf(needle, pos);
+        if (idx === -1) break;
+        literalRanges.push([idx, idx + needle.length]);
+        pos = idx + needle.length;
+      }
     }
+    if (literalRanges.length > 0) return literalRanges;
 
-    const haystack = text.toLowerCase();
-    const needle = trimmedQuery.toLowerCase();
-    const ranges = [];
-    let pos = 0;
+    // Pinyin fallback — same gates as getMatchTier.
+    if (!pinyinMatchingEnabled) return [];
+    const helpers = getPinyinHelpers();
+    if (!helpers) return [];
+    if (!helpers.matcherApi.hasAsciiLetter(trimmedQuery)) return [];
+    const idx = helpers.indexApi.getPinyinIndex(text);
+    if (!idx || !idx.hasCjk) return [];
 
-    while (pos <= haystack.length - needle.length) {
-      const idx = haystack.indexOf(needle, pos);
-      if (idx === -1) break;
-      ranges.push([idx, idx + needle.length]);
-      // Non-overlapping advance: skip past this match instead of stepping by 1.
-      pos = idx + needle.length;
-    }
-
-    return ranges;
+    const m = helpers.matcherApi.matchFullStartsWith(trimmedQuery, idx)
+           || helpers.matcherApi.matchInitialsStartsWith(trimmedQuery, idx)
+           || helpers.matcherApi.matchFullIncludes(trimmedQuery, idx)
+           || helpers.matcherApi.matchInitialsIncludes(trimmedQuery, idx)
+           || helpers.matcherApi.matchMixed(trimmedQuery, idx);
+    return m ? m.ranges : [];
   }
 
   function rankResults(items, query = '', limit = 10) {
