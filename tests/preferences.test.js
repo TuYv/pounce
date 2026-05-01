@@ -11,10 +11,12 @@ test('missing search preferences default to enabled', () => {
 test('explicit disabled search preferences are preserved', () => {
   assert.deepEqual(normalizeSearchPreferences({
     quickPickEnabled: false,
-    highlightMatchesEnabled: false
+    highlightMatchesEnabled: false,
+    pinyinMatchingEnabled: false
   }), {
     quickPickEnabled: false,
-    highlightMatchesEnabled: false
+    highlightMatchesEnabled: false,
+    pinyinMatchingEnabled: false
   });
 });
 
