@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeSelect = document.getElementById('themeSelect');
   const quickPickToggle = document.getElementById('quickPickEnabled');
   const highlightMatchesToggle = document.getElementById('highlightMatchesEnabled');
+  const pinyinMatchingToggle = document.getElementById('pinyinMatchingEnabled');
   const preferenceKeys = window.PouncePreferences.SEARCH_PREFERENCE_KEYS;
   const normalizeSearchPreferences = window.PouncePreferences.normalizeSearchPreferences;
 
@@ -396,6 +397,10 @@ document.addEventListener('DOMContentLoaded', () => {
         saveSearchPreference('highlightMatchesEnabled', highlightMatchesToggle.checked);
       });
 
+      pinyinMatchingToggle.addEventListener('change', () => {
+        saveSearchPreference('pinyinMatchingEnabled', pinyinMatchingToggle.checked);
+      });
+
       chrome.storage.onChanged.addListener((changes, area) => {
         if (area !== 'sync') return;
         const changedPreference = preferenceKeys.some(key => changes[key]);
@@ -403,7 +408,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         applySearchPreferenceToggles(normalizeSearchPreferences({
           quickPickEnabled: changes.quickPickEnabled ? changes.quickPickEnabled.newValue : quickPickToggle.checked,
-          highlightMatchesEnabled: changes.highlightMatchesEnabled ? changes.highlightMatchesEnabled.newValue : highlightMatchesToggle.checked
+          highlightMatchesEnabled: changes.highlightMatchesEnabled ? changes.highlightMatchesEnabled.newValue : highlightMatchesToggle.checked,
+          pinyinMatchingEnabled: changes.pinyinMatchingEnabled ? changes.pinyinMatchingEnabled.newValue : pinyinMatchingToggle.checked
         }));
       });
     } catch (error) {
@@ -414,6 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function applySearchPreferenceToggles(preferences) {
     quickPickToggle.checked = preferences.quickPickEnabled;
     highlightMatchesToggle.checked = preferences.highlightMatchesEnabled;
+    pinyinMatchingToggle.checked = preferences.pinyinMatchingEnabled;
   }
 
   async function saveSearchPreference(key, value) {
