@@ -90,7 +90,41 @@ test('matchers are case-insensitive on query', () => {
   assert.deepEqual(matchFullStartsWith('BAIDU', idxOf('百度搜索')), { ranges: [[0, 2]] });
 });
 
-test('matchMixed placeholder — returns null until walker is implemented', () => {
-  // This test intentionally pins the current behavior; Task 5 will replace it.
-  assert.equal(typeof matchMixed, 'function');
+test('matchMixed handles 百d搜索 → 百度搜索 (mode D mixed)', () => {
+  const result = matchMixed('百d搜索', idxOf('百度搜索'));
+  assert.deepEqual(result, { ranges: [[0, 4]] });
+});
+
+test('matchMixed handles baidu搜 → 百度搜索 (full pinyin + literal CJK)', () => {
+  const result = matchMixed('baidu搜', idxOf('百度搜索'));
+  assert.deepEqual(result, { ranges: [[0, 3]] });
+});
+
+test('matchMixed handles bd搜索 → 百度搜索 (initials + literal CJK)', () => {
+  const result = matchMixed('bd搜索', idxOf('百度搜索'));
+  assert.deepEqual(result, { ranges: [[0, 4]] });
+});
+
+test('matchMixed returns null when no contiguous match exists', () => {
+  assert.equal(matchMixed('xy', idxOf('百度搜索')), null);
+});
+
+test('matchMixed returns null on empty query', () => {
+  assert.equal(matchMixed('', idxOf('百度搜索')), null);
+});
+
+test('matchMixed returns null when idx.hasCjk is false', () => {
+  assert.equal(matchMixed('git', idxOf('GitHub')), null);
+});
+
+test('matchMixed handles middle-of-title start (我d → 我爱度...)', () => {
+  // Title 我爱度搜 has charInfo wo/ai/du/sou; query 我d wants to match 我 + initial of 度.
+  // But 度 is at idx 2, with 爱 at idx 1 in between → walker requires contiguous chars.
+  // 我d cannot bridge across 爱, so this returns null.
+  assert.equal(matchMixed('我d', idxOf('我爱度搜')), null);
+});
+
+test('matchMixed handles contiguous middle-of-title 度搜 → 我爱度搜', () => {
+  const result = matchMixed('度s', idxOf('我爱度搜'));
+  assert.deepEqual(result, { ranges: [[2, 4]] });
 });
