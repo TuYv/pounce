@@ -72,6 +72,14 @@
       this.docKeyUpHandler = null;
       this.runtimeMessageHandler = null;
       this.storageChangeHandler = null;
+      this.languageChangeHandler = null;
+
+      // 静态文本节点引用，用于语言切换时实时刷新
+      this.resultsCounterStaticKey = 'overlay.zeroResults';
+      this.navigateHintEl = null;
+      this.selectHintEl = null;
+      this.quickPickHintLabelEl = null;
+      this.closeHintEl = null;
 
       // Mac 用 ⌥ 符号，其他平台用 Alt+ 前缀
       const isMac = navigator.platform.toUpperCase().includes('MAC') ||
@@ -139,7 +147,9 @@
       this.searchInput = document.createElement('input');
       this.searchInput.className = 'pounce-search-input';
       this.searchInput.type = 'text';
-      this.searchInput.placeholder = 'Search tabs, history, bookmarks, and top sites...';
+      this.searchInput.placeholder = window.i18n
+        ? window.i18n.t('overlay.searchPlaceholder')
+        : 'Search tabs, history, bookmarks, and top sites...';
       this.searchInput.autocomplete = 'off';
       this.searchInput.spellcheck = false;
 
@@ -163,26 +173,68 @@
 
       const leftContainer = document.createElement('div');
       leftContainer.className = 'pounce-search-bottom-left';
-      leftContainer.textContent = '0 results';
+      leftContainer.textContent = window.i18n
+        ? window.i18n.t('overlay.zeroResults')
+        : '0 results';
       this.resultsCounter = leftContainer; // 保存引用以便后续更新
       bottomContainer.appendChild(leftContainer);
       const rightContainer = document.createElement('div');
       rightContainer.className = 'pounce-hints';
-      rightContainer.innerHTML = `
-        <span class="pounce-hint">
-          <span class="pounce-hint-key">↑</span><span class="pounce-hint-key">↓</span> Navigate
-        </span>
-        <span class="pounce-hint">
-          <span class="pounce-hint-key">↵</span> Select
-        </span>
-        <span class="pounce-hint" data-pounce-quick-pick-hint>
-          <span class="pounce-hint-key">${this.shortcutKeyLabel}</span><span class="pounce-hint-key">1-9</span> Quick pick
-        </span>
-        <span class="pounce-hint">
-          <span class="pounce-hint-key">Esc</span> Close
-        </span>
-      `;
-      this.quickPickHint = rightContainer.querySelector('[data-pounce-quick-pick-hint]');
+      // 用 DOM 构造而非 innerHTML，以便保留文本节点引用做语言切换刷新
+      const navigateHint = document.createElement('span');
+      navigateHint.className = 'pounce-hint';
+      const navUpKey = document.createElement('span');
+      navUpKey.className = 'pounce-hint-key';
+      navUpKey.textContent = '↑';
+      const navDownKey = document.createElement('span');
+      navDownKey.className = 'pounce-hint-key';
+      navDownKey.textContent = '↓';
+      const navigateLabel = document.createTextNode(' ' + (window.i18n ? window.i18n.t('overlay.navigate') : 'Navigate'));
+      navigateHint.appendChild(navUpKey);
+      navigateHint.appendChild(navDownKey);
+      navigateHint.appendChild(navigateLabel);
+      this.navigateHintEl = navigateLabel;
+
+      const selectHint = document.createElement('span');
+      selectHint.className = 'pounce-hint';
+      const selectKey = document.createElement('span');
+      selectKey.className = 'pounce-hint-key';
+      selectKey.textContent = '↵';
+      const selectLabel = document.createTextNode(' ' + (window.i18n ? window.i18n.t('overlay.select') : 'Select'));
+      selectHint.appendChild(selectKey);
+      selectHint.appendChild(selectLabel);
+      this.selectHintEl = selectLabel;
+
+      const quickPickHint = document.createElement('span');
+      quickPickHint.className = 'pounce-hint';
+      quickPickHint.setAttribute('data-pounce-quick-pick-hint', '');
+      const quickPickModKey = document.createElement('span');
+      quickPickModKey.className = 'pounce-hint-key';
+      quickPickModKey.textContent = this.shortcutKeyLabel;
+      const quickPickRangeKey = document.createElement('span');
+      quickPickRangeKey.className = 'pounce-hint-key';
+      quickPickRangeKey.textContent = '1-9';
+      const quickPickLabel = document.createTextNode(' ' + (window.i18n ? window.i18n.t('overlay.quickPick') : 'Quick pick'));
+      quickPickHint.appendChild(quickPickModKey);
+      quickPickHint.appendChild(quickPickRangeKey);
+      quickPickHint.appendChild(quickPickLabel);
+      this.quickPickHintLabelEl = quickPickLabel;
+
+      const closeHint = document.createElement('span');
+      closeHint.className = 'pounce-hint';
+      const closeKey = document.createElement('span');
+      closeKey.className = 'pounce-hint-key';
+      closeKey.textContent = 'Esc';
+      const closeLabel = document.createTextNode(' ' + (window.i18n ? window.i18n.t('overlay.close') : 'Close'));
+      closeHint.appendChild(closeKey);
+      closeHint.appendChild(closeLabel);
+      this.closeHintEl = closeLabel;
+
+      rightContainer.appendChild(navigateHint);
+      rightContainer.appendChild(selectHint);
+      rightContainer.appendChild(quickPickHint);
+      rightContainer.appendChild(closeHint);
+      this.quickPickHint = quickPickHint;
       bottomContainer.appendChild(rightContainer);
       
       // Assemble the overlay with correct structure
@@ -288,6 +340,45 @@
         this.applySearchPreferences();
       };
       chrome.storage.onChanged.addListener(this.storageChangeHandler);
+
+      // 语言切换：reload 词典后重渲染静态文案
+      this.languageChangeHandler = async (changes, area) => {
+        if (this.isDestroyed) return;
+        if (area !== 'sync' || !changes.language || !window.i18n) return;
+        try {
+          await window.i18n.reload();
+        } catch (e) {
+          console.warn('Pounce: failed to reload i18n', e);
+          return;
+        }
+        this.rerenderStaticOverlayText();
+      };
+      chrome.storage.onChanged.addListener(this.languageChangeHandler);
+    }
+
+    rerenderStaticOverlayText() {
+      if (!window.i18n) return;
+      if (this.searchInput) {
+        this.searchInput.placeholder = window.i18n.t('overlay.searchPlaceholder');
+      }
+      if (this.navigateHintEl) {
+        this.navigateHintEl.textContent = ' ' + window.i18n.t('overlay.navigate');
+      }
+      if (this.selectHintEl) {
+        this.selectHintEl.textContent = ' ' + window.i18n.t('overlay.select');
+      }
+      if (this.quickPickHintLabelEl) {
+        this.quickPickHintLabelEl.textContent = ' ' + window.i18n.t('overlay.quickPick');
+      }
+      if (this.closeHintEl) {
+        this.closeHintEl.textContent = ' ' + window.i18n.t('overlay.close');
+      }
+      // 重新渲染当前结果（含 sourceLabel 等动态文本）和计数
+      if (this.currentResults && this.currentResults.length) {
+        this.renderResults(this.searchInput ? this.searchInput.value : '');
+      } else if (this.resultsCounter) {
+        this.resultsCounter.textContent = window.i18n.t('overlay.zeroResults');
+      }
     }
     
     show() {
@@ -377,6 +468,15 @@
       }
       this.storageChangeHandler = null;
 
+      try {
+        if (this.languageChangeHandler && chrome.storage?.onChanged?.removeListener) {
+          chrome.storage.onChanged.removeListener(this.languageChangeHandler);
+        }
+      } catch (e) {
+        // chrome.runtime 可能已失效（extension context invalidated），忽略
+      }
+      this.languageChangeHandler = null;
+
       if (this.shadowHost && this.shadowHost.parentNode) {
         this.shadowHost.parentNode.removeChild(this.shadowHost);
       }
@@ -440,11 +540,13 @@
           this.handleSearch(this.searchInput.value);
         } else {
           console.error('Pounce: Response indicates failure:', response);
-          this.showError('Failed to load search data: ' + (response?.error || 'Unknown error'));
+          const base = window.i18n ? window.i18n.t('overlay.loadError') : 'Failed to load search data';
+          this.showError(base + ': ' + (response?.error || 'Unknown error'));
         }
       } catch (error) {
         console.error('Pounce: Error loading search data:', error);
-        this.showError('Failed to load search data: ' + error.message);
+        const base = window.i18n ? window.i18n.t('overlay.loadError') : 'Failed to load search data';
+        this.showError(base + ': ' + error.message);
       }
     }
     
@@ -561,13 +663,14 @@
         return aTitle.localeCompare(bTitle);
       });
 
+      const tr = (key, fallback) => (window.i18n ? window.i18n.t(key) : fallback);
       const results = filteredItems.slice(0, 10).map((item) => {
         const sourceLabel = item.type === 'history'
-          ? 'History'
+          ? tr('overlay.sourceHistory', 'History')
           : item.type === 'topSite'
-            ? 'Top Site'
+            ? tr('overlay.sourceTopSite', 'Top Site')
             : item.type === 'bookmark'
-              ? 'Bookmark'
+              ? tr('overlay.sourceBookmark', 'Bookmark')
               : '';
         const iconFallback = item.type === 'tab'
           ? 'T'
@@ -593,7 +696,7 @@
 
         return {
           ...item,
-          displayTitle: item.title || item.url || 'Untitled',
+          displayTitle: item.title || item.url || tr('overlay.untitled', 'Untitled'),
           displayUrl,
           sourceLabel,
           iconFallback
@@ -611,8 +714,8 @@
         title: `Search for "${trimmedQuery}"`,
         url: `search:${trimmedQuery}`,
         displayTitle: `Search for "${trimmedQuery}"`,
-        displayUrl: 'Search with default search engine',
-        sourceLabel: 'Search',
+        displayUrl: tr('overlay.searchDefault', 'Search with default search engine'),
+        sourceLabel: tr('overlay.sourceSearch', 'Search'),
         iconFallback: 'S',
         isSearchOption: true
       };
@@ -658,7 +761,7 @@
           url: normalizedUrl,
           displayTitle: `Open ${normalizedUrl}`,
           displayUrl: normalizedUrl,
-          sourceLabel: 'Open',
+          sourceLabel: window.i18n ? window.i18n.t('overlay.sourceOpen') : 'Open',
           iconFallback: 'O',
           isOpenOption: true
         };
@@ -767,7 +870,7 @@
       const content = document.createElement('div');
       content.className = 'pounce-result-content';
       
-      const titleText = item.displayTitle || item.title || 'Untitled';
+      const titleText = item.displayTitle || item.title || (window.i18n ? window.i18n.t('overlay.untitled') : 'Untitled');
       const urlText = item.displayUrl || item.url || '';
       const isHighlightable = this.searchPreferences.highlightMatchesEnabled &&
         HIGHLIGHTABLE_TYPES.includes(item.type) &&
@@ -967,14 +1070,15 @@
     }
     
     showLoading() {
-      this.resultsContainer.innerHTML = `
-        <div class="pounce-search-loading">
-          Loading search data...
-        </div>
-      `;
+      const loadingText = window.i18n ? window.i18n.t('overlay.loading') : 'Loading...';
+      this.resultsContainer.innerHTML = '';
+      const loadingEl = document.createElement('div');
+      loadingEl.className = 'pounce-search-loading';
+      loadingEl.textContent = loadingText;
+      this.resultsContainer.appendChild(loadingEl);
       // 加载时显示加载状态
       if (this.resultsCounter) {
-        this.resultsCounter.textContent = 'Loading...';
+        this.resultsCounter.textContent = loadingText;
       }
     }
     
@@ -1007,11 +1111,20 @@
   }
   
   // Initialize when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      window.pounceSearchOverlay = new PounceSearchOverlay();
-    });
-  } else {
+  const bootstrap = async () => {
+    if (window.i18n) {
+      try {
+        await window.i18n.init();
+      } catch (e) {
+        console.warn('Pounce: i18n init failed, falling back to English literals', e);
+      }
+    }
     window.pounceSearchOverlay = new PounceSearchOverlay();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => { bootstrap(); });
+  } else {
+    bootstrap();
   }
 })();
