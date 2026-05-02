@@ -259,12 +259,12 @@
     "description": "Generic notification title"
   },
   "notify.errorTitle": {
-    "message": "Pounce -Error",
-    "description": "Error notification title (matches exact source string)"
+    "message": "Pounce - Error",
+    "description": "Error notification title"
   },
   "notify.searchErrorTitle": {
-    "message": "Pounce -Search Error",
-    "description": "Search error notification title (matches exact source string)"
+    "message": "Pounce - Search Error",
+    "description": "Search error notification title"
   },
   "notify.installedTitle": {
     "message": "Pounce Installed Successfully",
