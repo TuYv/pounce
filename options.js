@@ -148,7 +148,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const manifestData = chrome.runtime.getManifest();
     const versionElement = document.getElementById('optionsVersionText');
     if (versionElement) {
-      versionElement.textContent = `Version ${manifestData.version}`;
+      versionElement.textContent = window.i18n
+        ? window.i18n.t('options.versionLabel', [manifestData.version])
+        : 'Version ' + manifestData.version;
     }
   } catch (error) {
     console.error('Failed to set version:', error);
@@ -232,7 +234,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 验证和规范化 URL
   function validateAndNormalizeUrl(input) {
     if (!input || !input.trim()) {
-      throw new Error('Please enter a URL');
+      throw new Error(window.i18n ? window.i18n.t('options.urlEmpty') : 'Please enter a URL');
     }
 
     let url = input.trim();
@@ -253,13 +255,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // 检查主机名
       if (!urlObj.hostname) {
-        throw new Error('Invalid URL format');
+        throw new Error(window.i18n ? window.i18n.t('options.urlInvalid') : 'Invalid URL format');
       }
-      
+
       return urlObj.href;
     } catch (e) {
       if (e.message.includes('Invalid URL')) {
-        throw new Error('Invalid URL format');
+        throw new Error(window.i18n ? window.i18n.t('options.urlInvalid') : 'Invalid URL format');
       }
       throw e;
     }
@@ -274,7 +276,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // 检查是否已存在
       if (urls.includes(normalizedUrl)) {
-        throw new Error('This URL already exists');
+        throw new Error(window.i18n ? window.i18n.t('options.urlDuplicate') : 'This URL already exists');
       }
       
       // 添加到列表
@@ -334,12 +336,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       <path d="M6.16931 3.99999V2.66666C6.16931 2.31304 6.30979 1.9739 6.55984 1.72385C6.80988 1.4738 7.14902 1.33333 7.50264 1.33333H10.1693C10.5229 1.33333 10.8621 1.4738 11.1121 1.72385C11.3622 1.9739 11.5026 2.31304 11.5026 2.66666V3.99999" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>`;
 
+    const openTitle = window.i18n ? window.i18n.t('options.openUrlTitle') : 'Open URL';
+    const removeTitle = window.i18n ? window.i18n.t('options.removeUrlTitle') : 'Remove URL';
     const listHtml = urls.map((url, index) => `
       <div class="url-item">
         <span class="url-index">${index + 1}</span>
         <span class="url-text">${escapeHtml(url)}</span>
-        <button class="open-btn" data-url="${escapeHtml(url)}" title="Open URL">${openIcon}</button>
-        <button class="delete-btn" data-index="${index}" title="Remove URL">${deleteIcon}</button>
+        <button class="open-btn" data-url="${escapeHtml(url)}" title="${escapeHtml(openTitle)}">${openIcon}</button>
+        <button class="delete-btn" data-index="${index}" title="${escapeHtml(removeTitle)}">${deleteIcon}</button>
       </div>
     `).join('');
 

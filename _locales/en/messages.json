@@ -177,6 +177,26 @@
     "message": "Batch Open URLs",
     "description": "Batch URL list header in options page"
   },
+  "options.add": {
+    "message": "Add",
+    "description": "Add-URL button label in options page"
+  },
+  "options.openAll": {
+    "message": "Open All",
+    "description": "Open-all-URLs button label in options page"
+  },
+  "options.clearAll": {
+    "message": "Clear All",
+    "description": "Clear-all-URLs button label in options page"
+  },
+  "options.openUrlTitle": {
+    "message": "Open URL",
+    "description": "Tooltip on per-row open button in options URL list"
+  },
+  "options.removeUrlTitle": {
+    "message": "Remove URL",
+    "description": "Tooltip on per-row remove button in options URL list"
+  },
   "options.savedUrlsCount": {
     "message": "$count$ saved URLs",
     "description": "Saved URL count, $count$ is a number",
@@ -199,6 +219,21 @@
   "options.footer": {
     "message": "© 2025 Pounce",
     "description": "Footer copyright"
+  },
+  "options.github": {
+    "message": "GitHub",
+    "description": "GitHub repo link label in options footer"
+  },
+  "options.reportIssue": {
+    "message": "Report Issue",
+    "description": "GitHub issue link label in options footer"
+  },
+  "options.versionLabel": {
+    "message": "Version $version$",
+    "description": "Footer version label, $version$ is the manifest version string",
+    "placeholders": {
+      "version": { "content": "$1" }
+    }
   },
 
   "overlay.searchPlaceholder": {
@@ -321,6 +356,9 @@
   "options.loadFailed": { "message": "Failed to load data", "description": "Toast when storage read fails" },
   "options.saveFailed": { "message": "Failed to save data", "description": "Toast when storage write fails" },
   "options.protocolError": { "message": "Only HTTP and HTTPS protocols are supported", "description": "Validation error on invalid URL protocol" },
+  "options.urlEmpty": { "message": "Please enter a URL", "description": "Validation error when URL input is empty" },
+  "options.urlInvalid": { "message": "Invalid URL format", "description": "Validation error when URL format is invalid" },
+  "options.urlDuplicate": { "message": "This URL already exists", "description": "Validation error when URL already exists in the list" },
   "options.urlAdded": { "message": "URL added successfully", "description": "Toast after adding a URL" },
   "options.urlRemoved": { "message": "URL removed successfully", "description": "Toast after removing a URL" },
   "options.themeUpdated": { "message": "Theme updated successfully", "description": "Toast after theme switch" },
