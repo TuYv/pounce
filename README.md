@@ -61,6 +61,9 @@ MIT — see [LICENSE](LICENSE)
 
 ## Changelog
 
+### 1.5.0
+- Added Simplified Chinese localization across popup, options, search overlay, and system notifications. Auto-detects browser language; manual override in Settings → Language.
+
 ### 1.4.7
 - Search Chinese-titled tabs / bookmarks / history by pinyin: type `bd` or `baidu` to find 百度. Mixed Chinese + Latin queries (`百d搜`) also work.
 - Setting toggle to turn pinyin matching off (default on). English titles never enter the pinyin path, so non-Chinese users pay no runtime cost.
