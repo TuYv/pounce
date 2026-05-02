@@ -20,7 +20,7 @@
 
   function formatMessage(message, placeholders, substitutions) {
     if (!placeholders) return message;
-    let out = message;
+    const lookup = {};
     for (const [name, def] of Object.entries(placeholders)) {
       const content = def && def.content;
       if (typeof content !== 'string') continue;
@@ -29,9 +29,11 @@
       const idx = parseInt(match[1], 10) - 1;
       const sub = substitutions && substitutions[idx];
       if (sub === undefined) continue;
-      out = out.split('$' + name + '$').join(String(sub));
+      lookup[name] = String(sub);
     }
-    return out;
+    return message.replace(/\$([A-Za-z_][A-Za-z0-9_]*)\$/g, (full, name) => {
+      return name in lookup ? lookup[name] : full;
+    });
   }
 
   // ----- Browser-only state below; skipped under node:test -----
@@ -62,20 +64,16 @@
   function applyToDom(doc) {
     if (!doc || !doc.querySelectorAll) return;
     doc.querySelectorAll('[data-i18n]').forEach(el => {
-      const v = api.t(el.dataset.i18n);
-      if (v) el.textContent = v;
+      if (dict[el.dataset.i18n]) el.textContent = api.t(el.dataset.i18n);
     });
     doc.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-      const v = api.t(el.dataset.i18nPlaceholder);
-      if (v) el.placeholder = v;
+      if (dict[el.dataset.i18nPlaceholder]) el.placeholder = api.t(el.dataset.i18nPlaceholder);
     });
     doc.querySelectorAll('[data-i18n-title]').forEach(el => {
-      const v = api.t(el.dataset.i18nTitle);
-      if (v) el.title = v;
+      if (dict[el.dataset.i18nTitle]) el.title = api.t(el.dataset.i18nTitle);
     });
     doc.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
-      const v = api.t(el.dataset.i18nAriaLabel);
-      if (v) el.setAttribute('aria-label', v);
+      if (dict[el.dataset.i18nAriaLabel]) el.setAttribute('aria-label', api.t(el.dataset.i18nAriaLabel));
     });
   }
 
@@ -83,7 +81,8 @@
     try {
       const r = await chrome.storage.sync.get([STORAGE_KEY]);
       return r[STORAGE_KEY] || 'auto';
-    } catch {
+    } catch (e) {
+      console.warn('[i18n] failed to read language preference', e);
       return 'auto';
     }
   }
@@ -91,7 +90,8 @@
   function browserLang() {
     try {
       return chrome.i18n.getUILanguage();
-    } catch {
+    } catch (e) {
+      console.warn('[i18n] failed to get browser language', e);
       return 'en';
     }
   }
@@ -115,7 +115,11 @@
 
     async setLanguage(lang, doc) {
       preference = lang;
-      try { await chrome.storage.sync.set({ [STORAGE_KEY]: lang }); } catch {}
+      try {
+        await chrome.storage.sync.set({ [STORAGE_KEY]: lang });
+      } catch (e) {
+        console.warn('[i18n] failed to persist language preference', e);
+      }
       resolvedLang = decideLanguage(preference, browserLang());
       dict = await loadDict(resolvedLang);
       applyToDom(doc || (typeof document !== 'undefined' ? document : null));
@@ -134,5 +138,4 @@
   };
 
   root.i18n = api;
-  if (typeof module !== 'undefined') module.exports = { decideLanguage, formatMessage };
 })(typeof window !== 'undefined' ? window : globalThis);

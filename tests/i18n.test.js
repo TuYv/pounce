@@ -46,3 +46,19 @@ test('formatMessage: missing substitution leaves placeholder name', () => {
   const placeholders = { count: { content: '$1' } };
   assert.equal(formatMessage('$count$ items', placeholders, []), '$count$ items');
 });
+
+test('formatMessage: substitution containing $name$ is not re-substituted', () => {
+  const placeholders = { a: { content: '$1' }, b: { content: '$2' } };
+  assert.equal(
+    formatMessage('$a$ $b$', placeholders, ['$b$', 'real']),
+    '$b$ real'
+  );
+});
+
+test('formatMessage: ignores tokens that have no placeholder definition', () => {
+  const placeholders = { name: { content: '$1' } };
+  assert.equal(
+    formatMessage('hi $name$, $unknown$ stays', placeholders, ['Rick']),
+    'hi Rick, $unknown$ stays'
+  );
+});
