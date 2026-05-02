@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       },
       runtime: {
         sendMessage: (message) => Promise.resolve({ success: true }),
-        openOptionsPage: () => window.open('options_html', '_blank')
+        openOptionsPage: () => window.open('options.html', '_blank')
       },
       tabs: {
         query: (queryInfo) => Promise.resolve([{ id: 1, url: 'http://localhost:8000', status: 'complete' }])
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       chrome.runtime.openOptionsPage();
       window.close();
     } else {
-      window.open('options_html', '_blank');
+      window.open('options.html', '_blank');
     }
   });
 
