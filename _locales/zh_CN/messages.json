@@ -36,7 +36,7 @@
     "description": "Loading placeholder in popup and overlay"
   },
   "popup_openSearchHint": {
-    "message": "随处可用",
+    "message": "随意",
     "description": "Hint word before the Alt+K kbd in popup footer (\"anywhere Alt+K\")"
   },
   "popup_loadingFailed": {
