@@ -288,14 +288,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // 提供更友好的错误信息
       let errorMessage = window.i18n ? window.i18n.t('popup.startFailed') : 'Failed to start search function';
-      if (error.message.includes('Cannot access a chrome:// URL')) {
+      if (error.message.includes('Cannot access a chrome:// URL') ||
+          error.message.includes('The extensions gallery cannot be scripted')) {
         errorMessage = window.i18n
           ? window.i18n.t('popup.restrictedPage')
-          : 'Search function cannot be used on Chrome internal pages. Please switch to a regular webpage and try again';
-      } else if (error.message.includes('The extensions gallery cannot be scripted')) {
-        errorMessage = window.i18n
-          ? window.i18n.t('popup.restrictedPage')
-          : 'Search function cannot be used on Chrome Web Store pages. Please switch to another webpage and try again';
+          : 'Search function cannot be used on this page. Please switch to a regular webpage (like google.com) and try again.';
       } else {
         errorMessage += ': ' + error.message;
       }
