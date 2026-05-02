@@ -36,6 +36,10 @@
     "message": "Loading...",
     "description": "Loading placeholder in popup and overlay"
   },
+  "popup.openSearchHint": {
+    "message": "anywhere",
+    "description": "Hint word before the Alt+K kbd in popup footer (\"anywhere Alt+K\")"
+  },
   "popup.loadingFailed": {
     "message": "Loading failed",
     "description": "Shown in popup when URL list fails to load"
