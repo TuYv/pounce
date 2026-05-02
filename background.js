@@ -1,4 +1,47 @@
 // 后台脚本 - Service Worker
+// 懒加载 i18n 消息字典（service worker 可能被回收，每次通知调用都重新加载）
+async function loadI18nMessages() {
+  let preference = 'auto';
+  try {
+    const r = await chrome.storage.sync.get(['language']);
+    preference = r.language || 'auto';
+  } catch {}
+  const browserLang = (chrome.i18n.getUILanguage() || '').toLowerCase();
+  let lang;
+  if (preference === 'en' || preference === 'zh_CN') {
+    lang = preference;
+  } else {
+    lang = browserLang.startsWith('zh') ? 'zh_CN' : 'en';
+  }
+  try {
+    const url = chrome.runtime.getURL('_locales/' + lang + '/messages.json');
+    const res = await fetch(url);
+    return { lang, dict: await res.json() };
+  } catch {
+    if (lang !== 'en') {
+      const res = await fetch(chrome.runtime.getURL('_locales/en/messages.json'));
+      return { lang: 'en', dict: await res.json() };
+    }
+    return { lang: 'en', dict: {} };
+  }
+}
+
+function tFromDict(dict, key, substitutions) {
+  const entry = dict[key];
+  if (!entry) return key;
+  let out = entry.message;
+  if (entry.placeholders) {
+    for (const [name, def] of Object.entries(entry.placeholders)) {
+      const m = /^\$(\d+)$/.exec(def.content || '');
+      if (!m) continue;
+      const sub = substitutions && substitutions[parseInt(m[1], 10) - 1];
+      if (sub === undefined) continue;
+      out = out.split('$' + name + '$').join(String(sub));
+    }
+  }
+  return out;
+}
+
 // 处理快捷键命令
 chrome.commands.onCommand.addListener((command) => {
   console.log('Pounce: Command received:', command);
@@ -142,41 +185,50 @@ async function openAllUrls() {
     
     if (urls.length === 0) {
       // 如果没有配置网址，显示通知
-      await chrome.notifications.create({
-        type: 'basic',
-        iconUrl: 'icons/icon48.png',
-        title: 'Pounce',
-        message: 'Please add URLs first before using this feature'
-      });
+      {
+        const { dict } = await loadI18nMessages();
+        await chrome.notifications.create({
+          type: 'basic',
+          iconUrl: 'icons/icon48.png',
+          title: tFromDict(dict, 'notify.title'),
+          message: tFromDict(dict, 'notify.noUrls')
+        });
+      }
       return;
     }
-    
+
     // 批量打开网址
     const promises = urls.map(url => {
       return chrome.tabs.create({ url: url, active: false });
     });
-    
+
     await Promise.all(promises);
-    
+
     // 显示成功通知
-    await chrome.notifications.create({
-      type: 'basic',
-      iconUrl: 'icons/icon48.png',
-      title: 'Pounce',
-      message: `Successfully opened ${urls.length} URLs`
-    });
-    
+    {
+      const { dict } = await loadI18nMessages();
+      await chrome.notifications.create({
+        type: 'basic',
+        iconUrl: 'icons/icon48.png',
+        title: tFromDict(dict, 'notify.title'),
+        message: tFromDict(dict, 'notify.openedCount', [String(urls.length)])
+      });
+    }
+
   } catch (error) {
     console.error('Error occurred while opening URLs:', error);
-    
+
     // 显示错误通知
-    await chrome.notifications.create({
-      type: 'basic',
-      iconUrl: 'icons/icon48.png',
-      title: 'Pounce -Error',
-      message: 'Error occurred while opening URLs, please check URL configuration'
-    });
-    
+    {
+      const { dict } = await loadI18nMessages();
+      await chrome.notifications.create({
+        type: 'basic',
+        iconUrl: 'icons/icon48.png',
+        title: tFromDict(dict, 'notify.errorTitle'),
+        message: tFromDict(dict, 'notify.openError')
+      });
+    }
+
     throw error;
   }
 }
@@ -481,13 +533,16 @@ async function performWebSearch(query, bridgeTabId) {
     console.error('Error performing web search:', error);
     
     // 显示错误通知
-    await chrome.notifications.create({
-      type: 'basic',
-      iconUrl: 'icons/icon48.png',
-      title: 'Pounce -Search Error',
-      message: 'Failed to perform web search'
-    });
-    
+    {
+      const { dict } = await loadI18nMessages();
+      await chrome.notifications.create({
+        type: 'basic',
+        iconUrl: 'icons/icon48.png',
+        title: tFromDict(dict, 'notify.searchErrorTitle'),
+        message: tFromDict(dict, 'notify.searchError')
+      });
+    }
+
     throw error;
   }
 }
@@ -499,12 +554,15 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     const isMac = platformInfo.os === 'mac';
     const searchShortcut = isMac ? '⌘K' : 'Alt+K';
     const batchShortcut = isMac ? '⌘⇧U' : 'Ctrl+Shift+U';
-    await chrome.notifications.create({
-      type: 'basic',
-      iconUrl: 'icons/icon48.png',
-      title: 'Pounce Installed Successfully',
-      message: `Press ${searchShortcut} to search tabs & bookmarks. Use ${batchShortcut} to batch open URLs.`
-    });
+    {
+      const { dict } = await loadI18nMessages();
+      await chrome.notifications.create({
+        type: 'basic',
+        iconUrl: 'icons/icon48.png',
+        title: tFromDict(dict, 'notify.installedTitle'),
+        message: tFromDict(dict, 'notify.installedBody', [searchShortcut, batchShortcut])
+      });
+    }
     
     // 打开配置页面
     chrome.runtime.openOptionsPage();
