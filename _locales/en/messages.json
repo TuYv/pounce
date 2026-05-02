@@ -1,0 +1,300 @@
+{
+  "ext_name": {
+    "message": "Pounce – Cmd+K Search Tabs & Bookmarks",
+    "description": "Extension name shown in Chrome Web Store and chrome://extensions"
+  },
+  "ext_description": {
+    "message": "One keystroke to find anything in your browser. Press ⌘K to search open tabs, bookmarks, history, and top sites.",
+    "description": "Extension description in Chrome Web Store"
+  },
+  "action_title": {
+    "message": "Pounce – Search Tabs, Bookmarks & History",
+    "description": "Toolbar icon tooltip"
+  },
+  "cmd_open_all": {
+    "message": "Open all configured URLs",
+    "description": "Description of the batch-open keyboard command"
+  },
+  "cmd_search": {
+    "message": "Search open tabs and bookmarks",
+    "description": "Description of the search keyboard command"
+  },
+
+  "popup.searchTabsBookmarks": {
+    "message": "Search Tabs & Bookmarks",
+    "description": "Primary search button label in popup (both has-URLs and empty states)"
+  },
+  "popup.batchOpenURLs": {
+    "message": "Batch Open URLs",
+    "description": "Batch open button label and section title in popup"
+  },
+  "popup.addUrls": {
+    "message": "+ Add URLs for batch open",
+    "description": "Empty-state CTA in popup"
+  },
+  "popup.loading": {
+    "message": "Loading...",
+    "description": "Loading placeholder in popup and overlay"
+  },
+  "popup.loadingFailed": {
+    "message": "Loading failed",
+    "description": "Shown in popup when URL list fails to load"
+  },
+  "popup.star": {
+    "message": "Star",
+    "description": "GitHub star link label in popup footer"
+  },
+  "popup.issue": {
+    "message": "Issue",
+    "description": "GitHub issue link label in popup footer"
+  },
+  "popup.starTitle": {
+    "message": "Star on GitHub",
+    "description": "Tooltip for GitHub star link in popup footer"
+  },
+  "popup.reportTitle": {
+    "message": "Report an issue",
+    "description": "Tooltip for GitHub issue link in popup footer"
+  },
+  "popup.settingsTitle": {
+    "message": "Settings",
+    "description": "Tooltip for settings button in popup"
+  },
+  "popup.themeTitle": {
+    "message": "Auto (System)",
+    "description": "Tooltip for theme toggle button in popup"
+  },
+
+  "options.title": {
+    "message": "Pounce Settings",
+    "description": "Options page title"
+  },
+  "options.appearance": {
+    "message": "Appearance",
+    "description": "Options section header"
+  },
+  "options.darkMode": {
+    "message": "Dark Mode",
+    "description": "Theme group label"
+  },
+  "options.lightMode": {
+    "message": "Light Mode",
+    "description": "Light theme label"
+  },
+  "options.light": {
+    "message": "Light",
+    "description": "Light theme button"
+  },
+  "options.dark": {
+    "message": "Dark",
+    "description": "Dark theme button"
+  },
+  "options.system": {
+    "message": "System",
+    "description": "System theme button"
+  },
+  "options.followSystem": {
+    "message": "Follow System",
+    "description": "System theme description"
+  },
+
+  "options.language": {
+    "message": "Language",
+    "description": "Language section header"
+  },
+  "options.languageAuto": {
+    "message": "Auto (follow browser)",
+    "description": "Language dropdown auto option"
+  },
+  "options.languageEnglish": {
+    "message": "English",
+    "description": "Language dropdown English option"
+  },
+  "options.languageChinese": {
+    "message": "中文",
+    "description": "Language dropdown Chinese option (kept native)"
+  },
+
+  "options.searchExperience": {
+    "message": "Search Experience",
+    "description": "Search settings section header"
+  },
+  "options.highlightMatches": {
+    "message": "Highlight matches",
+    "description": "Toggle label"
+  },
+  "options.highlightMatchesDesc": {
+    "message": "Emphasize matched text in result titles and URLs.",
+    "description": "Toggle description"
+  },
+  "options.pinyinToggle": {
+    "message": "Match Chinese titles by pinyin",
+    "description": "Pinyin toggle label"
+  },
+  "options.pinyinToggleDesc": {
+    "message": "Type \"bd\" or \"baidu\" to find 百度. Auto-skipped for non-Chinese titles.",
+    "description": "Pinyin toggle description"
+  },
+  "options.quickPick": {
+    "message": "Quick pick",
+    "description": "Quick pick toggle label"
+  },
+  "options.quickPickDesc": {
+    "message": "Open visible results with Alt/Option + 1-9.",
+    "description": "Quick pick description"
+  },
+
+  "options.keyboardShortcuts": {
+    "message": "Keyboard Shortcuts",
+    "description": "Keyboard shortcuts section header in options page"
+  },
+  "options.openSearch": {
+    "message": "Open search",
+    "description": "Shortcut label for open-search command in options page"
+  },
+  "options.batchOpen": {
+    "message": "Batch open",
+    "description": "Shortcut label for batch-open command in options page"
+  },
+  "options.navigate": {
+    "message": "Navigate",
+    "description": "Shortcut label for navigate action in options page"
+  },
+  "options.selectClose": {
+    "message": "Select / Close",
+    "description": "Shortcut label for select/close action in options page"
+  },
+  "options.manage": {
+    "message": "Manage →",
+    "description": "Link to manage keyboard shortcuts page"
+  },
+
+  "options.batchOpenURLs": {
+    "message": "Batch Open URLs",
+    "description": "Batch URL list header in options page"
+  },
+  "options.savedUrlsCount": {
+    "message": "$count$ saved URLs",
+    "description": "Saved URL count, $count$ is a number",
+    "placeholders": {
+      "count": { "content": "$1" }
+    }
+  },
+  "options.noUrlsYet": {
+    "message": "No URLs yet",
+    "description": "First line of empty state in options URL list"
+  },
+  "options.addUrlAbove": {
+    "message": "Add a URL above to get started",
+    "description": "Second line of empty state in options URL list"
+  },
+  "options.urlPlaceholder": {
+    "message": "github.com or https://example.com",
+    "description": "Placeholder text for the URL input field in options"
+  },
+  "options.footer": {
+    "message": "© 2025 Pounce",
+    "description": "Footer copyright"
+  },
+
+  "overlay.searchPlaceholder": {
+    "message": "Search tabs, history, bookmarks, and top sites...",
+    "description": "Overlay search input placeholder"
+  },
+  "overlay.navigate": {
+    "message": "Navigate",
+    "description": "Hint label for arrow keys in overlay"
+  },
+  "overlay.select": {
+    "message": "Select",
+    "description": "Hint label for Enter key in overlay"
+  },
+  "overlay.quickPick": {
+    "message": "Quick pick",
+    "description": "Hint label for Alt+1-9 quick pick in overlay"
+  },
+  "overlay.close": {
+    "message": "Close",
+    "description": "Hint label for Esc key in overlay"
+  },
+  "overlay.loading": {
+    "message": "Loading...",
+    "description": "Results counter text while search data is loading"
+  },
+  "overlay.loadError": {
+    "message": "Failed to load search data",
+    "description": "Error shown in overlay when search data fails to load (base message, error detail appended)"
+  },
+  "overlay.sourceHistory": {
+    "message": "History",
+    "description": "Badge label for history results in overlay"
+  },
+  "overlay.sourceTopSite": {
+    "message": "Top Site",
+    "description": "Badge label for top-site results in overlay"
+  },
+  "overlay.sourceBookmark": {
+    "message": "Bookmark",
+    "description": "Badge label for bookmark results in overlay"
+  },
+  "overlay.sourceSearch": {
+    "message": "Search",
+    "description": "Badge label for web search option in overlay"
+  },
+  "overlay.sourceOpen": {
+    "message": "Open",
+    "description": "Badge label for open tabs in overlay"
+  },
+  "overlay.searchDefault": {
+    "message": "Search with default search engine",
+    "description": "Display URL for the web search row in overlay"
+  },
+  "overlay.untitled": {
+    "message": "Untitled",
+    "description": "Fallback title when a tab/bookmark has no title"
+  },
+
+  "notify.title": {
+    "message": "Pounce",
+    "description": "Generic notification title"
+  },
+  "notify.errorTitle": {
+    "message": "Pounce -Error",
+    "description": "Error notification title (matches exact source string)"
+  },
+  "notify.searchErrorTitle": {
+    "message": "Pounce -Search Error",
+    "description": "Search error notification title (matches exact source string)"
+  },
+  "notify.installedTitle": {
+    "message": "Pounce Installed Successfully",
+    "description": "Onboarding notification title"
+  },
+  "notify.noUrls": {
+    "message": "Please add URLs first before using this feature",
+    "description": "Shown when batch-open fires with empty list"
+  },
+  "notify.openedCount": {
+    "message": "Successfully opened $count$ URLs",
+    "description": "Confirmation after batch open",
+    "placeholders": {
+      "count": { "content": "$1" }
+    }
+  },
+  "notify.openError": {
+    "message": "Error occurred while opening URLs, please check URL configuration",
+    "description": "Batch open failure"
+  },
+  "notify.searchError": {
+    "message": "Failed to perform web search",
+    "description": "Web search failure"
+  },
+  "notify.installedBody": {
+    "message": "Press $search$ to search tabs & bookmarks. Use $batch$ to batch open URLs.",
+    "description": "Onboarding body, $search$ and $batch$ are keyboard shortcut strings",
+    "placeholders": {
+      "search": { "content": "$1" },
+      "batch": { "content": "$2" }
+    }
+  }
+}
