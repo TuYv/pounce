@@ -296,5 +296,33 @@
       "search": { "content": "$1" },
       "batch": { "content": "$2" }
     }
-  }
+  },
+
+  "popup.opening": { "message": "Opening...", "description": "Transient button label while triggering an action" },
+  "popup.tabError": { "message": "Unable to get current tab", "description": "Error when current tab can't be obtained" },
+  "popup.restrictedPage": { "message": "Search function cannot be used on this page. Please switch to a regular webpage (like google.com) and try again.", "description": "Shown when user tries to open overlay on chrome:// or extension pages" },
+  "popup.pageLoading": { "message": "Page is still loading. Please wait for it to finish loading and try again.", "description": "Shown when overlay attempted on a still-loading page" },
+  "popup.initFailed": { "message": "Search function initialization failed, please try again", "description": "Generic init error in popup" },
+  "popup.startFailed": { "message": "Failed to start search function", "description": "Generic start error in popup" },
+
+  "options.noUrlsToOpen": { "message": "No URLs to open", "description": "Empty state for batch open action" },
+  "options.openedOk": { "message": "All URLs opened successfully", "description": "Success toast after batch open" },
+  "options.openFailed": {
+    "message": "Failed to open: $reason$",
+    "description": "Toast on batch open failure; $reason$ is an error message",
+    "placeholders": { "reason": { "content": "$1" } }
+  },
+  "options.noUrlsToClear": { "message": "No URLs to clear", "description": "Empty state for clear action" },
+  "options.clearedOk": { "message": "All URLs cleared", "description": "Success toast after clearing URLs" },
+  "options.loadFailed": { "message": "Failed to load data", "description": "Toast when storage read fails" },
+  "options.saveFailed": { "message": "Failed to save data", "description": "Toast when storage write fails" },
+  "options.protocolError": { "message": "Only HTTP and HTTPS protocols are supported", "description": "Validation error on invalid URL protocol" },
+  "options.urlAdded": { "message": "URL added successfully", "description": "Toast after adding a URL" },
+  "options.urlRemoved": { "message": "URL removed successfully", "description": "Toast after removing a URL" },
+  "options.themeUpdated": { "message": "Theme updated successfully", "description": "Toast after theme switch" },
+  "options.settingSaveFailed": { "message": "Failed to save setting", "description": "Generic toggle save failure" },
+
+  "options.shortcutNotSet": { "message": "Not set", "description": "Shown in keyboard shortcut display when a shortcut has not been configured" },
+  "options.clearUrlsConfirm": { "message": "Are you sure you want to clear all URLs? This action cannot be undone.", "description": "Confirmation dialog before clearing all batch-open URLs" },
+  "overlay.zeroResults": { "message": "0 results", "description": "Results counter initial state in overlay before any search" }
 }
