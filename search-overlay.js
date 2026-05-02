@@ -376,8 +376,17 @@
       // 重新渲染当前结果（含 sourceLabel 等动态文本）和计数
       if (this.currentResults && this.currentResults.length) {
         this.renderResults(this.searchInput ? this.searchInput.value : '');
-      } else if (this.resultsCounter) {
-        this.resultsCounter.textContent = window.i18n.t('overlay.zeroResults');
+      } else {
+        // 0 结果：刷新计数和（若已挂出）空态文案
+        if (this.resultsCounter) {
+          this.resultsCounter.textContent = window.i18n.t('overlay.zeroResults');
+        }
+        if (this.resultsContainer) {
+          const emptyEl = this.resultsContainer.querySelector('.pounce-search-empty');
+          if (emptyEl) {
+            emptyEl.textContent = window.i18n.t('overlay.noResults');
+          }
+        }
       }
     }
     
@@ -541,7 +550,8 @@
         } else {
           console.error('Pounce: Response indicates failure:', response);
           const base = window.i18n ? window.i18n.t('overlay.loadError') : 'Failed to load search data';
-          this.showError(base + ': ' + (response?.error || 'Unknown error'));
+          const unknownErr = window.i18n ? window.i18n.t('overlay.unknownError') : 'Unknown error';
+          this.showError(base + ': ' + (response?.error || unknownErr));
         }
       } catch (error) {
         console.error('Pounce: Error loading search data:', error);
@@ -708,12 +718,15 @@
       }
 
       const openResult = this.createOpenFallbackResult(trimmedQuery);
+      const searchTitle = window.i18n
+        ? window.i18n.t('overlay.searchForQuery', [trimmedQuery])
+        : `Search for "${trimmedQuery}"`;
       const searchResult = {
         type: 'search',
         id: 'web-search',
-        title: `Search for "${trimmedQuery}"`,
+        title: searchTitle,
         url: `search:${trimmedQuery}`,
-        displayTitle: `Search for "${trimmedQuery}"`,
+        displayTitle: searchTitle,
         displayUrl: tr('overlay.searchDefault', 'Search with default search engine'),
         sourceLabel: tr('overlay.sourceSearch', 'Search'),
         iconFallback: 'S',
@@ -759,7 +772,7 @@
           id: 'direct-open',
           title: normalizedUrl,
           url: normalizedUrl,
-          displayTitle: `Open ${normalizedUrl}`,
+          displayTitle: window.i18n ? window.i18n.t('overlay.openUrl', [normalizedUrl]) : `Open ${normalizedUrl}`,
           displayUrl: normalizedUrl,
           sourceLabel: window.i18n ? window.i18n.t('overlay.sourceOpen') : 'Open',
           iconFallback: 'O',
@@ -854,7 +867,7 @@
         // 使用实际的网页图标（跳过 chrome:// 图标，浏览器会阻止加载）
         const img = document.createElement('img');
         img.src = item.favIconUrl;
-        img.alt = item.displayTitle || item.title || 'Website icon';
+        img.alt = item.displayTitle || item.title || (window.i18n ? window.i18n.t('overlay.websiteIconAlt') : 'Website icon');
         img.onerror = function() {
           // 如果图标加载失败，显示默认文字
           icon.innerHTML = '';
@@ -1083,11 +1096,13 @@
     }
     
     showEmpty() {
-      this.resultsContainer.innerHTML = `
-        <div class="pounce-search-empty">
-          No matching tabs, history, bookmarks, or top sites found
-        </div>
-      `;
+      this.resultsContainer.innerHTML = '';
+      const emptyEl = document.createElement('div');
+      emptyEl.className = 'pounce-search-empty';
+      emptyEl.textContent = window.i18n
+        ? window.i18n.t('overlay.noResults')
+        : 'No matching tabs, history, bookmarks, or top sites found';
+      this.resultsContainer.appendChild(emptyEl);
       // 更新计数为0
       this.updateResultsCount(0);
     }
@@ -1104,7 +1119,9 @@
     
     updateResultsCount(count) {
       if (this.resultsCounter) {
-        const text = count === 1 ? '1 result' : `${count} results`;
+        const text = window.i18n
+          ? (count === 1 ? window.i18n.t('overlay.resultsCountOne') : window.i18n.t('overlay.resultsCount', [String(count)]))
+          : (count === 1 ? '1 result' : `${count} results`);
         this.resultsCounter.textContent = text;
       }
     }

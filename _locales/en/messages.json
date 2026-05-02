@@ -366,5 +366,43 @@
 
   "options.shortcutNotSet": { "message": "Not set", "description": "Shown in keyboard shortcut display when a shortcut has not been configured" },
   "options.clearUrlsConfirm": { "message": "Are you sure you want to clear all URLs? This action cannot be undone.", "description": "Confirmation dialog before clearing all batch-open URLs" },
-  "overlay.zeroResults": { "message": "0 results", "description": "Results counter initial state in overlay before any search" }
+  "overlay.zeroResults": { "message": "0 results", "description": "Results counter initial state in overlay before any search" },
+
+  "overlay.noResults": {
+    "message": "No matching tabs, history, bookmarks, or top sites found",
+    "description": "Empty state when search returns 0 results"
+  },
+  "overlay.searchForQuery": {
+    "message": "Search for \"$query$\"",
+    "description": "Synthetic web-search row title in overlay",
+    "placeholders": {
+      "query": { "content": "$1" }
+    }
+  },
+  "overlay.openUrl": {
+    "message": "Open $url$",
+    "description": "Direct-open row title in overlay",
+    "placeholders": {
+      "url": { "content": "$1" }
+    }
+  },
+  "overlay.websiteIconAlt": {
+    "message": "Website icon",
+    "description": "Alt text for result-row favicon images"
+  },
+  "overlay.unknownError": {
+    "message": "Unknown error",
+    "description": "Fallback when error has no message"
+  },
+  "overlay.resultsCount": {
+    "message": "$count$ results",
+    "description": "Generic results-count label",
+    "placeholders": {
+      "count": { "content": "$1" }
+    }
+  },
+  "overlay.resultsCountOne": {
+    "message": "1 result",
+    "description": "Singular results-count label"
+  }
 }
