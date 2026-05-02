@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       },
       runtime: {
         sendMessage: (message) => Promise.resolve({ success: true }),
-        openOptionsPage: () => window.open('options.html', '_blank')
+        openOptionsPage: () => window.open('options_html', '_blank')
       },
       tabs: {
         query: (queryInfo) => Promise.resolve([{ id: 1, url: 'http://localhost:8000', status: 'complete' }])
@@ -66,9 +66,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const themeLabelFallback = { system: 'Auto (System)', light: 'Light Mode', dark: 'Dark Mode' };
     const themeLabel = (mode) => {
       if (window.i18n) {
-        if (mode === 'system') return window.i18n.t('popup.themeTitle');
-        if (mode === 'light') return window.i18n.t('options.lightMode');
-        if (mode === 'dark') return window.i18n.t('options.darkMode');
+        if (mode === 'system') return window.i18n.t('popup_themeTitle');
+        if (mode === 'light') return window.i18n.t('options_lightMode');
+        if (mode === 'dark') return window.i18n.t('options_darkMode');
       }
       return themeLabelFallback[mode] || themeLabelFallback.system;
     };
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       openAllBtn.addEventListener('click', async () => {
         openAllBtn.disabled = true;
         const buttonText = openAllBtn.querySelector('.batch-label') || openAllBtn.querySelector('.button-content span');
-        if (buttonText) buttonText.textContent = window.i18n ? window.i18n.t('popup.opening') : 'Opening...';
+        if (buttonText) buttonText.textContent = window.i18n ? window.i18n.t('popup_opening') : 'Opening...';
 
         try {
           // 发送消息给后台脚本执行打开操作
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           console.error('Failed to open URLs:', error);
           openAllBtn.disabled = false;
           const buttonText = openAllBtn.querySelector('.batch-label') || openAllBtn.querySelector('.button-content span');
-          if (buttonText) buttonText.textContent = window.i18n ? window.i18n.t('popup.batchOpenURLs') : 'Batch Open URLs';
+          if (buttonText) buttonText.textContent = window.i18n ? window.i18n.t('popup_batchOpenURLs') : 'Batch Open URLs';
         }
       });
       
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (error) {
     console.error('Failed to load data:', error);
-    loadingEl.textContent = window.i18n ? window.i18n.t('popup.loadingFailed') : 'Loading failed';
+    loadingEl.textContent = window.i18n ? window.i18n.t('popup_loadingFailed') : 'Loading failed';
   }
 
   // 设置按钮点击事件
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       chrome.runtime.openOptionsPage();
       window.close();
     } else {
-      window.open('options.html', '_blank');
+      window.open('options_html', '_blank');
     }
   });
 
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
       
       if (!activeTab) {
-        alert(window.i18n ? window.i18n.t('popup.tabError') : 'Unable to get current tab');
+        alert(window.i18n ? window.i18n.t('popup_tabError') : 'Unable to get current tab');
         return;
       }
 
@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           activeTab.url.startsWith('https://chromewebstore.google.com') ||
           activeTab.url.startsWith('https://chrome.google.com/webstore')) {
         alert(window.i18n
-          ? window.i18n.t('popup.restrictedPage')
+          ? window.i18n.t('popup_restrictedPage')
           : 'Search function cannot be used on this page. Please switch to a regular webpage (like google.com) and try again.');
         return;
       }
@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // 检查页面是否已加载完成
       if (activeTab.status !== 'complete') {
         alert(window.i18n
-          ? window.i18n.t('popup.pageLoading')
+          ? window.i18n.t('popup_pageLoading')
           : 'Page is still loading. Please wait for it to finish loading and try again.');
         return;
       }
@@ -287,11 +287,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.error('Failed to trigger search:', error);
       
       // 提供更友好的错误信息
-      let errorMessage = window.i18n ? window.i18n.t('popup.startFailed') : 'Failed to start search function';
+      let errorMessage = window.i18n ? window.i18n.t('popup_startFailed') : 'Failed to start search function';
       if (error.message.includes('Cannot access a chrome:// URL') ||
           error.message.includes('The extensions gallery cannot be scripted')) {
         errorMessage = window.i18n
-          ? window.i18n.t('popup.restrictedPage')
+          ? window.i18n.t('popup_restrictedPage')
           : 'Search function cannot be used on this page. Please switch to a regular webpage (like google.com) and try again.';
       } else {
         errorMessage += ': ' + error.message;

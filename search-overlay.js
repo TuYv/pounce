@@ -75,7 +75,7 @@
       this.languageChangeHandler = null;
 
       // 静态文本节点引用，用于语言切换时实时刷新
-      this.resultsCounterStaticKey = 'overlay.zeroResults';
+      this.resultsCounterStaticKey = 'overlay_zeroResults';
       this.navigateHintEl = null;
       this.selectHintEl = null;
       this.quickPickHintLabelEl = null;
@@ -148,7 +148,7 @@
       this.searchInput.className = 'pounce-search-input';
       this.searchInput.type = 'text';
       this.searchInput.placeholder = window.i18n
-        ? window.i18n.t('overlay.searchPlaceholder')
+        ? window.i18n.t('overlay_searchPlaceholder')
         : 'Search tabs, history, bookmarks, and top sites...';
       this.searchInput.autocomplete = 'off';
       this.searchInput.spellcheck = false;
@@ -174,7 +174,7 @@
       const leftContainer = document.createElement('div');
       leftContainer.className = 'pounce-search-bottom-left';
       leftContainer.textContent = window.i18n
-        ? window.i18n.t('overlay.zeroResults')
+        ? window.i18n.t('overlay_zeroResults')
         : '0 results';
       this.resultsCounter = leftContainer; // 保存引用以便后续更新
       bottomContainer.appendChild(leftContainer);
@@ -189,7 +189,7 @@
       const navDownKey = document.createElement('span');
       navDownKey.className = 'pounce-hint-key';
       navDownKey.textContent = '↓';
-      const navigateLabel = document.createTextNode(' ' + (window.i18n ? window.i18n.t('overlay.navigate') : 'Navigate'));
+      const navigateLabel = document.createTextNode(' ' + (window.i18n ? window.i18n.t('overlay_navigate') : 'Navigate'));
       navigateHint.appendChild(navUpKey);
       navigateHint.appendChild(navDownKey);
       navigateHint.appendChild(navigateLabel);
@@ -200,7 +200,7 @@
       const selectKey = document.createElement('span');
       selectKey.className = 'pounce-hint-key';
       selectKey.textContent = '↵';
-      const selectLabel = document.createTextNode(' ' + (window.i18n ? window.i18n.t('overlay.select') : 'Select'));
+      const selectLabel = document.createTextNode(' ' + (window.i18n ? window.i18n.t('overlay_select') : 'Select'));
       selectHint.appendChild(selectKey);
       selectHint.appendChild(selectLabel);
       this.selectHintEl = selectLabel;
@@ -214,7 +214,7 @@
       const quickPickRangeKey = document.createElement('span');
       quickPickRangeKey.className = 'pounce-hint-key';
       quickPickRangeKey.textContent = '1-9';
-      const quickPickLabel = document.createTextNode(' ' + (window.i18n ? window.i18n.t('overlay.quickPick') : 'Quick pick'));
+      const quickPickLabel = document.createTextNode(' ' + (window.i18n ? window.i18n.t('overlay_quickPick') : 'Quick pick'));
       quickPickHint.appendChild(quickPickModKey);
       quickPickHint.appendChild(quickPickRangeKey);
       quickPickHint.appendChild(quickPickLabel);
@@ -225,7 +225,7 @@
       const closeKey = document.createElement('span');
       closeKey.className = 'pounce-hint-key';
       closeKey.textContent = 'Esc';
-      const closeLabel = document.createTextNode(' ' + (window.i18n ? window.i18n.t('overlay.close') : 'Close'));
+      const closeLabel = document.createTextNode(' ' + (window.i18n ? window.i18n.t('overlay_close') : 'Close'));
       closeHint.appendChild(closeKey);
       closeHint.appendChild(closeLabel);
       this.closeHintEl = closeLabel;
@@ -359,19 +359,19 @@
     rerenderStaticOverlayText() {
       if (this.isDestroyed || !window.i18n) return;
       if (this.searchInput) {
-        this.searchInput.placeholder = window.i18n.t('overlay.searchPlaceholder');
+        this.searchInput.placeholder = window.i18n.t('overlay_searchPlaceholder');
       }
       if (this.navigateHintEl) {
-        this.navigateHintEl.textContent = ' ' + window.i18n.t('overlay.navigate');
+        this.navigateHintEl.textContent = ' ' + window.i18n.t('overlay_navigate');
       }
       if (this.selectHintEl) {
-        this.selectHintEl.textContent = ' ' + window.i18n.t('overlay.select');
+        this.selectHintEl.textContent = ' ' + window.i18n.t('overlay_select');
       }
       if (this.quickPickHintLabelEl) {
-        this.quickPickHintLabelEl.textContent = ' ' + window.i18n.t('overlay.quickPick');
+        this.quickPickHintLabelEl.textContent = ' ' + window.i18n.t('overlay_quickPick');
       }
       if (this.closeHintEl) {
-        this.closeHintEl.textContent = ' ' + window.i18n.t('overlay.close');
+        this.closeHintEl.textContent = ' ' + window.i18n.t('overlay_close');
       }
       // 重新渲染当前结果（含 sourceLabel 等动态文本）和计数
       if (this.currentResults && this.currentResults.length) {
@@ -379,12 +379,12 @@
       } else {
         // 0 结果：刷新计数和（若已挂出）空态文案
         if (this.resultsCounter) {
-          this.resultsCounter.textContent = window.i18n.t('overlay.zeroResults');
+          this.resultsCounter.textContent = window.i18n.t('overlay_zeroResults');
         }
         if (this.resultsContainer) {
           const emptyEl = this.resultsContainer.querySelector('.pounce-search-empty');
           if (emptyEl) {
-            emptyEl.textContent = window.i18n.t('overlay.noResults');
+            emptyEl.textContent = window.i18n.t('overlay_noResults');
           }
         }
       }
@@ -549,13 +549,13 @@
           this.handleSearch(this.searchInput.value);
         } else {
           console.error('Pounce: Response indicates failure:', response);
-          const base = window.i18n ? window.i18n.t('overlay.loadError') : 'Failed to load search data';
-          const unknownErr = window.i18n ? window.i18n.t('overlay.unknownError') : 'Unknown error';
+          const base = window.i18n ? window.i18n.t('overlay_loadError') : 'Failed to load search data';
+          const unknownErr = window.i18n ? window.i18n.t('overlay_unknownError') : 'Unknown error';
           this.showError(base + ': ' + (response?.error || unknownErr));
         }
       } catch (error) {
         console.error('Pounce: Error loading search data:', error);
-        const base = window.i18n ? window.i18n.t('overlay.loadError') : 'Failed to load search data';
+        const base = window.i18n ? window.i18n.t('overlay_loadError') : 'Failed to load search data';
         this.showError(base + ': ' + error.message);
       }
     }
@@ -676,11 +676,11 @@
       const tr = (key, fallback) => (window.i18n ? window.i18n.t(key) : fallback);
       const results = filteredItems.slice(0, 10).map((item) => {
         const sourceLabel = item.type === 'history'
-          ? tr('overlay.sourceHistory', 'History')
+          ? tr('overlay_sourceHistory', 'History')
           : item.type === 'topSite'
-            ? tr('overlay.sourceTopSite', 'Top Site')
+            ? tr('overlay_sourceTopSite', 'Top Site')
             : item.type === 'bookmark'
-              ? tr('overlay.sourceBookmark', 'Bookmark')
+              ? tr('overlay_sourceBookmark', 'Bookmark')
               : '';
         const iconFallback = item.type === 'tab'
           ? 'T'
@@ -706,7 +706,7 @@
 
         return {
           ...item,
-          displayTitle: item.title || item.url || tr('overlay.untitled', 'Untitled'),
+          displayTitle: item.title || item.url || tr('overlay_untitled', 'Untitled'),
           displayUrl,
           sourceLabel,
           iconFallback
@@ -719,7 +719,7 @@
 
       const openResult = this.createOpenFallbackResult(trimmedQuery);
       const searchTitle = window.i18n
-        ? window.i18n.t('overlay.searchForQuery', [trimmedQuery])
+        ? window.i18n.t('overlay_searchForQuery', [trimmedQuery])
         : `Search for "${trimmedQuery}"`;
       const searchResult = {
         type: 'search',
@@ -727,8 +727,8 @@
         title: searchTitle,
         url: `search:${trimmedQuery}`,
         displayTitle: searchTitle,
-        displayUrl: tr('overlay.searchDefault', 'Search with default search engine'),
-        sourceLabel: tr('overlay.sourceSearch', 'Search'),
+        displayUrl: tr('overlay_searchDefault', 'Search with default search engine'),
+        sourceLabel: tr('overlay_sourceSearch', 'Search'),
         iconFallback: 'S',
         isSearchOption: true
       };
@@ -772,9 +772,9 @@
           id: 'direct-open',
           title: normalizedUrl,
           url: normalizedUrl,
-          displayTitle: window.i18n ? window.i18n.t('overlay.openUrl', [normalizedUrl]) : `Open ${normalizedUrl}`,
+          displayTitle: window.i18n ? window.i18n.t('overlay_openUrl', [normalizedUrl]) : `Open ${normalizedUrl}`,
           displayUrl: normalizedUrl,
-          sourceLabel: window.i18n ? window.i18n.t('overlay.sourceOpen') : 'Open',
+          sourceLabel: window.i18n ? window.i18n.t('overlay_sourceOpen') : 'Open',
           iconFallback: 'O',
           isOpenOption: true
         };
@@ -867,7 +867,7 @@
         // 使用实际的网页图标（跳过 chrome:// 图标，浏览器会阻止加载）
         const img = document.createElement('img');
         img.src = item.favIconUrl;
-        img.alt = item.displayTitle || item.title || (window.i18n ? window.i18n.t('overlay.websiteIconAlt') : 'Website icon');
+        img.alt = item.displayTitle || item.title || (window.i18n ? window.i18n.t('overlay_websiteIconAlt') : 'Website icon');
         img.onerror = function() {
           // 如果图标加载失败，显示默认文字
           icon.innerHTML = '';
@@ -883,7 +883,7 @@
       const content = document.createElement('div');
       content.className = 'pounce-result-content';
       
-      const titleText = item.displayTitle || item.title || (window.i18n ? window.i18n.t('overlay.untitled') : 'Untitled');
+      const titleText = item.displayTitle || item.title || (window.i18n ? window.i18n.t('overlay_untitled') : 'Untitled');
       const urlText = item.displayUrl || item.url || '';
       const isHighlightable = this.searchPreferences.highlightMatchesEnabled &&
         HIGHLIGHTABLE_TYPES.includes(item.type) &&
@@ -1083,7 +1083,7 @@
     }
     
     showLoading() {
-      const loadingText = window.i18n ? window.i18n.t('overlay.loading') : 'Loading...';
+      const loadingText = window.i18n ? window.i18n.t('overlay_loading') : 'Loading...';
       this.resultsContainer.innerHTML = '';
       const loadingEl = document.createElement('div');
       loadingEl.className = 'pounce-search-loading';
@@ -1100,7 +1100,7 @@
       const emptyEl = document.createElement('div');
       emptyEl.className = 'pounce-search-empty';
       emptyEl.textContent = window.i18n
-        ? window.i18n.t('overlay.noResults')
+        ? window.i18n.t('overlay_noResults')
         : 'No matching tabs, history, bookmarks, or top sites found';
       this.resultsContainer.appendChild(emptyEl);
       // 更新计数为0
@@ -1120,7 +1120,7 @@
     updateResultsCount(count) {
       if (this.resultsCounter) {
         const text = window.i18n
-          ? (count === 1 ? window.i18n.t('overlay.resultsCountOne') : window.i18n.t('overlay.resultsCount', [String(count)]))
+          ? (count === 1 ? window.i18n.t('overlay_resultsCountOne') : window.i18n.t('overlay_resultsCount', [String(count)]))
           : (count === 1 ? '1 result' : `${count} results`);
         this.resultsCounter.textContent = text;
       }

@@ -190,8 +190,8 @@ async function openAllUrls() {
         await chrome.notifications.create({
           type: 'basic',
           iconUrl: 'icons/icon48.png',
-          title: tFromDict(dict, 'notify.title'),
-          message: tFromDict(dict, 'notify.noUrls')
+          title: tFromDict(dict, 'notify_title'),
+          message: tFromDict(dict, 'notify_noUrls')
         });
       }
       return;
@@ -210,8 +210,8 @@ async function openAllUrls() {
       await chrome.notifications.create({
         type: 'basic',
         iconUrl: 'icons/icon48.png',
-        title: tFromDict(dict, 'notify.title'),
-        message: tFromDict(dict, 'notify.openedCount', [String(urls.length)])
+        title: tFromDict(dict, 'notify_title'),
+        message: tFromDict(dict, 'notify_openedCount', [String(urls.length)])
       });
     }
 
@@ -224,8 +224,8 @@ async function openAllUrls() {
       await chrome.notifications.create({
         type: 'basic',
         iconUrl: 'icons/icon48.png',
-        title: tFromDict(dict, 'notify.errorTitle'),
-        message: tFromDict(dict, 'notify.openError')
+        title: tFromDict(dict, 'notify_errorTitle'),
+        message: tFromDict(dict, 'notify_openError')
       });
     }
 
@@ -546,8 +546,8 @@ async function performWebSearch(query, bridgeTabId) {
       await chrome.notifications.create({
         type: 'basic',
         iconUrl: 'icons/icon48.png',
-        title: tFromDict(dict, 'notify.searchErrorTitle'),
-        message: tFromDict(dict, 'notify.searchError')
+        title: tFromDict(dict, 'notify_searchErrorTitle'),
+        message: tFromDict(dict, 'notify_searchError')
       });
     }
 
@@ -567,8 +567,8 @@ chrome.runtime.onInstalled.addListener(async (details) => {
       await chrome.notifications.create({
         type: 'basic',
         iconUrl: 'icons/icon48.png',
-        title: tFromDict(dict, 'notify.installedTitle'),
-        message: tFromDict(dict, 'notify.installedBody', [searchShortcut, batchShortcut])
+        title: tFromDict(dict, 'notify_installedTitle'),
+        message: tFromDict(dict, 'notify_installedBody', [searchShortcut, batchShortcut])
       });
     }
     

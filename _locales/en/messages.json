@@ -19,389 +19,466 @@
     "message": "Search open tabs and bookmarks",
     "description": "Description of the search keyboard command"
   },
-
-  "popup.searchTabsBookmarks": {
+  "popup_searchTabsBookmarks": {
     "message": "Search Tabs & Bookmarks",
     "description": "Primary search button label in popup (both has-URLs and empty states)"
   },
-  "popup.batchOpenURLs": {
+  "popup_batchOpenURLs": {
     "message": "Batch Open URLs",
     "description": "Batch open button label and section title in popup"
   },
-  "popup.addUrls": {
+  "popup_addUrls": {
     "message": "+ Add URLs for batch open",
     "description": "Empty-state CTA in popup"
   },
-  "popup.loading": {
+  "popup_loading": {
     "message": "Loading...",
     "description": "Loading placeholder in popup and overlay"
   },
-  "popup.openSearchHint": {
+  "popup_openSearchHint": {
     "message": "anywhere",
     "description": "Hint word before the Alt+K kbd in popup footer (\"anywhere Alt+K\")"
   },
-  "popup.loadingFailed": {
+  "popup_loadingFailed": {
     "message": "Loading failed",
     "description": "Shown in popup when URL list fails to load"
   },
-  "popup.star": {
+  "popup_star": {
     "message": "Star",
     "description": "GitHub star link label in popup footer"
   },
-  "popup.issue": {
+  "popup_issue": {
     "message": "Issue",
     "description": "GitHub issue link label in popup footer"
   },
-  "popup.starTitle": {
+  "popup_starTitle": {
     "message": "Star on GitHub",
     "description": "Tooltip for GitHub star link in popup footer"
   },
-  "popup.reportTitle": {
+  "popup_reportTitle": {
     "message": "Report an issue",
     "description": "Tooltip for GitHub issue link in popup footer"
   },
-  "popup.settingsTitle": {
+  "popup_settingsTitle": {
     "message": "Settings",
     "description": "Tooltip for settings button in popup"
   },
-  "popup.themeTitle": {
+  "popup_themeTitle": {
     "message": "Auto (System)",
     "description": "Tooltip for theme toggle button in popup"
   },
-
-  "options.title": {
+  "options_title": {
     "message": "Pounce Settings",
     "description": "Options page title"
   },
-  "options.appearance": {
+  "options_appearance": {
     "message": "Appearance",
     "description": "Options section header"
   },
-  "options.darkMode": {
+  "options_darkMode": {
     "message": "Dark Mode",
     "description": "Theme group label"
   },
-  "options.lightMode": {
+  "options_lightMode": {
     "message": "Light Mode",
     "description": "Light theme label"
   },
-  "options.light": {
+  "options_light": {
     "message": "Light",
     "description": "Light theme button"
   },
-  "options.dark": {
+  "options_dark": {
     "message": "Dark",
     "description": "Dark theme button"
   },
-  "options.system": {
+  "options_system": {
     "message": "System",
     "description": "System theme button"
   },
-  "options.followSystem": {
+  "options_followSystem": {
     "message": "Follow System",
     "description": "System theme description"
   },
-
-  "options.language": {
+  "options_language": {
     "message": "Language",
     "description": "Language section header"
   },
-  "options.languageAuto": {
+  "options_languageAuto": {
     "message": "Auto (follow browser)",
     "description": "Language dropdown auto option"
   },
-  "options.languageEnglish": {
+  "options_languageEnglish": {
     "message": "English",
     "description": "Language dropdown English option"
   },
-  "options.languageChinese": {
+  "options_languageChinese": {
     "message": "中文",
     "description": "Language dropdown Chinese option (kept native)"
   },
-
-  "options.searchExperience": {
+  "options_searchExperience": {
     "message": "Search Experience",
     "description": "Search settings section header"
   },
-  "options.highlightMatches": {
+  "options_highlightMatches": {
     "message": "Highlight matches",
     "description": "Toggle label"
   },
-  "options.highlightMatchesDesc": {
+  "options_highlightMatchesDesc": {
     "message": "Emphasize matched text in result titles and URLs.",
     "description": "Toggle description"
   },
-  "options.pinyinToggle": {
+  "options_pinyinToggle": {
     "message": "Match Chinese titles by pinyin",
     "description": "Pinyin toggle label"
   },
-  "options.pinyinToggleDesc": {
+  "options_pinyinToggleDesc": {
     "message": "Type \"bd\" or \"baidu\" to find 百度. Auto-skipped for non-Chinese titles.",
     "description": "Pinyin toggle description"
   },
-  "options.quickPick": {
+  "options_quickPick": {
     "message": "Quick pick",
     "description": "Quick pick toggle label"
   },
-  "options.quickPickDesc": {
+  "options_quickPickDesc": {
     "message": "Open visible results with Alt/Option + 1-9.",
     "description": "Quick pick description"
   },
-
-  "options.keyboardShortcuts": {
+  "options_keyboardShortcuts": {
     "message": "Keyboard Shortcuts",
     "description": "Keyboard shortcuts section header in options page"
   },
-  "options.openSearch": {
+  "options_openSearch": {
     "message": "Open search",
     "description": "Shortcut label for open-search command in options page"
   },
-  "options.batchOpen": {
+  "options_batchOpen": {
     "message": "Batch open",
     "description": "Shortcut label for batch-open command in options page"
   },
-  "options.navigate": {
+  "options_navigate": {
     "message": "Navigate",
     "description": "Shortcut label for navigate action in options page"
   },
-  "options.selectClose": {
+  "options_selectClose": {
     "message": "Select / Close",
     "description": "Shortcut label for select/close action in options page"
   },
-  "options.manage": {
+  "options_manage": {
     "message": "Manage →",
     "description": "Link to manage keyboard shortcuts page"
   },
-
-  "options.batchOpenURLs": {
+  "options_batchOpenURLs": {
     "message": "Batch Open URLs",
     "description": "Batch URL list header in options page"
   },
-  "options.add": {
+  "options_add": {
     "message": "Add",
     "description": "Add-URL button label in options page"
   },
-  "options.openAll": {
+  "options_openAll": {
     "message": "Open All",
     "description": "Open-all-URLs button label in options page"
   },
-  "options.clearAll": {
+  "options_clearAll": {
     "message": "Clear All",
     "description": "Clear-all-URLs button label in options page"
   },
-  "options.openUrlTitle": {
+  "options_openUrlTitle": {
     "message": "Open URL",
     "description": "Tooltip on per-row open button in options URL list"
   },
-  "options.removeUrlTitle": {
+  "options_removeUrlTitle": {
     "message": "Remove URL",
     "description": "Tooltip on per-row remove button in options URL list"
   },
-  "options.savedUrlsCount": {
+  "options_savedUrlsCount": {
     "message": "$count$ saved URLs",
     "description": "Saved URL count, $count$ is a number",
     "placeholders": {
-      "count": { "content": "$1" }
+      "count": {
+        "content": "$1"
+      }
     }
   },
-  "options.noUrlsYet": {
+  "options_noUrlsYet": {
     "message": "No URLs yet",
     "description": "First line of empty state in options URL list"
   },
-  "options.addUrlAbove": {
+  "options_addUrlAbove": {
     "message": "Add a URL above to get started",
     "description": "Second line of empty state in options URL list"
   },
-  "options.urlPlaceholder": {
+  "options_urlPlaceholder": {
     "message": "github.com or https://example.com",
     "description": "Placeholder text for the URL input field in options"
   },
-  "options.footer": {
+  "options_footer": {
     "message": "© 2025 Pounce",
     "description": "Footer copyright"
   },
-  "options.github": {
+  "options_github": {
     "message": "GitHub",
     "description": "GitHub repo link label in options footer"
   },
-  "options.reportIssue": {
+  "options_reportIssue": {
     "message": "Report Issue",
     "description": "GitHub issue link label in options footer"
   },
-  "options.versionLabel": {
+  "options_versionLabel": {
     "message": "Version $version$",
     "description": "Footer version label, $version$ is the manifest version string",
     "placeholders": {
-      "version": { "content": "$1" }
+      "version": {
+        "content": "$1"
+      }
     }
   },
-
-  "overlay.searchPlaceholder": {
+  "overlay_searchPlaceholder": {
     "message": "Search tabs, history, bookmarks, and top sites...",
     "description": "Overlay search input placeholder"
   },
-  "overlay.navigate": {
+  "overlay_navigate": {
     "message": "Navigate",
     "description": "Hint label for arrow keys in overlay"
   },
-  "overlay.select": {
+  "overlay_select": {
     "message": "Select",
     "description": "Hint label for Enter key in overlay"
   },
-  "overlay.quickPick": {
+  "overlay_quickPick": {
     "message": "Quick pick",
     "description": "Hint label for Alt+1-9 quick pick in overlay"
   },
-  "overlay.close": {
+  "overlay_close": {
     "message": "Close",
     "description": "Hint label for Esc key in overlay"
   },
-  "overlay.loading": {
+  "overlay_loading": {
     "message": "Loading...",
     "description": "Results counter text while search data is loading"
   },
-  "overlay.loadError": {
+  "overlay_loadError": {
     "message": "Failed to load search data",
     "description": "Error shown in overlay when search data fails to load (base message, error detail appended)"
   },
-  "overlay.sourceHistory": {
+  "overlay_sourceHistory": {
     "message": "History",
     "description": "Badge label for history results in overlay"
   },
-  "overlay.sourceTopSite": {
+  "overlay_sourceTopSite": {
     "message": "Top Site",
     "description": "Badge label for top-site results in overlay"
   },
-  "overlay.sourceBookmark": {
+  "overlay_sourceBookmark": {
     "message": "Bookmark",
     "description": "Badge label for bookmark results in overlay"
   },
-  "overlay.sourceSearch": {
+  "overlay_sourceSearch": {
     "message": "Search",
     "description": "Badge label for web search option in overlay"
   },
-  "overlay.sourceOpen": {
+  "overlay_sourceOpen": {
     "message": "Open",
     "description": "Badge label for open tabs in overlay"
   },
-  "overlay.searchDefault": {
+  "overlay_searchDefault": {
     "message": "Search with default search engine",
     "description": "Display URL for the web search row in overlay"
   },
-  "overlay.untitled": {
+  "overlay_untitled": {
     "message": "Untitled",
     "description": "Fallback title when a tab/bookmark has no title"
   },
-
-  "notify.title": {
+  "notify_title": {
     "message": "Pounce",
     "description": "Generic notification title"
   },
-  "notify.errorTitle": {
+  "notify_errorTitle": {
     "message": "Pounce - Error",
     "description": "Error notification title"
   },
-  "notify.searchErrorTitle": {
+  "notify_searchErrorTitle": {
     "message": "Pounce - Search Error",
     "description": "Search error notification title"
   },
-  "notify.installedTitle": {
+  "notify_installedTitle": {
     "message": "Pounce Installed Successfully",
     "description": "Onboarding notification title"
   },
-  "notify.noUrls": {
+  "notify_noUrls": {
     "message": "Please add URLs first before using this feature",
     "description": "Shown when batch-open fires with empty list"
   },
-  "notify.openedCount": {
+  "notify_openedCount": {
     "message": "Successfully opened $count$ URLs",
     "description": "Confirmation after batch open",
     "placeholders": {
-      "count": { "content": "$1" }
+      "count": {
+        "content": "$1"
+      }
     }
   },
-  "notify.openError": {
+  "notify_openError": {
     "message": "Error occurred while opening URLs, please check URL configuration",
     "description": "Batch open failure"
   },
-  "notify.searchError": {
+  "notify_searchError": {
     "message": "Failed to perform web search",
     "description": "Web search failure"
   },
-  "notify.installedBody": {
+  "notify_installedBody": {
     "message": "Press $search$ to search tabs & bookmarks. Use $batch$ to batch open URLs.",
     "description": "Onboarding body, $search$ and $batch$ are keyboard shortcut strings",
     "placeholders": {
-      "search": { "content": "$1" },
-      "batch": { "content": "$2" }
+      "search": {
+        "content": "$1"
+      },
+      "batch": {
+        "content": "$2"
+      }
     }
   },
-
-  "popup.opening": { "message": "Opening...", "description": "Transient button label while triggering an action" },
-  "popup.tabError": { "message": "Unable to get current tab", "description": "Error when current tab can't be obtained" },
-  "popup.restrictedPage": { "message": "Search function cannot be used on this page. Please switch to a regular webpage (like google.com) and try again.", "description": "Shown when user tries to open overlay on chrome:// or extension pages" },
-  "popup.pageLoading": { "message": "Page is still loading. Please wait for it to finish loading and try again.", "description": "Shown when overlay attempted on a still-loading page" },
-  "popup.initFailed": { "message": "Search function initialization failed, please try again", "description": "Generic init error in popup" },
-  "popup.startFailed": { "message": "Failed to start search function", "description": "Generic start error in popup" },
-
-  "options.noUrlsToOpen": { "message": "No URLs to open", "description": "Empty state for batch open action" },
-  "options.openedOk": { "message": "All URLs opened successfully", "description": "Success toast after batch open" },
-  "options.openFailed": {
+  "popup_opening": {
+    "message": "Opening...",
+    "description": "Transient button label while triggering an action"
+  },
+  "popup_tabError": {
+    "message": "Unable to get current tab",
+    "description": "Error when current tab can't be obtained"
+  },
+  "popup_restrictedPage": {
+    "message": "Search function cannot be used on this page. Please switch to a regular webpage (like google.com) and try again.",
+    "description": "Shown when user tries to open overlay on chrome:// or extension pages"
+  },
+  "popup_pageLoading": {
+    "message": "Page is still loading. Please wait for it to finish loading and try again.",
+    "description": "Shown when overlay attempted on a still-loading page"
+  },
+  "popup_initFailed": {
+    "message": "Search function initialization failed, please try again",
+    "description": "Generic init error in popup"
+  },
+  "popup_startFailed": {
+    "message": "Failed to start search function",
+    "description": "Generic start error in popup"
+  },
+  "options_noUrlsToOpen": {
+    "message": "No URLs to open",
+    "description": "Empty state for batch open action"
+  },
+  "options_openedOk": {
+    "message": "All URLs opened successfully",
+    "description": "Success toast after batch open"
+  },
+  "options_openFailed": {
     "message": "Failed to open: $reason$",
     "description": "Toast on batch open failure; $reason$ is an error message",
-    "placeholders": { "reason": { "content": "$1" } }
+    "placeholders": {
+      "reason": {
+        "content": "$1"
+      }
+    }
   },
-  "options.noUrlsToClear": { "message": "No URLs to clear", "description": "Empty state for clear action" },
-  "options.clearedOk": { "message": "All URLs cleared", "description": "Success toast after clearing URLs" },
-  "options.loadFailed": { "message": "Failed to load data", "description": "Toast when storage read fails" },
-  "options.saveFailed": { "message": "Failed to save data", "description": "Toast when storage write fails" },
-  "options.protocolError": { "message": "Only HTTP and HTTPS protocols are supported", "description": "Validation error on invalid URL protocol" },
-  "options.urlEmpty": { "message": "Please enter a URL", "description": "Validation error when URL input is empty" },
-  "options.urlInvalid": { "message": "Invalid URL format", "description": "Validation error when URL format is invalid" },
-  "options.urlDuplicate": { "message": "This URL already exists", "description": "Validation error when URL already exists in the list" },
-  "options.urlAdded": { "message": "URL added successfully", "description": "Toast after adding a URL" },
-  "options.urlRemoved": { "message": "URL removed successfully", "description": "Toast after removing a URL" },
-  "options.themeUpdated": { "message": "Theme updated successfully", "description": "Toast after theme switch" },
-  "options.settingSaveFailed": { "message": "Failed to save setting", "description": "Generic toggle save failure" },
-
-  "options.shortcutNotSet": { "message": "Not set", "description": "Shown in keyboard shortcut display when a shortcut has not been configured" },
-  "options.clearUrlsConfirm": { "message": "Are you sure you want to clear all URLs? This action cannot be undone.", "description": "Confirmation dialog before clearing all batch-open URLs" },
-  "overlay.zeroResults": { "message": "0 results", "description": "Results counter initial state in overlay before any search" },
-
-  "overlay.noResults": {
+  "options_noUrlsToClear": {
+    "message": "No URLs to clear",
+    "description": "Empty state for clear action"
+  },
+  "options_clearedOk": {
+    "message": "All URLs cleared",
+    "description": "Success toast after clearing URLs"
+  },
+  "options_loadFailed": {
+    "message": "Failed to load data",
+    "description": "Toast when storage read fails"
+  },
+  "options_saveFailed": {
+    "message": "Failed to save data",
+    "description": "Toast when storage write fails"
+  },
+  "options_protocolError": {
+    "message": "Only HTTP and HTTPS protocols are supported",
+    "description": "Validation error on invalid URL protocol"
+  },
+  "options_urlEmpty": {
+    "message": "Please enter a URL",
+    "description": "Validation error when URL input is empty"
+  },
+  "options_urlInvalid": {
+    "message": "Invalid URL format",
+    "description": "Validation error when URL format is invalid"
+  },
+  "options_urlDuplicate": {
+    "message": "This URL already exists",
+    "description": "Validation error when URL already exists in the list"
+  },
+  "options_urlAdded": {
+    "message": "URL added successfully",
+    "description": "Toast after adding a URL"
+  },
+  "options_urlRemoved": {
+    "message": "URL removed successfully",
+    "description": "Toast after removing a URL"
+  },
+  "options_themeUpdated": {
+    "message": "Theme updated successfully",
+    "description": "Toast after theme switch"
+  },
+  "options_settingSaveFailed": {
+    "message": "Failed to save setting",
+    "description": "Generic toggle save failure"
+  },
+  "options_shortcutNotSet": {
+    "message": "Not set",
+    "description": "Shown in keyboard shortcut display when a shortcut has not been configured"
+  },
+  "options_clearUrlsConfirm": {
+    "message": "Are you sure you want to clear all URLs? This action cannot be undone.",
+    "description": "Confirmation dialog before clearing all batch-open URLs"
+  },
+  "overlay_zeroResults": {
+    "message": "0 results",
+    "description": "Results counter initial state in overlay before any search"
+  },
+  "overlay_noResults": {
     "message": "No matching tabs, history, bookmarks, or top sites found",
     "description": "Empty state when search returns 0 results"
   },
-  "overlay.searchForQuery": {
+  "overlay_searchForQuery": {
     "message": "Search for \"$query$\"",
     "description": "Synthetic web-search row title in overlay",
     "placeholders": {
-      "query": { "content": "$1" }
+      "query": {
+        "content": "$1"
+      }
     }
   },
-  "overlay.openUrl": {
+  "overlay_openUrl": {
     "message": "Open $url$",
     "description": "Direct-open row title in overlay",
     "placeholders": {
-      "url": { "content": "$1" }
+      "url": {
+        "content": "$1"
+      }
     }
   },
-  "overlay.websiteIconAlt": {
+  "overlay_websiteIconAlt": {
     "message": "Website icon",
     "description": "Alt text for result-row favicon images"
   },
-  "overlay.unknownError": {
+  "overlay_unknownError": {
     "message": "Unknown error",
     "description": "Fallback when error has no message"
   },
-  "overlay.resultsCount": {
+  "overlay_resultsCount": {
     "message": "$count$ results",
     "description": "Generic results-count label",
     "placeholders": {
-      "count": { "content": "$1" }
+      "count": {
+        "content": "$1"
+      }
     }
   },
-  "overlay.resultsCountOne": {
+  "overlay_resultsCountOne": {
     "message": "1 result",
     "description": "Singular results-count label"
   }

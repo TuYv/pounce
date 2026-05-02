@@ -19,389 +19,466 @@
     "message": "搜索打开的标签页和书签",
     "description": "Description of the search keyboard command"
   },
-
-  "popup.searchTabsBookmarks": {
+  "popup_searchTabsBookmarks": {
     "message": "搜索标签页与书签",
     "description": "Primary search button label in popup (both has-URLs and empty states)"
   },
-  "popup.batchOpenURLs": {
+  "popup_batchOpenURLs": {
     "message": "批量打开 URL",
     "description": "Batch open button label and section title in popup"
   },
-  "popup.addUrls": {
+  "popup_addUrls": {
     "message": "+ 添加用于批量打开的 URL",
     "description": "Empty-state CTA in popup"
   },
-  "popup.loading": {
+  "popup_loading": {
     "message": "加载中…",
     "description": "Loading placeholder in popup and overlay"
   },
-  "popup.openSearchHint": {
+  "popup_openSearchHint": {
     "message": "随处可用",
     "description": "Hint word before the Alt+K kbd in popup footer (\"anywhere Alt+K\")"
   },
-  "popup.loadingFailed": {
+  "popup_loadingFailed": {
     "message": "加载失败",
     "description": "Shown in popup when URL list fails to load"
   },
-  "popup.star": {
+  "popup_star": {
     "message": "Star",
     "description": "GitHub star link label in popup footer"
   },
-  "popup.issue": {
+  "popup_issue": {
     "message": "反馈",
     "description": "GitHub issue link label in popup footer"
   },
-  "popup.starTitle": {
+  "popup_starTitle": {
     "message": "在 GitHub 上 Star",
     "description": "Tooltip for GitHub star link in popup footer"
   },
-  "popup.reportTitle": {
+  "popup_reportTitle": {
     "message": "反馈问题",
     "description": "Tooltip for GitHub issue link in popup footer"
   },
-  "popup.settingsTitle": {
+  "popup_settingsTitle": {
     "message": "设置",
     "description": "Tooltip for settings button in popup"
   },
-  "popup.themeTitle": {
+  "popup_themeTitle": {
     "message": "自动（跟随系统）",
     "description": "Tooltip for theme toggle button in popup"
   },
-
-  "options.title": {
+  "options_title": {
     "message": "Pounce 设置",
     "description": "Options page title"
   },
-  "options.appearance": {
+  "options_appearance": {
     "message": "外观",
     "description": "Options section header"
   },
-  "options.darkMode": {
+  "options_darkMode": {
     "message": "深色模式",
     "description": "Theme group label"
   },
-  "options.lightMode": {
+  "options_lightMode": {
     "message": "浅色模式",
     "description": "Light theme label"
   },
-  "options.light": {
+  "options_light": {
     "message": "浅色",
     "description": "Light theme button"
   },
-  "options.dark": {
+  "options_dark": {
     "message": "深色",
     "description": "Dark theme button"
   },
-  "options.system": {
+  "options_system": {
     "message": "系统",
     "description": "System theme button"
   },
-  "options.followSystem": {
+  "options_followSystem": {
     "message": "跟随系统",
     "description": "System theme description"
   },
-
-  "options.language": {
+  "options_language": {
     "message": "语言",
     "description": "Language section header"
   },
-  "options.languageAuto": {
+  "options_languageAuto": {
     "message": "自动（跟随浏览器）",
     "description": "Language dropdown auto option"
   },
-  "options.languageEnglish": {
+  "options_languageEnglish": {
     "message": "English",
     "description": "Language dropdown English option"
   },
-  "options.languageChinese": {
+  "options_languageChinese": {
     "message": "中文",
     "description": "Language dropdown Chinese option (kept native)"
   },
-
-  "options.searchExperience": {
+  "options_searchExperience": {
     "message": "搜索体验",
     "description": "Search settings section header"
   },
-  "options.highlightMatches": {
+  "options_highlightMatches": {
     "message": "高亮匹配项",
     "description": "Toggle label"
   },
-  "options.highlightMatchesDesc": {
+  "options_highlightMatchesDesc": {
     "message": "在结果标题和 URL 中突出显示匹配到的文字。",
     "description": "Toggle description"
   },
-  "options.pinyinToggle": {
+  "options_pinyinToggle": {
     "message": "按拼音匹配中文标题",
     "description": "Pinyin toggle label"
   },
-  "options.pinyinToggleDesc": {
+  "options_pinyinToggleDesc": {
     "message": "输入「bd」或「baidu」即可命中「百度」。非中文标题会自动跳过。",
     "description": "Pinyin toggle description"
   },
-  "options.quickPick": {
+  "options_quickPick": {
     "message": "快速跳转",
     "description": "Quick pick toggle label"
   },
-  "options.quickPickDesc": {
+  "options_quickPickDesc": {
     "message": "使用 Alt/Option + 1-9 直接打开当前可见的结果。",
     "description": "Quick pick description"
   },
-
-  "options.keyboardShortcuts": {
+  "options_keyboardShortcuts": {
     "message": "键盘快捷键",
     "description": "Keyboard shortcuts section header in options page"
   },
-  "options.openSearch": {
+  "options_openSearch": {
     "message": "打开搜索",
     "description": "Shortcut label for open-search command in options page"
   },
-  "options.batchOpen": {
+  "options_batchOpen": {
     "message": "批量打开",
     "description": "Shortcut label for batch-open command in options page"
   },
-  "options.navigate": {
+  "options_navigate": {
     "message": "导航",
     "description": "Shortcut label for navigate action in options page"
   },
-  "options.selectClose": {
+  "options_selectClose": {
     "message": "选中 / 关闭",
     "description": "Shortcut label for select/close action in options page"
   },
-  "options.manage": {
+  "options_manage": {
     "message": "管理 →",
     "description": "Link to manage keyboard shortcuts page"
   },
-
-  "options.batchOpenURLs": {
+  "options_batchOpenURLs": {
     "message": "批量打开 URL",
     "description": "Batch URL list header in options page"
   },
-  "options.add": {
+  "options_add": {
     "message": "添加",
     "description": "Add-URL button label in options page"
   },
-  "options.openAll": {
+  "options_openAll": {
     "message": "全部打开",
     "description": "Open-all-URLs button label in options page"
   },
-  "options.clearAll": {
+  "options_clearAll": {
     "message": "全部清空",
     "description": "Clear-all-URLs button label in options page"
   },
-  "options.openUrlTitle": {
+  "options_openUrlTitle": {
     "message": "打开 URL",
     "description": "Tooltip on per-row open button in options URL list"
   },
-  "options.removeUrlTitle": {
+  "options_removeUrlTitle": {
     "message": "移除 URL",
     "description": "Tooltip on per-row remove button in options URL list"
   },
-  "options.savedUrlsCount": {
+  "options_savedUrlsCount": {
     "message": "已保存 $count$ 个 URL",
     "description": "Saved URL count, $count$ is a number",
     "placeholders": {
-      "count": { "content": "$1" }
+      "count": {
+        "content": "$1"
+      }
     }
   },
-  "options.noUrlsYet": {
+  "options_noUrlsYet": {
     "message": "还没有 URL",
     "description": "First line of empty state in options URL list"
   },
-  "options.addUrlAbove": {
+  "options_addUrlAbove": {
     "message": "在上方添加一个 URL 开始使用",
     "description": "Second line of empty state in options URL list"
   },
-  "options.urlPlaceholder": {
+  "options_urlPlaceholder": {
     "message": "github.com 或 https://example.com",
     "description": "Placeholder text for the URL input field in options"
   },
-  "options.footer": {
+  "options_footer": {
     "message": "© 2025 Pounce",
     "description": "Footer copyright"
   },
-  "options.github": {
+  "options_github": {
     "message": "GitHub",
     "description": "GitHub repo link label in options footer"
   },
-  "options.reportIssue": {
+  "options_reportIssue": {
     "message": "反馈问题",
     "description": "GitHub issue link label in options footer"
   },
-  "options.versionLabel": {
+  "options_versionLabel": {
     "message": "版本 $version$",
     "description": "Footer version label, $version$ is the manifest version string",
     "placeholders": {
-      "version": { "content": "$1" }
+      "version": {
+        "content": "$1"
+      }
     }
   },
-
-  "overlay.searchPlaceholder": {
+  "overlay_searchPlaceholder": {
     "message": "搜索标签页、历史记录、书签和常用站点…",
     "description": "Overlay search input placeholder"
   },
-  "overlay.navigate": {
+  "overlay_navigate": {
     "message": "导航",
     "description": "Hint label for arrow keys in overlay"
   },
-  "overlay.select": {
+  "overlay_select": {
     "message": "选中",
     "description": "Hint label for Enter key in overlay"
   },
-  "overlay.quickPick": {
+  "overlay_quickPick": {
     "message": "快速跳转",
     "description": "Hint label for Alt+1-9 quick pick in overlay"
   },
-  "overlay.close": {
+  "overlay_close": {
     "message": "关闭",
     "description": "Hint label for Esc key in overlay"
   },
-  "overlay.loading": {
+  "overlay_loading": {
     "message": "加载中…",
     "description": "Results counter text while search data is loading"
   },
-  "overlay.loadError": {
+  "overlay_loadError": {
     "message": "加载搜索数据失败",
     "description": "Error shown in overlay when search data fails to load (base message, error detail appended)"
   },
-  "overlay.sourceHistory": {
+  "overlay_sourceHistory": {
     "message": "历史记录",
     "description": "Badge label for history results in overlay"
   },
-  "overlay.sourceTopSite": {
+  "overlay_sourceTopSite": {
     "message": "常用站点",
     "description": "Badge label for top-site results in overlay"
   },
-  "overlay.sourceBookmark": {
+  "overlay_sourceBookmark": {
     "message": "书签",
     "description": "Badge label for bookmark results in overlay"
   },
-  "overlay.sourceSearch": {
+  "overlay_sourceSearch": {
     "message": "搜索",
     "description": "Badge label for web search option in overlay"
   },
-  "overlay.sourceOpen": {
+  "overlay_sourceOpen": {
     "message": "已打开",
     "description": "Badge label for open tabs in overlay"
   },
-  "overlay.searchDefault": {
+  "overlay_searchDefault": {
     "message": "使用默认搜索引擎搜索",
     "description": "Display URL for the web search row in overlay"
   },
-  "overlay.untitled": {
+  "overlay_untitled": {
     "message": "无标题",
     "description": "Fallback title when a tab/bookmark has no title"
   },
-
-  "notify.title": {
+  "notify_title": {
     "message": "Pounce",
     "description": "Generic notification title"
   },
-  "notify.errorTitle": {
+  "notify_errorTitle": {
     "message": "Pounce - 错误",
     "description": "Error notification title"
   },
-  "notify.searchErrorTitle": {
+  "notify_searchErrorTitle": {
     "message": "Pounce - 搜索错误",
     "description": "Search error notification title"
   },
-  "notify.installedTitle": {
+  "notify_installedTitle": {
     "message": "Pounce 安装成功",
     "description": "Onboarding notification title"
   },
-  "notify.noUrls": {
+  "notify_noUrls": {
     "message": "请先添加 URL 再使用此功能",
     "description": "Shown when batch-open fires with empty list"
   },
-  "notify.openedCount": {
+  "notify_openedCount": {
     "message": "已成功打开 $count$ 个 URL",
     "description": "Confirmation after batch open",
     "placeholders": {
-      "count": { "content": "$1" }
+      "count": {
+        "content": "$1"
+      }
     }
   },
-  "notify.openError": {
+  "notify_openError": {
     "message": "打开 URL 时出错，请检查 URL 配置",
     "description": "Batch open failure"
   },
-  "notify.searchError": {
+  "notify_searchError": {
     "message": "网页搜索执行失败",
     "description": "Web search failure"
   },
-  "notify.installedBody": {
+  "notify_installedBody": {
     "message": "按 $search$ 搜索标签页和书签，按 $batch$ 批量打开 URL。",
     "description": "Onboarding body, $search$ and $batch$ are keyboard shortcut strings",
     "placeholders": {
-      "search": { "content": "$1" },
-      "batch": { "content": "$2" }
+      "search": {
+        "content": "$1"
+      },
+      "batch": {
+        "content": "$2"
+      }
     }
   },
-
-  "popup.opening": { "message": "打开中…", "description": "Transient button label while triggering an action" },
-  "popup.tabError": { "message": "无法获取当前标签页", "description": "Error when current tab can't be obtained" },
-  "popup.restrictedPage": { "message": "此页面无法使用搜索功能，请切换到普通网页（如 google.com）后再试。", "description": "Shown when user tries to open overlay on chrome:// or extension pages" },
-  "popup.pageLoading": { "message": "页面仍在加载，请等待加载完成后再试。", "description": "Shown when overlay attempted on a still-loading page" },
-  "popup.initFailed": { "message": "搜索功能初始化失败，请重试", "description": "Generic init error in popup" },
-  "popup.startFailed": { "message": "启动搜索功能失败", "description": "Generic start error in popup" },
-
-  "options.noUrlsToOpen": { "message": "没有可打开的 URL", "description": "Empty state for batch open action" },
-  "options.openedOk": { "message": "所有 URL 已成功打开", "description": "Success toast after batch open" },
-  "options.openFailed": {
+  "popup_opening": {
+    "message": "打开中…",
+    "description": "Transient button label while triggering an action"
+  },
+  "popup_tabError": {
+    "message": "无法获取当前标签页",
+    "description": "Error when current tab can't be obtained"
+  },
+  "popup_restrictedPage": {
+    "message": "此页面无法使用搜索功能，请切换到普通网页（如 google.com）后再试。",
+    "description": "Shown when user tries to open overlay on chrome:// or extension pages"
+  },
+  "popup_pageLoading": {
+    "message": "页面仍在加载，请等待加载完成后再试。",
+    "description": "Shown when overlay attempted on a still-loading page"
+  },
+  "popup_initFailed": {
+    "message": "搜索功能初始化失败，请重试",
+    "description": "Generic init error in popup"
+  },
+  "popup_startFailed": {
+    "message": "启动搜索功能失败",
+    "description": "Generic start error in popup"
+  },
+  "options_noUrlsToOpen": {
+    "message": "没有可打开的 URL",
+    "description": "Empty state for batch open action"
+  },
+  "options_openedOk": {
+    "message": "所有 URL 已成功打开",
+    "description": "Success toast after batch open"
+  },
+  "options_openFailed": {
     "message": "打开失败：$reason$",
     "description": "Toast on batch open failure; $reason$ is an error message",
-    "placeholders": { "reason": { "content": "$1" } }
+    "placeholders": {
+      "reason": {
+        "content": "$1"
+      }
+    }
   },
-  "options.noUrlsToClear": { "message": "没有可清空的 URL", "description": "Empty state for clear action" },
-  "options.clearedOk": { "message": "所有 URL 已清空", "description": "Success toast after clearing URLs" },
-  "options.loadFailed": { "message": "数据加载失败", "description": "Toast when storage read fails" },
-  "options.saveFailed": { "message": "数据保存失败", "description": "Toast when storage write fails" },
-  "options.protocolError": { "message": "仅支持 HTTP 和 HTTPS 协议", "description": "Validation error on invalid URL protocol" },
-  "options.urlEmpty": { "message": "请输入 URL", "description": "Validation error when URL input is empty" },
-  "options.urlInvalid": { "message": "URL 格式无效", "description": "Validation error when URL format is invalid" },
-  "options.urlDuplicate": { "message": "此 URL 已存在", "description": "Validation error when URL already exists in the list" },
-  "options.urlAdded": { "message": "URL 添加成功", "description": "Toast after adding a URL" },
-  "options.urlRemoved": { "message": "URL 移除成功", "description": "Toast after removing a URL" },
-  "options.themeUpdated": { "message": "主题已更新", "description": "Toast after theme switch" },
-  "options.settingSaveFailed": { "message": "设置保存失败", "description": "Generic toggle save failure" },
-
-  "options.shortcutNotSet": { "message": "未设置", "description": "Shown in keyboard shortcut display when a shortcut has not been configured" },
-  "options.clearUrlsConfirm": { "message": "确定要清空所有 URL 吗？此操作无法撤销。", "description": "Confirmation dialog before clearing all batch-open URLs" },
-  "overlay.zeroResults": { "message": "0 条结果", "description": "Results counter initial state in overlay before any search" },
-
-  "overlay.noResults": {
+  "options_noUrlsToClear": {
+    "message": "没有可清空的 URL",
+    "description": "Empty state for clear action"
+  },
+  "options_clearedOk": {
+    "message": "所有 URL 已清空",
+    "description": "Success toast after clearing URLs"
+  },
+  "options_loadFailed": {
+    "message": "数据加载失败",
+    "description": "Toast when storage read fails"
+  },
+  "options_saveFailed": {
+    "message": "数据保存失败",
+    "description": "Toast when storage write fails"
+  },
+  "options_protocolError": {
+    "message": "仅支持 HTTP 和 HTTPS 协议",
+    "description": "Validation error on invalid URL protocol"
+  },
+  "options_urlEmpty": {
+    "message": "请输入 URL",
+    "description": "Validation error when URL input is empty"
+  },
+  "options_urlInvalid": {
+    "message": "URL 格式无效",
+    "description": "Validation error when URL format is invalid"
+  },
+  "options_urlDuplicate": {
+    "message": "此 URL 已存在",
+    "description": "Validation error when URL already exists in the list"
+  },
+  "options_urlAdded": {
+    "message": "URL 添加成功",
+    "description": "Toast after adding a URL"
+  },
+  "options_urlRemoved": {
+    "message": "URL 移除成功",
+    "description": "Toast after removing a URL"
+  },
+  "options_themeUpdated": {
+    "message": "主题已更新",
+    "description": "Toast after theme switch"
+  },
+  "options_settingSaveFailed": {
+    "message": "设置保存失败",
+    "description": "Generic toggle save failure"
+  },
+  "options_shortcutNotSet": {
+    "message": "未设置",
+    "description": "Shown in keyboard shortcut display when a shortcut has not been configured"
+  },
+  "options_clearUrlsConfirm": {
+    "message": "确定要清空所有 URL 吗？此操作无法撤销。",
+    "description": "Confirmation dialog before clearing all batch-open URLs"
+  },
+  "overlay_zeroResults": {
+    "message": "0 条结果",
+    "description": "Results counter initial state in overlay before any search"
+  },
+  "overlay_noResults": {
     "message": "未找到匹配的标签页、历史记录、书签或常用站点",
     "description": "Empty state when search returns 0 results"
   },
-  "overlay.searchForQuery": {
+  "overlay_searchForQuery": {
     "message": "搜索「$query$」",
     "description": "Synthetic web-search row title in overlay",
     "placeholders": {
-      "query": { "content": "$1" }
+      "query": {
+        "content": "$1"
+      }
     }
   },
-  "overlay.openUrl": {
+  "overlay_openUrl": {
     "message": "打开 $url$",
     "description": "Direct-open row title in overlay",
     "placeholders": {
-      "url": { "content": "$1" }
+      "url": {
+        "content": "$1"
+      }
     }
   },
-  "overlay.websiteIconAlt": {
+  "overlay_websiteIconAlt": {
     "message": "网站图标",
     "description": "Alt text for result-row favicon images"
   },
-  "overlay.unknownError": {
+  "overlay_unknownError": {
     "message": "未知错误",
     "description": "Fallback when error has no message"
   },
-  "overlay.resultsCount": {
+  "overlay_resultsCount": {
     "message": "$count$ 条结果",
     "description": "Generic results-count label",
     "placeholders": {
-      "count": { "content": "$1" }
+      "count": {
+        "content": "$1"
+      }
     }
   },
-  "overlay.resultsCountOne": {
+  "overlay_resultsCountOne": {
     "message": "1 条结果",
     "description": "Singular results-count label"
   }
