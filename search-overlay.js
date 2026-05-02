@@ -357,7 +357,7 @@
     }
 
     rerenderStaticOverlayText() {
-      if (!window.i18n) return;
+      if (this.isDestroyed || !window.i18n) return;
       if (this.searchInput) {
         this.searchInput.placeholder = window.i18n.t('overlay.searchPlaceholder');
       }
@@ -1136,7 +1136,7 @@
     window.pounceSearchOverlay = overlay;
     if (window.i18n) {
       window.i18n.init().then(() => {
-        if (!overlay.isDestroyed) overlay.rerenderStaticOverlayText();
+        overlay.rerenderStaticOverlayText();
       }).catch((e) => {
         console.warn('Pounce: i18n init failed, falling back to English literals', e);
       });

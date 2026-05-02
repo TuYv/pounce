@@ -489,14 +489,21 @@ async function showSearchOverlay() {
 // 注入 content script 并显示搜索覆盖层
 async function injectAndShow(tabId, bridgeTabId) {
   try {
-    await chrome.scripting.executeScript({ target: { tabId }, files: ['i18n.js'] });
-    await chrome.scripting.executeScript({ target: { tabId }, files: ['theme-manager.js'] });
-    await chrome.scripting.executeScript({ target: { tabId }, files: ['preferences.js'] });
-    await chrome.scripting.executeScript({ target: { tabId }, files: ['vendor/tiny-pinyin.js'] });
-    await chrome.scripting.executeScript({ target: { tabId }, files: ['pinyin-index.js'] });
-    await chrome.scripting.executeScript({ target: { tabId }, files: ['pinyin-matcher.js'] });
-    await chrome.scripting.executeScript({ target: { tabId }, files: ['search-ranking.js'] });
-    await chrome.scripting.executeScript({ target: { tabId }, files: ['search-overlay.js'] });
+    // 单次 executeScript 按 files 数组顺序执行，省去 8 次 IPC 往返。
+    // 顺序约束：preferences/pinyin/ranking 都被 overlay 顶层引用，i18n 同步加载以便构造期可用。
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      files: [
+        'i18n.js',
+        'theme-manager.js',
+        'preferences.js',
+        'vendor/tiny-pinyin.js',
+        'pinyin-index.js',
+        'pinyin-matcher.js',
+        'search-ranking.js',
+        'search-overlay.js',
+      ],
+    });
     // CSS 不再注入宿主页：overlay 已迁至 Shadow DOM，search-overlay.js 内部自己 link 样式表
     await new Promise((resolve) => setTimeout(resolve, 100));
 
