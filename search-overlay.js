@@ -1127,20 +1127,24 @@
     }
   }
   
-  // Initialize when DOM is ready
-  const bootstrap = async () => {
+  // Initialize when DOM is ready.
+  // 关键时序：先 new 出 overlay 注册 onMessage 监听，再异步加载 i18n。
+  // 否则 background.js 在 bridge 标签页加载完 50ms 后发送 showSearchOverlay
+  // 时监听器还没就绪，消息会丢失。i18n.init 完成后再刷新一次静态文本。
+  const bootstrap = () => {
+    const overlay = new PounceSearchOverlay();
+    window.pounceSearchOverlay = overlay;
     if (window.i18n) {
-      try {
-        await window.i18n.init();
-      } catch (e) {
+      window.i18n.init().then(() => {
+        if (!overlay.isDestroyed) overlay.rerenderStaticOverlayText();
+      }).catch((e) => {
         console.warn('Pounce: i18n init failed, falling back to English literals', e);
-      }
+      });
     }
-    window.pounceSearchOverlay = new PounceSearchOverlay();
   };
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => { bootstrap(); });
+    document.addEventListener('DOMContentLoaded', bootstrap);
   } else {
     bootstrap();
   }

@@ -489,6 +489,7 @@ async function showSearchOverlay() {
 // 注入 content script 并显示搜索覆盖层
 async function injectAndShow(tabId, bridgeTabId) {
   try {
+    await chrome.scripting.executeScript({ target: { tabId }, files: ['i18n.js'] });
     await chrome.scripting.executeScript({ target: { tabId }, files: ['theme-manager.js'] });
     await chrome.scripting.executeScript({ target: { tabId }, files: ['preferences.js'] });
     await chrome.scripting.executeScript({ target: { tabId }, files: ['vendor/tiny-pinyin.js'] });
