@@ -554,15 +554,15 @@
     <img src="./icons/icon128.png" alt="">
     <span class="header-title">Pounce</span>
     <div class="header-sep"></div>
-    <span class="header-sub">Settings</span>
+    <span class="header-sub" data-i18n="popup.settingsTitle">Settings</span>
   </div>
 
   <!-- URL Management -->
   <div class="section">
-    <div class="section-label">Batch Open URLs</div>
+    <div class="section-label" data-i18n="options.batchOpenURLs">Batch Open URLs</div>
 
     <div class="input-row">
-      <input type="text" id="urlInput" class="url-input" placeholder="github.com or https://example.com">
+      <input type="text" id="urlInput" class="url-input" placeholder="github.com or https://example.com" data-i18n-placeholder="options.urlPlaceholder">
       <button id="addBtn" class="btn btn-primary">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
           <path d="M12 5v14M5 12h14"/>
@@ -574,7 +574,7 @@
     <div id="inputSuccess" class="msg msg-success" style="display:none;"></div>
 
     <div class="list-meta">
-      <span class="list-count"><span id="urlCount">0</span> saved URLs</span>
+      <span class="list-count" id="urlCountLabel"><span id="urlCount">0</span> saved URLs</span>
       <div class="list-actions">
         <button id="openAllBtn" class="btn btn-ghost" style="font-size:12px; padding:6px 10px;">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -594,7 +594,7 @@
 
     <div class="url-list" id="urlList">
       <div class="empty-state" id="emptyState">
-        No URLs yet<br>Add a URL above to get started
+        <span data-i18n="options.noUrlsYet">No URLs yet</span><br><span data-i18n="options.addUrlAbove">Add a URL above to get started</span>
       </div>
     </div>
   </div>
@@ -602,24 +602,24 @@
   <!-- Keyboard Shortcuts -->
   <div class="section">
     <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;">
-      Keyboard Shortcuts
-      <button id="manageShortcutsBtn" style="font-size:11px;font-weight:500;color:var(--primary);background:none;border:none;cursor:pointer;letter-spacing:0.01em;">Manage →</button>
+      <span data-i18n="options.keyboardShortcuts">Keyboard Shortcuts</span>
+      <button id="manageShortcutsBtn" data-i18n="options.manage" style="font-size:11px;font-weight:500;color:var(--primary);background:none;border:none;cursor:pointer;letter-spacing:0.01em;">Manage →</button>
     </div>
     <div class="shortcut-grid">
       <div class="shortcut-item">
-        <span class="shortcut-name">Open search</span>
+        <span class="shortcut-name" data-i18n="options.openSearch">Open search</span>
         <kbd id="shortcut-search">—</kbd>
       </div>
       <div class="shortcut-item">
-        <span class="shortcut-name">Batch open</span>
+        <span class="shortcut-name" data-i18n="options.batchOpen">Batch open</span>
         <kbd id="shortcut-batch">—</kbd>
       </div>
       <div class="shortcut-item">
-        <span class="shortcut-name">Navigate</span>
+        <span class="shortcut-name" data-i18n="options.navigate">Navigate</span>
         <div class="shortcut-arrows"><kbd>↑</kbd><kbd>↓</kbd></div>
       </div>
       <div class="shortcut-item">
-        <span class="shortcut-name">Select / Close</span>
+        <span class="shortcut-name" data-i18n="options.selectClose">Select / Close</span>
         <div class="shortcut-arrows"><kbd>↵</kbd><kbd>Esc</kbd></div>
       </div>
     </div>
@@ -627,12 +627,12 @@
 
   <!-- Search Behavior -->
   <div class="section">
-    <div class="section-label">Search Experience</div>
+    <div class="section-label" data-i18n="options.searchExperience">Search Experience</div>
     <div class="settings-list">
       <label class="setting-row">
         <div class="setting-copy">
-          <div class="setting-title">Quick pick</div>
-          <div class="setting-desc">Open visible results with Alt/Option + 1-9.</div>
+          <div class="setting-title" data-i18n="options.quickPick">Quick pick</div>
+          <div class="setting-desc" data-i18n="options.quickPickDesc">Open visible results with Alt/Option + 1-9.</div>
         </div>
         <span class="toggle">
           <input type="checkbox" id="quickPickEnabled" checked>
@@ -641,8 +641,8 @@
       </label>
       <label class="setting-row">
         <div class="setting-copy">
-          <div class="setting-title">Highlight matches</div>
-          <div class="setting-desc">Emphasize matched text in result titles and URLs.</div>
+          <div class="setting-title" data-i18n="options.highlightMatches">Highlight matches</div>
+          <div class="setting-desc" data-i18n="options.highlightMatchesDesc">Emphasize matched text in result titles and URLs.</div>
         </div>
         <span class="toggle">
           <input type="checkbox" id="highlightMatchesEnabled" checked>
@@ -651,8 +651,8 @@
       </label>
       <label class="setting-row">
         <div class="setting-copy">
-          <div class="setting-title">Match Chinese titles by pinyin</div>
-          <div class="setting-desc">Type "bd" or "baidu" to find 百度. Auto-skipped for non-Chinese titles.</div>
+          <div class="setting-title" data-i18n="options.pinyinToggle">Match Chinese titles by pinyin</div>
+          <div class="setting-desc" data-i18n="options.pinyinToggleDesc">Type "bd" or "baidu" to find 百度. Auto-skipped for non-Chinese titles.</div>
         </div>
         <span class="toggle">
           <input type="checkbox" id="pinyinMatchingEnabled" checked>
@@ -664,35 +664,45 @@
 
   <!-- Appearance -->
   <div class="section">
-    <div class="section-label">Appearance</div>
+    <div class="section-label" data-i18n="options.appearance">Appearance</div>
     <div class="theme-options">
       <div class="theme-option">
         <input type="radio" name="theme" id="theme-system" value="system" checked>
         <label for="theme-system">
           <div class="theme-preview"><div class="theme-preview-system"></div></div>
-          <span class="theme-label">System</span>
+          <span class="theme-label" data-i18n="options.system">System</span>
         </label>
       </div>
       <div class="theme-option">
         <input type="radio" name="theme" id="theme-light" value="light">
         <label for="theme-light">
           <div class="theme-preview"><div class="theme-preview-light"></div></div>
-          <span class="theme-label">Light</span>
+          <span class="theme-label" data-i18n="options.light">Light</span>
         </label>
       </div>
       <div class="theme-option">
         <input type="radio" name="theme" id="theme-dark" value="dark">
         <label for="theme-dark">
           <div class="theme-preview"><div class="theme-preview-dark"></div></div>
-          <span class="theme-label">Dark</span>
+          <span class="theme-label" data-i18n="options.dark">Dark</span>
         </label>
       </div>
     </div>
     <!-- hidden select for JS compatibility -->
     <select id="themeSelect">
-      <option value="system">Follow System</option>
-      <option value="light">Light Mode</option>
-      <option value="dark">Dark Mode</option>
+      <option value="system" data-i18n="options.followSystem">Follow System</option>
+      <option value="light" data-i18n="options.lightMode">Light Mode</option>
+      <option value="dark" data-i18n="options.darkMode">Dark Mode</option>
+    </select>
+  </div>
+
+  <!-- Language -->
+  <div class="section">
+    <div class="section-label" data-i18n="options.language">Language</div>
+    <select id="language-select" class="url-input" style="max-width:280px;">
+      <option value="auto" data-i18n="options.languageAuto">Auto (follow browser)</option>
+      <option value="en" data-i18n="options.languageEnglish">English</option>
+      <option value="zh_CN" data-i18n="options.languageChinese">中文</option>
     </select>
   </div>
 
@@ -701,7 +711,7 @@
     <div class="footer-meta">
       <span>Pounce</span>
       <span class="footer-sep">·</span>
-      <span id="optionsVersionText">Loading...</span>
+      <span id="optionsVersionText" data-i18n="popup.loading">Loading...</span>
     </div>
     <div class="footer-right">
       <a class="footer-link" href="https://github.com/TuYv/pounce" target="_blank" rel="noopener noreferrer">
@@ -718,12 +728,13 @@
         Report Issue
       </a>
       <span class="footer-sep">·</span>
-      <span>© 2025 Pounce</span>
+      <span data-i18n="options.footer">© 2025 Pounce</span>
     </div>
   </div>
 
 </div>
 
+<script src="i18n.js"></script>
 <script src="theme-manager.js"></script>
 <script src="preferences.js"></script>
 <script src="options-theme-sync.js"></script>
