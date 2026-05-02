@@ -1,5 +1,14 @@
 // 弹出面板逻辑
 document.addEventListener('DOMContentLoaded', async () => {
+  // 先初始化 i18n，确保后续渲染读取到的是已翻译文本
+  if (window.i18n) {
+    try {
+      await window.i18n.init();
+    } catch (e) {
+      console.warn('[popup] i18n init failed', e);
+    }
+  }
+
   // 模拟chrome API用于预览
   if (typeof chrome === 'undefined') {
     window.chrome = {
@@ -54,13 +63,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 主题切换按钮
   const themeToggle = document.getElementById('themeToggle');
   if (themeToggle) {
-    const themeLabels = { system: 'Auto (System)', light: 'Light Mode', dark: 'Dark Mode' };
+    const themeLabelFallback = { system: 'Auto (System)', light: 'Light Mode', dark: 'Dark Mode' };
+    const themeLabel = (mode) => {
+      if (window.i18n) {
+        if (mode === 'system') return window.i18n.t('popup_themeTitle');
+        if (mode === 'light') return window.i18n.t('options_lightMode');
+        if (mode === 'dark') return window.i18n.t('options_darkMode');
+      }
+      return themeLabelFallback[mode] || themeLabelFallback.system;
+    };
     const themeOrder = ['system', 'light', 'dark'];
     try {
       const tResult = await chrome.storage.sync.get(['theme']);
       const initTheme = tResult.theme || 'system';
       themeToggle.setAttribute('data-p', initTheme);
-      themeToggle.title = themeLabels[initTheme] || 'Auto (System)';
+      themeToggle.title = themeLabel(initTheme);
     } catch (e) {
       themeToggle.setAttribute('data-p', 'system');
     }
@@ -68,16 +85,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       const cur = themeToggle.getAttribute('data-p') || 'system';
       const next = themeOrder[(themeOrder.indexOf(cur) + 1) % themeOrder.length];
       themeToggle.setAttribute('data-p', next);
-      themeToggle.title = themeLabels[next];
+      themeToggle.title = themeLabel(next);
       if (themeManager) await themeManager.setTheme(next);
     });
 
-    // 监听设置页面的主题变更，实时同步按钮状态
-    chrome.storage.onChanged.addListener((changes, area) => {
-      if (area === 'sync' && changes.theme) {
+    // 监听设置页面的主题/语言变更，实时同步状态
+    chrome.storage.onChanged.addListener(async (changes, area) => {
+      if (area !== 'sync') return;
+      if (changes.theme) {
         const newTheme = changes.theme.newValue || 'system';
         themeToggle.setAttribute('data-p', newTheme);
-        themeToggle.title = themeLabels[newTheme] || 'Auto (System)';
+        themeToggle.title = themeLabel(newTheme);
+      }
+      if (changes.language && window.i18n) {
+        await window.i18n.reload();
+        // 重新应用动态文本（标题等不在 data-i18n 范围内的）
+        const cur = themeToggle.getAttribute('data-p') || 'system';
+        themeToggle.title = themeLabel(cur);
       }
     });
   }
@@ -109,8 +133,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       openAllBtn.addEventListener('click', async () => {
         openAllBtn.disabled = true;
         const buttonText = openAllBtn.querySelector('.batch-label') || openAllBtn.querySelector('.button-content span');
-        if (buttonText) buttonText.textContent = 'Opening...';
-        
+        if (buttonText) buttonText.textContent = window.i18n ? window.i18n.t('popup_opening') : 'Opening...';
+
         try {
           // 发送消息给后台脚本执行打开操作
           await chrome.runtime.sendMessage({ action: 'openAllUrls' });
@@ -119,7 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           console.error('Failed to open URLs:', error);
           openAllBtn.disabled = false;
           const buttonText = openAllBtn.querySelector('.batch-label') || openAllBtn.querySelector('.button-content span');
-          if (buttonText) buttonText.textContent = 'Batch Open URLs';
+          if (buttonText) buttonText.textContent = window.i18n ? window.i18n.t('popup_batchOpenURLs') : 'Batch Open URLs';
         }
       });
       
@@ -147,7 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (error) {
     console.error('Failed to load data:', error);
-    loadingEl.textContent = 'Loading failed';
+    loadingEl.textContent = window.i18n ? window.i18n.t('popup_loadingFailed') : 'Loading failed';
   }
 
   // 设置按钮点击事件
@@ -184,7 +208,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
       
       if (!activeTab) {
-        alert('Unable to get current tab');
+        alert(window.i18n ? window.i18n.t('popup_tabError') : 'Unable to get current tab');
         return;
       }
 
@@ -195,13 +219,17 @@ document.addEventListener('DOMContentLoaded', async () => {
           activeTab.url.startsWith('about:') ||
           activeTab.url.startsWith('https://chromewebstore.google.com') ||
           activeTab.url.startsWith('https://chrome.google.com/webstore')) {
-        alert('Search function cannot be used on this page. Please switch to a regular webpage (like google.com) and try again.');
+        alert(window.i18n
+          ? window.i18n.t('popup_restrictedPage')
+          : 'Search function cannot be used on this page. Please switch to a regular webpage (like google.com) and try again.');
         return;
       }
 
       // 检查页面是否已加载完成
       if (activeTab.status !== 'complete') {
-        alert('Page is still loading. Please wait for it to finish loading and try again.');
+        alert(window.i18n
+          ? window.i18n.t('popup_pageLoading')
+          : 'Page is still loading. Please wait for it to finish loading and try again.');
         return;
       }
       
@@ -245,6 +273,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                if (window.pounceSearchOverlay) {
                  window.pounceSearchOverlay.show();
                } else {
+                 // Note: this code runs in the target tab's context; window.i18n is not available here.
                  alert('Search function initialization failed, please try again');
                }
              }, 100);
@@ -258,15 +287,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.error('Failed to trigger search:', error);
       
       // 提供更友好的错误信息
-      let errorMessage = 'Failed to start search function';
-      if (error.message.includes('Cannot access a chrome:// URL')) {
-        errorMessage = 'Search function cannot be used on Chrome internal pages. Please switch to a regular webpage and try again';
-      } else if (error.message.includes('The extensions gallery cannot be scripted')) {
-        errorMessage = 'Search function cannot be used on Chrome Web Store pages. Please switch to another webpage and try again';
+      let errorMessage = window.i18n ? window.i18n.t('popup_startFailed') : 'Failed to start search function';
+      if (error.message.includes('Cannot access a chrome:// URL') ||
+          error.message.includes('The extensions gallery cannot be scripted')) {
+        errorMessage = window.i18n
+          ? window.i18n.t('popup_restrictedPage')
+          : 'Search function cannot be used on this page. Please switch to a regular webpage (like google.com) and try again.';
       } else {
         errorMessage += ': ' + error.message;
       }
-      
+
       alert(errorMessage);
     }
   }

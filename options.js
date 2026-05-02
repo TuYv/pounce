@@ -1,5 +1,27 @@
 // 配置页面逻辑
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // 先初始化 i18n，确保后续渲染读取到的是已翻译文本
+  if (window.i18n) {
+    try {
+      await window.i18n.init();
+    } catch (e) {
+      console.warn('[options] i18n init failed', e);
+    }
+  }
+
+  // 绑定语言下拉框
+  const languageSelect = document.getElementById('language-select');
+  if (languageSelect && window.i18n) {
+    languageSelect.value = window.i18n.getPreference();
+    languageSelect.addEventListener('change', async (e) => {
+      try {
+        await window.i18n.setLanguage(e.target.value);
+      } catch (err) {
+        console.warn('[options] setLanguage failed', err);
+      }
+    });
+  }
+
   // 模拟chrome.storage API用于预览
   if (typeof chrome === 'undefined' || !chrome.storage) {
     const mockStore = {
@@ -62,7 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // 将 "Command+Shift+K" 这类字符串拆成多个 <kbd> 片段
   function renderShortcut(container, shortcut) {
     if (!shortcut) {
-      container.innerHTML = '<span style="color:var(--muted);font-size:11px;">Not set</span>';
+      const notSet = window.i18n ? window.i18n.t('options_shortcutNotSet') : 'Not set';
+      container.innerHTML = `<span style="color:var(--muted);font-size:11px;">${escapeHtml(notSet)}</span>`;
       return;
     }
     const KEY_MAP = {
@@ -125,7 +148,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const manifestData = chrome.runtime.getManifest();
     const versionElement = document.getElementById('optionsVersionText');
     if (versionElement) {
-      versionElement.textContent = `Version ${manifestData.version}`;
+      versionElement.textContent = window.i18n
+        ? window.i18n.t('options_versionLabel', [manifestData.version])
+        : 'Version ' + manifestData.version;
     }
   } catch (error) {
     console.error('Failed to set version:', error);
@@ -144,20 +169,22 @@ document.addEventListener('DOMContentLoaded', () => {
   // 打开所有URL按钮事件
   openAllBtn.addEventListener('click', async () => {
     if (urls.length === 0) {
-      showError('No URLs to open');
+      showError(window.i18n ? window.i18n.t('options_noUrlsToOpen') : 'No URLs to open');
       return;
     }
-    
+
     openAllBtn.disabled = true;
     const buttonText = openAllBtn.querySelector('span:not(.button-icon)');
     const originalText = buttonText ? buttonText.textContent : 'Open All';
-    if (buttonText) buttonText.textContent = 'Opening...';
-    
+    if (buttonText) buttonText.textContent = window.i18n ? window.i18n.t('popup_opening') : 'Opening...';
+
     try {
       await chrome.runtime.sendMessage({ action: 'openAllUrls' });
-      showSuccess('All URLs opened successfully');
+      showSuccess(window.i18n ? window.i18n.t('options_openedOk') : 'All URLs opened successfully');
     } catch (error) {
-      showError('Failed to open: ' + error.message);
+      showError(window.i18n
+        ? window.i18n.t('options_openFailed', [error.message])
+        : 'Failed to open: ' + error.message);
     } finally {
       openAllBtn.disabled = false;
       if (buttonText) buttonText.textContent = originalText;
@@ -167,15 +194,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // 清空所有按钮事件
   clearAllBtn.addEventListener('click', () => {
     if (urls.length === 0) {
-      showError('No URLs to clear');
+      showError(window.i18n ? window.i18n.t('options_noUrlsToClear') : 'No URLs to clear');
       return;
     }
-    
-    if (confirm('Are you sure you want to clear all URLs? This action cannot be undone.')) {
+
+    const confirmMsg = window.i18n
+      ? window.i18n.t('options_clearUrlsConfirm')
+      : 'Are you sure you want to clear all URLs? This action cannot be undone.';
+    if (confirm(confirmMsg)) {
       urls = [];
       saveUrls();
       renderUrlList();
-      showSuccess('All URLs cleared');
+      showSuccess(window.i18n ? window.i18n.t('options_clearedOk') : 'All URLs cleared');
     }
   });
 
@@ -187,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
       renderUrlList();
     } catch (error) {
       console.error('Failed to load data:', error);
-      showError('Failed to load data');
+      showError(window.i18n ? window.i18n.t('options_loadFailed') : 'Failed to load data');
     }
   }
 
@@ -197,14 +227,14 @@ document.addEventListener('DOMContentLoaded', () => {
       await chrome.storage.sync.set({ urls: urls });
     } catch (error) {
       console.error('Failed to save data:', error);
-      showError('Failed to save data');
+      showError(window.i18n ? window.i18n.t('options_saveFailed') : 'Failed to save data');
     }
   }
 
   // 验证和规范化 URL
   function validateAndNormalizeUrl(input) {
     if (!input || !input.trim()) {
-      throw new Error('Please enter a URL');
+      throw new Error(window.i18n ? window.i18n.t('options_urlEmpty') : 'Please enter a URL');
     }
 
     let url = input.trim();
@@ -220,18 +250,18 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // 检查协议
       if (!['http:', 'https:'].includes(urlObj.protocol)) {
-        throw new Error('Only HTTP and HTTPS protocols are supported');
+        throw new Error(window.i18n ? window.i18n.t('options_protocolError') : 'Only HTTP and HTTPS protocols are supported');
       }
       
       // 检查主机名
       if (!urlObj.hostname) {
-        throw new Error('Invalid URL format');
+        throw new Error(window.i18n ? window.i18n.t('options_urlInvalid') : 'Invalid URL format');
       }
-      
+
       return urlObj.href;
     } catch (e) {
       if (e.message.includes('Invalid URL')) {
-        throw new Error('Invalid URL format');
+        throw new Error(window.i18n ? window.i18n.t('options_urlInvalid') : 'Invalid URL format');
       }
       throw e;
     }
@@ -246,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // 检查是否已存在
       if (urls.includes(normalizedUrl)) {
-        throw new Error('This URL already exists');
+        throw new Error(window.i18n ? window.i18n.t('options_urlDuplicate') : 'This URL already exists');
       }
       
       // 添加到列表
@@ -256,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 更新界面
       renderUrlList();
       urlInput.value = '';
-      showSuccess('URL added successfully');
+      showSuccess(window.i18n ? window.i18n.t('options_urlAdded') : 'URL added successfully');
       
     } catch (error) {
       showError(error.message);
@@ -269,16 +299,27 @@ document.addEventListener('DOMContentLoaded', () => {
       urls.splice(index, 1);
       await saveUrls();
       renderUrlList();
-      showSuccess('URL removed successfully');
+      showSuccess(window.i18n ? window.i18n.t('options_urlRemoved') : 'URL removed successfully');
     }
   }
 
   // 渲染 URL 列表
   function renderUrlList() {
-    urlCount.textContent = urls.length;
-    
+    // 更新 "$count$ saved URLs" 文案（整体替换，原 #urlCount span 内嵌入数字）
+    const urlCountLabel = document.getElementById('urlCountLabel');
+    if (urlCountLabel) {
+      const label = window.i18n
+        ? window.i18n.t('options_savedUrlsCount', [String(urls.length)])
+        : `${urls.length} saved URLs`;
+      urlCountLabel.textContent = label;
+    } else if (urlCount) {
+      urlCount.textContent = urls.length;
+    }
+
     if (urls.length === 0) {
-      urlList.innerHTML = '<div class="empty-state" id="emptyState">No URLs configured for batch opening<br>Click Add above to add URLs</div>';
+      const noUrls = window.i18n ? window.i18n.t('options_noUrlsYet') : 'No URLs yet';
+      const addAbove = window.i18n ? window.i18n.t('options_addUrlAbove') : 'Add a URL above to get started';
+      urlList.innerHTML = `<div class="empty-state" id="emptyState">${escapeHtml(noUrls)}<br>${escapeHtml(addAbove)}</div>`;
       return;
     }
 
@@ -295,12 +336,14 @@ document.addEventListener('DOMContentLoaded', () => {
       <path d="M6.16931 3.99999V2.66666C6.16931 2.31304 6.30979 1.9739 6.55984 1.72385C6.80988 1.4738 7.14902 1.33333 7.50264 1.33333H10.1693C10.5229 1.33333 10.8621 1.4738 11.1121 1.72385C11.3622 1.9739 11.5026 2.31304 11.5026 2.66666V3.99999" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>`;
 
+    const openTitle = window.i18n ? window.i18n.t('options_openUrlTitle') : 'Open URL';
+    const removeTitle = window.i18n ? window.i18n.t('options_removeUrlTitle') : 'Remove URL';
     const listHtml = urls.map((url, index) => `
       <div class="url-item">
         <span class="url-index">${index + 1}</span>
         <span class="url-text">${escapeHtml(url)}</span>
-        <button class="open-btn" data-url="${escapeHtml(url)}" title="Open URL">${openIcon}</button>
-        <button class="delete-btn" data-index="${index}" title="Remove URL">${deleteIcon}</button>
+        <button class="open-btn" data-url="${escapeHtml(url)}" title="${escapeHtml(openTitle)}">${openIcon}</button>
+        <button class="delete-btn" data-index="${index}" title="${escapeHtml(removeTitle)}">${deleteIcon}</button>
       </div>
     `).join('');
 
@@ -369,13 +412,26 @@ document.addEventListener('DOMContentLoaded', () => {
       // 监听主题选择变化
       themeSelect.addEventListener('change', async (e) => {
         await themeManager.setTheme(e.target.value);
-        showSuccess('Theme updated successfully');
+        showSuccess(window.i18n ? window.i18n.t('options_themeUpdated') : 'Theme updated successfully');
       });
 
       // 监听来自其他页面的主题变更（storage onChanged 比消息传递更可靠）
-      chrome.storage.onChanged.addListener((changes, area) => {
-        if (area === 'sync' && changes.theme) {
+      // 同步处理语言变更：重新加载翻译并刷新下拉框选中项
+      chrome.storage.onChanged.addListener(async (changes, area) => {
+        if (area !== 'sync') return;
+        if (changes.theme) {
           themeSelect.value = changes.theme.newValue || 'system';
+        }
+        if (changes.language && window.i18n) {
+          try {
+            await window.i18n.reload();
+          } catch (e) {
+            console.warn('[options] i18n reload failed', e);
+          }
+          const sel = document.getElementById('language-select');
+          if (sel) sel.value = window.i18n.getPreference();
+          // 重新渲染包含动态文本的 URL 列表
+          renderUrlList();
         }
       });
       
@@ -428,7 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
       await chrome.storage.sync.set({ [key]: value });
     } catch (error) {
       console.error('Failed to save search preference:', error);
-      showError('Failed to save setting');
+      showError(window.i18n ? window.i18n.t('options_settingSaveFailed') : 'Failed to save setting');
     }
   }
 });

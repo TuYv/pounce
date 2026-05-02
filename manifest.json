@@ -1,28 +1,29 @@
 {
    "action": {
       "default_popup": "popup.html",
-      "default_title": "Pounce – Search Tabs, Bookmarks & History"
+      "default_title": "__MSG_action_title__"
    },
    "background": {
       "service_worker": "background.js"
    },
    "commands": {
       "open-all-urls": {
-         "description": "Open all configured URLs",
+         "description": "__MSG_cmd_open_all__",
          "suggested_key": {
             "default": "Ctrl+Shift+U",
             "mac": "Command+Shift+U"
          }
       },
       "search-tabs-bookmarks": {
-         "description": "Search open tabs and bookmarks",
+         "description": "__MSG_cmd_search__",
          "suggested_key": {
             "default": "Alt+K",
             "mac": "Command+K"
          }
       }
    },
-   "description": "One keystroke to find anything in your browser. Press ⌘K to search open tabs, bookmarks, history, and top sites.",
+   "default_locale": "en",
+   "description": "__MSG_ext_description__",
    "icons": {
       "128": "icons/icon128.png",
       "16": "icons/icon16.png",
@@ -30,15 +31,15 @@
    },
    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3rgTha7FzWroptYBsBi+B2Fen827de9dix5th+3ZPgSRF8OSRMNUXGPYWF510uKvarjCj60bk7PJxzb9efv0JxgeAga0gofldgN1fug+EOQkrDaTUsg464wMyA640jvNQ5uHC5pVaRDfJOs3mKavZ+Ou7NF9UeZr5s/CiheWaF5LgxVd466WV1zyMr1XYLHbs0rhYKhB6reoBHLlArkSLKri2NSbrIXO9up2002Qav5eJ6+br7yqO9gomjTJRHhC7o0xK5EIZqwUhFfkXS1CGKSUdLaozZq98T9TCKyO5Jox6PrH8fIkTPnlwpvXqPqweL7X2TDA3cFaHacLoauKiQIDAQAB",
    "manifest_version": 3,
-   "name": "Pounce – Cmd+K Search Tabs & Bookmarks",
+   "name": "__MSG_ext_name__",
    "options_page": "options.html",
    "permissions": [ "storage", "tabs", "notifications", "bookmarks", "history", "topSites", "scripting", "activeTab" ],
    "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "1.4.7",
+   "version": "1.5.0",
    "web_accessible_resources": [
       {
          "matches": [ "<all_urls>" ],
-         "resources": [ "search-overlay.css" ]
+         "resources": [ "search-overlay.css", "_locales/*/messages.json" ]
       }
    ]
 }
