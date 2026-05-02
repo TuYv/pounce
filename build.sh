@@ -17,6 +17,8 @@ FILES=(
   options-theme-sync.js
   theme-manager.js
   preferences.js
+  i18n.js
+  _locales
   search-overlay.js
   search-overlay.css
   search-ranking.js
