@@ -441,6 +441,34 @@ function isProtectedUrl(url) {
   return PROTECTED_URL_PREFIXES.some(prefix => url.startsWith(prefix));
 }
 
+// 注入失败信号：宿主页是 chrome-error://（DNS/网络失败），url 看起来正常但 frame 拒绝注入
+function isErrorPageInjectionFailure(error) {
+  return /showing error page/i.test(String(error?.message || ''));
+}
+
+async function openBridgeOverlay() {
+  const bridgeTab = await chrome.tabs.create({ url: chrome.runtime.getURL('bridge.html'), active: true });
+  if (bridgeTab.status !== 'complete') {
+    await new Promise((resolve) => {
+      chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
+        if (tabId === bridgeTab.id && info.status === 'complete') {
+          chrome.tabs.onUpdated.removeListener(listener);
+          resolve();
+        }
+      });
+    });
+  }
+  // bridge.html 已内嵌所有脚本，直接发消息即可，无需 executeScript
+  await new Promise((resolve) => setTimeout(resolve, 50));
+  const response = await chrome.tabs.sendMessage(bridgeTab.id, {
+    action: 'showSearchOverlay',
+    bridgeTabId: bridgeTab.id
+  });
+  if (response?.success !== true) {
+    throw new Error(response?.error || 'Bridge overlay launch failed');
+  }
+}
+
 // 显示搜索覆盖层
 async function showSearchOverlay() {
   async function requestOverlayShow(tabId) {
@@ -460,29 +488,10 @@ async function showSearchOverlay() {
     throw new Error('No active tab found');
   }
 
-  // chrome:// 等受保护页面无法注入 content script，新开 google.com 作为跳板页
+  // chrome:// 等受保护页面无法注入 content script，新开 bridge.html 作为跳板页
   if (isProtectedUrl(activeTab.url)) {
     console.debug('Pounce: Protected URL, opening bridge tab:', activeTab.url);
-    const bridgeTab = await chrome.tabs.create({ url: chrome.runtime.getURL('bridge.html'), active: true });
-    if (bridgeTab.status !== 'complete') {
-      await new Promise((resolve) => {
-        chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
-          if (tabId === bridgeTab.id && info.status === 'complete') {
-            chrome.tabs.onUpdated.removeListener(listener);
-            resolve();
-          }
-        });
-      });
-    }
-    // bridge.html 已内嵌所有脚本，直接发消息即可，无需 executeScript
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    const response = await chrome.tabs.sendMessage(bridgeTab.id, {
-      action: 'showSearchOverlay',
-      bridgeTabId: bridgeTab.id
-    });
-    if (response?.success !== true) {
-      throw new Error(response?.error || 'Bridge overlay launch failed');
-    }
+    await openBridgeOverlay();
     return;
   }
 
@@ -493,40 +502,45 @@ async function showSearchOverlay() {
     console.debug('Pounce: Content script not ready, will inject:', error.message);
   }
 
-  await injectAndShow(activeTab.id, null);
+  try {
+    await injectAndShow(activeTab.id, null);
+  } catch (injectionError) {
+    // 错误页（DNS/网络失败）注入会被 Chrome 拒绝，回退到 bridge 让用户继续搜索
+    if (isErrorPageInjectionFailure(injectionError)) {
+      console.debug('Pounce: error page detected, falling back to bridge tab');
+      await openBridgeOverlay();
+      return;
+    }
+    throw injectionError;
+  }
 }
 
 // 注入 content script 并显示搜索覆盖层
 async function injectAndShow(tabId, bridgeTabId) {
-  try {
-    // 单次 executeScript 按 files 数组顺序执行，省去 8 次 IPC 往返。
-    // 顺序约束：preferences/pinyin/ranking 都被 overlay 顶层引用，i18n 同步加载以便构造期可用。
-    await chrome.scripting.executeScript({
-      target: { tabId },
-      files: [
-        'i18n.js',
-        'theme-manager.js',
-        'preferences.js',
-        'vendor/tiny-pinyin.js',
-        'pinyin-index.js',
-        'pinyin-matcher.js',
-        'search-ranking.js',
-        'search-overlay.js',
-      ],
-    });
-    // CSS 不再注入宿主页：overlay 已迁至 Shadow DOM，search-overlay.js 内部自己 link 样式表
-    await new Promise((resolve) => setTimeout(resolve, 100));
+  // 单次 executeScript 按 files 数组顺序执行，省去 8 次 IPC 往返。
+  // 顺序约束：preferences/pinyin/ranking 都被 overlay 顶层引用，i18n 同步加载以便构造期可用。
+  await chrome.scripting.executeScript({
+    target: { tabId },
+    files: [
+      'i18n.js',
+      'theme-manager.js',
+      'preferences.js',
+      'vendor/tiny-pinyin.js',
+      'pinyin-index.js',
+      'pinyin-matcher.js',
+      'search-ranking.js',
+      'search-overlay.js',
+    ],
+  });
+  // CSS 不再注入宿主页：overlay 已迁至 Shadow DOM，search-overlay.js 内部自己 link 样式表
+  await new Promise((resolve) => setTimeout(resolve, 100));
 
-    const response = await chrome.tabs.sendMessage(tabId, {
-      action: 'showSearchOverlay',
-      bridgeTabId: bridgeTabId ?? null
-    });
-    if (response?.success !== true) {
-      throw new Error(response?.error || 'Overlay launch was not acknowledged');
-    }
-  } catch (injectionError) {
-    console.error('Failed to inject content script:', injectionError);
-    throw injectionError;
+  const response = await chrome.tabs.sendMessage(tabId, {
+    action: 'showSearchOverlay',
+    bridgeTabId: bridgeTabId ?? null
+  });
+  if (response?.success !== true) {
+    throw new Error(response?.error || 'Overlay launch was not acknowledged');
   }
 }
 
