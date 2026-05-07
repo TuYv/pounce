@@ -65,6 +65,12 @@ MIT — see [LICENSE](LICENSE)
 
 ## Changelog
 
+### 1.5.2
+- Better history recall: previously, frequently-typed work URLs could fall out of the candidate pool and look "missing" to the search overlay. The history pool now spans 1,000 entries instead of 50, so the ranker can surface high-`typedCount` URLs that aren't recently visited.
+- New setting: choose how many results to show (10 / 20 / 50, default 10).
+- Fix: ⌘K now works on tabs that failed to load (DNS / network errors). Falls back to the same bridge tab used for `chrome://` pages.
+- Match highlighting is always on; the toggle has been removed.
+
 ### 1.5.1
 - Renamed to "Find Anything with ⌘K" — better matches the actual search scope (tabs + bookmarks + history + top sites).
 - Fix: extension's own `bridge.html` no longer leaks into search results via the history source.
