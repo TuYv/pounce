@@ -21,6 +21,10 @@ Keyboard-first, doesn't leave your current page.
 
 </div>
 
+> The name *Pounce* — to leap and seize. 🐾
+>
+> When you need it, it pounces in and finds what you really want.
+
 ## Features
 
 - 🔍 **Unified search** — one `⌘K`, search open tabs + bookmarks + history + top sites at once
