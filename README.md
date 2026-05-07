@@ -65,6 +65,9 @@ MIT — see [LICENSE](LICENSE)
 
 ## Changelog
 
+### 1.5.3
+- Fix: search dialog corners turned into a pill shape on sites that scale `<html>` font-size (e.g. baidu.com sets it to 100px). The Shadow DOM doesn't isolate `rem` from the host document, so the radius variable was being multiplied. Switched to fixed pixels.
+
 ### 1.5.2
 - Better history recall: previously, frequently-typed work URLs could fall out of the candidate pool and look "missing" to the search overlay. The history pool now spans 1,000 entries instead of 50, so the ranker can surface high-`typedCount` URLs that aren't recently visited.
 - New setting: choose how many results to show (10 / 20 / 50, default 10).
