@@ -70,6 +70,7 @@
       this.shadowHost = null;
       this.docKeyDownHandler = null;
       this.docKeyUpHandler = null;
+      this.focusShieldHandler = null;
       this.runtimeMessageHandler = null;
       this.storageChangeHandler = null;
       this.languageChangeHandler = null;
@@ -314,6 +315,23 @@
       document.addEventListener('keydown', this.docKeyDownHandler, { capture: true });
       document.addEventListener('keyup', this.docKeyUpHandler, { capture: true });
 
+      // 屏蔽宿主页的 focus trap：浮层显示期间，"焦点进入 Pounce shadowHost"
+      // 这一类 focusin 在 document capture 阶段就 stopPropagation，不让事件继续
+      // 传到 body 及更下层。背景：Quasar QDialog 等 a11y 模态库会在 body 上挂
+      // bubble 阶段 focusin，发现焦点跑出 dialog 就把焦点拽回 dialog 内第一个
+      // [tabindex>=0] 元素（如关闭按钮）。从源头拦掉事件，它们不再触发抢回逻辑，
+      // 避免和我们形成 ping-pong。仅当 target 是 shadowHost 时才拦，宿主自己内部
+      // 的 focus 移动事件原样冒泡，不影响宿主自身的 focus 管理。
+      // 验证场景：OpenObserve（QA 部署版本未带 allow-focus-outside），打开日志
+      // 详情后按 Cmd+K，焦点会被关闭按钮抢走 → 此守卫接住。
+      this.focusShieldHandler = (e) => {
+        if (this.isDestroyed || !this.isVisible) return;
+        if (e.target === this.shadowHost) {
+          e.stopPropagation();
+        }
+      };
+      document.addEventListener('focusin', this.focusShieldHandler, { capture: true });
+
       this.shadowRoot.getElementById('pounce-close-icon').addEventListener('click', (e) => {
         this.hide();
         e.preventDefault();
@@ -457,6 +475,10 @@
       if (this.docKeyUpHandler) {
         document.removeEventListener('keyup', this.docKeyUpHandler, { capture: true });
         this.docKeyUpHandler = null;
+      }
+      if (this.focusShieldHandler) {
+        document.removeEventListener('focusin', this.focusShieldHandler, { capture: true });
+        this.focusShieldHandler = null;
       }
 
       try {
