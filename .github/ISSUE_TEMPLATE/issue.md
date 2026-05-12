@@ -1,3 +1,11 @@
+---
+name: "Bug 或建议 / Bug or suggestion"
+about: "报告 bug 或提建议 / Report a bug or suggest something"
+title: ""
+labels: ""
+assignees: ""
+---
+
 <!--
 中文 / English 都可以。Bug 报告请尽量填完「复现步骤」和「环境」两栏。
 功能建议可忽略 Bug 相关字段。
