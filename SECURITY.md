@@ -2,7 +2,7 @@
 
 ## Supported version
 
-Security fixes are applied to the latest version available from the Chrome Web Store. Older releases are not maintained separately.
+Only the latest version available from the Chrome Web Store is currently supported. Older releases are not maintained separately.
 
 ## Reporting a vulnerability
 
