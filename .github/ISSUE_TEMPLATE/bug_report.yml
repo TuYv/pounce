@@ -9,7 +9,7 @@ body:
       value: |
         Thanks for helping improve Pounce.
 
-        **Privacy and security:** Remove personal or sensitive information from logs, screenshots, and recordings. If this may be a security vulnerability, report it privately through [GitHub Security Advisories](https://github.com/TuYv/pounce/security/advisories/new) instead of opening a public Issue.
+        **Privacy and security:** Remove personal or sensitive information, including private URLs, browsing history, credentials, and access tokens, from logs, screenshots, and recordings. If this may be a security vulnerability, report it privately through [GitHub Security Advisories](https://github.com/TuYv/pounce/security/advisories/new) instead of opening a public Issue.
 
   - type: input
     id: pounce-version
@@ -79,7 +79,7 @@ body:
     id: screenshots-or-recordings
     attributes:
       label: Screenshots or recordings
-      description: Optional. Drag files here if they help explain the problem. Remove personal or sensitive information before uploading.
+      description: Optional. Drag files here if they help explain the problem. Remove personal or sensitive information, including private URLs, browsing history, credentials, and access tokens, before uploading.
 
   - type: checkboxes
     id: confirmation

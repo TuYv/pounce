@@ -2,11 +2,15 @@
 
 <!-- Concisely describe the problem and how this change addresses it. -->
 
-Closes #
+## Related work
+
+<!-- Link an Issue or Discussion; enter N/A if none. Use `Closes #...` when appropriate. -->
+
+Related Issue or Discussion:
 
 ## Verification
 
-- [ ] `node --test tests/*.test.js`
+- [ ] `node --test tests/*.test.js` passes locally.
 - [ ] I completed the relevant manual browser checks in Chrome or Microsoft Edge.
 - [ ] I added or updated tests where practical.
 
@@ -14,17 +18,16 @@ Closes #
 
 ## User-facing changes
 
-- [ ] This change has no visible user-interface changes, or I attached screenshots/GIFs showing them.
+- [ ] I described the user-facing impact below and attached screenshots/GIFs for visible UI changes.
 - [ ] I updated both English and Simplified Chinese user-facing text where applicable.
+
+User-facing impact:
 
 ## Manifest and permissions
 
-<!-- Select exactly one option. Explain any manifest or permission changes below. -->
+- [ ] I declared manifest and browser-permission impact below.
 
-- [ ] This change does not modify the manifest or browser permissions.
-- [ ] This change modifies the manifest or browser permissions, and I explained why below.
-
-Explanation:
+Impact: Unchanged / Changed — explanation:
 
 ## Scope
 
