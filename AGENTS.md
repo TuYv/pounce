@@ -19,7 +19,13 @@ Follow the existing plain HTML/CSS/JavaScript style:
 - Keep user-facing strings and new comments concise and in English unless matching nearby localized text.
 
 ## Testing Guidelines
-No automated test suite is configured in this workspace. Treat manual regression checks as required before opening a PR:
+Pounce uses Node.js's built-in test runner and has no npm dependencies. Run the full automated test suite with:
+
+```sh
+node --test tests/*.test.js
+```
+
+Add focused regression tests under `tests/` for shared JavaScript behavior. Manual browser checks remain required for extension integration and UI changes:
 
 - Verify URL add/remove/save flows in `options.html`.
 - Verify popup actions, especially “Open All” and search launch.
