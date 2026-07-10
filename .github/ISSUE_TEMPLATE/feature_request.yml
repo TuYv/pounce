@@ -1,0 +1,64 @@
+name: Feature or improvement
+description: Propose a focused improvement to Pounce.
+title: "[Idea]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Pounce is conservatively maintained. Ideas may be declined to keep the project's scope and permissions focused.
+
+  - type: textarea
+    id: problem-or-limitation
+    attributes:
+      label: Problem or limitation
+      description: What problem are you trying to solve, and who encounters it?
+    validations:
+      required: true
+
+  - type: textarea
+    id: desired-outcome
+    attributes:
+      label: Desired outcome
+      description: Describe the result you want, without assuming a particular implementation.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-approach
+    attributes:
+      label: Proposed approach
+      description: Explain a focused way Pounce could address the problem, including alternatives you considered.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: permissions
+    attributes:
+      label: Would this require new browser permissions?
+      options:
+        - "No"
+        - Unsure
+        - "Yes"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: willingness
+    attributes:
+      label: Would you be willing to contribute this change?
+      options:
+        - "Yes"
+        - Maybe with guidance
+        - "No"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: I searched existing Issues and Discussions for similar ideas.
+          required: true

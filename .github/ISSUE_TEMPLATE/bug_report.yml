@@ -1,0 +1,92 @@
+name: Bug report
+description: Report a reproducible problem in Pounce.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Pounce.
+
+        **Privacy and security:** Remove personal or sensitive information from logs, screenshots, and recordings. If this may be a security vulnerability, report it privately through [GitHub Security Advisories](https://github.com/TuYv/pounce/security/advisories/new) instead of opening a public Issue.
+
+  - type: input
+    id: pounce-version
+    attributes:
+      label: Pounce version
+      description: Find the version on the extension details page or in `manifest.json`.
+      placeholder: e.g. 1.2.3
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options:
+        - Chrome
+        - Microsoft Edge
+        - Other Chromium browser
+    validations:
+      required: true
+
+  - type: input
+    id: browser-version
+    attributes:
+      label: Browser version
+      placeholder: e.g. 126.0.6478.127
+    validations:
+      required: true
+
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating system
+      placeholder: e.g. Windows 11, macOS 15, or Ubuntu 24.04
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What happened? Include any error messages and relevant context.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Provide the smallest reliable sequence that triggers the problem.
+      placeholder: |
+        1. Go to ...
+        2. Click ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: What did you expect Pounce to do?
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots-or-recordings
+    attributes:
+      label: Screenshots or recordings
+      description: Optional. Drag files here if they help explain the problem. Remove personal or sensitive information before uploading.
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: I searched existing Issues and Discussions for similar reports.
+          required: true
+        - label: This report is not about a security vulnerability.
+          required: true
