@@ -65,15 +65,15 @@
 
 ## 社区
 
-Pounce 采取审慎维护的方式，以保持快速、私密和专注。我们欢迎缺陷修复和范围明确的改进。可复现的问题或具体提案请提交到 [Issues](https://github.com/TuYv/pounce/issues)，早期设计问题请在 [Discussions](https://github.com/TuYv/pounce/discussions) 中讨论。
+Pounce 采取审慎维护的方式，以保持快速、注重隐私且功能聚焦。我们欢迎缺陷修复和范围明确的改进。可复现的问题或具体提案请提交到 [Issues](https://github.com/TuYv/pounce/issues)，早期设计问题请在 [Discussions](https://github.com/TuYv/pounce/discussions) 中讨论。
 
 ## 参与贡献
 
-请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)，了解本地开发环境、测试、项目约定和 Pull Request 要求。适合开始参与的问题可查看 [`good first issue`](https://github.com/TuYv/pounce/labels/good%20first%20issue) 和 [`help wanted`](https://github.com/TuYv/pounce/labels/help%20wanted) 标签。
+请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)，了解本地开发环境、测试、项目约定和 Pull Request 要求。新贡献者可从 [`good first issue`](https://github.com/TuYv/pounce/labels/good%20first%20issue) 和 [`help wanted`](https://github.com/TuYv/pounce/labels/help%20wanted) 标签开始。
 
 ## 路线图
 
-当前方向包括无障碍支持、自动化测试覆盖、本地化质量，以及对基于 Chromium 的浏览器的兼容性。这些是优先方向，不代表承诺的发布日期。
+当前改进方向包括无障碍体验、自动化测试覆盖、多语言质量，以及 Chromium 系浏览器兼容性。这些是方向说明，不代表承诺的发布日期。
 
 ## 安全
 

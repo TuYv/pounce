@@ -73,7 +73,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, tests, project conventio
 
 ## Roadmap
 
-Current direction areas include accessibility, automated test coverage, localization quality, and compatibility with Chromium-based browsers. These are priorities, not promised release dates.
+Current improvement areas include accessibility, automated test coverage, localization quality, and compatibility across Chromium-based browsers. These are direction areas rather than promised release dates.
 
 ## Security
 
