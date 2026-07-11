@@ -63,6 +63,22 @@ All permissions are used only for core search functionality. **No data ever leav
 | `scripting` | Inject the search overlay into the current page |
 | `activeTab` | Access the current tab when you trigger the overlay |
 
+## Community
+
+Pounce is conservatively maintained to stay fast, private, and focused. Bug fixes and well-scoped improvements are welcome. Use [Issues](https://github.com/TuYv/pounce/issues) for reproducible problems or concrete proposals, and [Discussions](https://github.com/TuYv/pounce/discussions) for early design questions.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, tests, project conventions, and pull request expectations. Good places to start include issues labeled [`good first issue`](https://github.com/TuYv/pounce/labels/good%20first%20issue) and [`help wanted`](https://github.com/TuYv/pounce/labels/help%20wanted).
+
+## Roadmap
+
+Current direction areas include accessibility, automated test coverage, localization quality, and compatibility with Chromium-based browsers. These are priorities, not promised release dates.
+
+## Security
+
+Please report vulnerabilities privately by following [SECURITY.md](SECURITY.md). Do not disclose security issues in public Issues or Discussions.
+
 ## License
 
 MIT — see [LICENSE](LICENSE)
