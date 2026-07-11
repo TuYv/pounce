@@ -69,7 +69,7 @@ Pounce 采取审慎维护的方式，以保持快速、注重隐私且功能聚�
 
 ## 参与贡献
 
-请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)，了解本地开发环境、测试、项目约定和 Pull Request 要求。新贡献者可从 [`good first issue`](https://github.com/TuYv/pounce/labels/good%20first%20issue) 和 [`help wanted`](https://github.com/TuYv/pounce/labels/help%20wanted) 标签开始。
+请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)，了解本地开发环境、测试、项目约定和 Pull Request 要求。新贡献者可从带有 [`good first issue`](https://github.com/TuYv/pounce/labels/good%20first%20issue) 或 [`help wanted`](https://github.com/TuYv/pounce/labels/help%20wanted) 标签的问题开始。
 
 ## 路线图
 
