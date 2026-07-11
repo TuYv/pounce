@@ -82,7 +82,7 @@ Add `.github/pull_request_template.md` requiring:
 Add `.github/workflows/test.yml` with the following behavior:
 
 - Trigger on pull requests and pushes to `master`.
-- Run on Ubuntu with active Node.js LTS versions 20 and 22.
+- Run on Ubuntu with active Node.js LTS versions 22 and 24.
 - Check out the repository and run `node --test tests/*.test.js` directly.
 - Use no npm install step because Pounce has no package dependencies.
 - Keep job and check names stable so branch protection can adopt them later if desired.

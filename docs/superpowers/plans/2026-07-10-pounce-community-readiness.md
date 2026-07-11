@@ -20,7 +20,7 @@
 - Create `.github/ISSUE_TEMPLATE/feature_request.yml`: problem-focused enhancement proposals.
 - Create `.github/ISSUE_TEMPLATE/config.yml`: security and discussion links; disable blank issues.
 - Create `.github/pull_request_template.md`: PR evidence and permission checklist.
-- Create `.github/workflows/test.yml`: Node.js 20/22 test matrix.
+- Create `.github/workflows/test.yml`: Node.js 22/24 test matrix.
 - Modify `AGENTS.md`: document the actual automated test suite.
 - Modify `README.md`: add community, contribution, roadmap, and security entry points.
 - Modify `README.zh-CN.md`: add equivalent Chinese entry points.
@@ -558,8 +558,8 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 20
           - 22
+          - 24
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -736,7 +736,7 @@ gh pr create --repo TuYv/pounce --base master --head feat/oss-community-readines
 
 - add contribution, security, and conduct policies
 - replace the combined issue template with structured Issue Forms
-- add a dependency-free Node.js 20/22 CI matrix
+- add a dependency-free Node.js 22/24 CI matrix
 - add bilingual community, roadmap, contribution, and security entry points
 
 ## Verification
