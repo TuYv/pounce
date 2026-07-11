@@ -859,10 +859,10 @@ Run:
 
 ```bash
 gh repo view TuYv/pounce --json hasDiscussionsEnabled --jq .hasDiscussionsEnabled
-gh api repos/TuYv/pounce/private-vulnerability-reporting
+test "$(gh api repos/TuYv/pounce/private-vulnerability-reporting --jq .enabled)" = true
 ```
 
-Expected: Discussions reports `true` and the private-vulnerability-reporting endpoint succeeds. Do not merge if either verification fails.
+Expected: Discussions reports `true`, and private vulnerability reporting has `enabled: true`; the assertion must exit 0. Do not merge if either verification fails.
 
 - [ ] **Step 5: Merge the Pounce pull request**
 
