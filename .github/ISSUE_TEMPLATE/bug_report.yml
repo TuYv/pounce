@@ -9,6 +9,8 @@ body:
       value: |
         Thanks for helping improve Pounce.
 
+        Reports may be submitted in English or 中文.
+
         **Privacy and security:** Remove personal or sensitive information, including private URLs, browsing history, credentials, and access tokens, from logs, screenshots, and recordings. If this may be a security vulnerability, report it privately through [GitHub Security Advisories](https://github.com/TuYv/pounce/security/advisories/new) instead of opening a public Issue.
 
   - type: input

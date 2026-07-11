@@ -4,5 +4,5 @@ contact_links:
     url: https://github.com/TuYv/pounce/discussions
     about: Discuss an idea before turning it into a scoped feature request.
   - name: Security vulnerability
-    url: https://github.com/TuYv/pounce/security/advisories/new
+    url: https://github.com/TuYv/pounce/security/policy
     about: Report vulnerabilities privately. Do not open a public Issue.

@@ -11,7 +11,7 @@ Thanks for helping improve Pounce. The project is intentionally conservative abo
 
 ## Local development
 
-Pounce is a dependency-free Manifest V3 extension built with plain HTML, CSS, and JavaScript.
+Pounce requires no package-manager install step and is built with plain HTML, CSS, and JavaScript.
 
 1. Clone the repository.
 2. Open `chrome://extensions` or `edge://extensions`.

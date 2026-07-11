@@ -2,6 +2,7 @@
 
 **Date:** 2026-07-10
 **Status:** Approved on 2026-07-10 via merged PR #9
+**Implementation amendment:** During PR #10, the CI matrix was corrected from Node.js 20/22 to 22/24 after verifying the [official Node.js release schedule](https://github.com/nodejs/Release/blob/main/schedule.json) showed Node.js 20 is end-of-life. This implementation amendment was not part of PR #9's design approval.
 
 ## Summary
 
@@ -84,7 +85,7 @@ Add `.github/workflows/test.yml` with the following behavior:
 - Trigger on pull requests and pushes to `master`.
 - Run on Ubuntu with active Node.js LTS versions 22 and 24.
 - Check out the repository and run `node --test tests/*.test.js` directly.
-- Use no npm install step because Pounce has no package dependencies.
+- Use no npm install step because the test workflow has no npm dependencies.
 - Keep job and check names stable so branch protection can adopt them later if desired.
 
 The existing `AGENTS.md` testing section must be corrected because the repository now contains automated tests even though it has no package manager.
@@ -100,15 +101,23 @@ Update both `README.md` and `README.zh-CN.md` with equivalent sections:
 
 Existing dynamic Chrome Web Store user, rating, version, GitHub star, and license badges remain. No user count or star count will be hard-coded into prose.
 
-### Repository settings
+### Publication sequence and repository settings
 
-After the content pull request is merged:
+Publish the Pounce changes in this order:
 
-- Enable GitHub Discussions.
-- Enable private vulnerability reporting if the repository and account support it.
-- Set focused repository topics such as `chrome-extension`, `browser-extension`, `productivity`, `keyboard-first`, `local-first`, `javascript`, and `open-source`.
+1. Obtain explicit user approval.
+2. Before merging, enable and verify GitHub Discussions and private vulnerability reporting.
+3. Merge the content pull request.
+4. After the merge, set focused repository topics and create accurate labels and seed issues.
+
+The live-settings step must:
+
+- Verify GitHub Discussions is enabled.
+- Verify private vulnerability reporting is enabled.
 - Keep Issues enabled.
 - Do not enable settings that require paid features or change repository visibility.
+
+Post-merge topics should include `chrome-extension`, `browser-extension`, `productivity`, `keyboard-first`, `local-first`, `javascript`, and `open-source`.
 
 ### Seed contribution opportunities
 
@@ -180,8 +189,8 @@ After pull requests are opened:
 
 ## Failure Handling
 
-- If a repository setting cannot be enabled through the GitHub API, leave repository content intact and report the exact manual setting required.
-- If private vulnerability reporting is unavailable, keep `SECURITY.md` but route reports to GitHub Security Advisories without claiming the private form is enabled.
+- If a required pre-merge repository setting cannot be enabled through the GitHub API, leave repository content intact, report the exact manual setting required, and do not merge while the gate is unmet.
+- If private vulnerability reporting is unavailable, keep `SECURITY.md`, do not claim the private form is enabled, and stop before merge for user direction.
 - If any existing test fails before the change, stop and report the baseline failure rather than weakening or deleting the test.
 - If a proposed seed issue cannot be made concrete, omit it instead of publishing a vague placeholder.
 - If profile-repository visibility prevents pull-request review, keep it private and provide the pull request URL; do not publish the unfinished README.
@@ -191,5 +200,6 @@ After pull requests are opened:
 - The design document is committed first for review.
 - Implementation begins only after this design is approved.
 - Pounce content changes and the GitHub profile README use separate pull requests.
-- Repository settings and seed issues are applied only after the corresponding content is merged and links are valid.
+- Pounce Discussions and private vulnerability reporting are enabled and verified only after explicit user approval and before merge.
+- Pounce topics, labels, and seed issues are added only after the corresponding content is merged and links are valid.
 - No pull request is merged without explicit user approval.

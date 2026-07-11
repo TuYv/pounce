@@ -1,10 +1,12 @@
 # Pounce Community Readiness Implementation Plan
 
+> **Status:** Execution record (non-normative). The design spec and final repository files are authoritative.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Make Pounce straightforward for genuine external contributors to report problems, discuss scoped improvements, run tests, submit pull requests, and report security issues.
 
-**Architecture:** Keep Pounce dependency-free and add only repository-native community files, GitHub Issue Forms, and a GitHub Actions workflow that runs the existing Node.js test suite. Content changes land through one pull request; repository settings, labels, and seed issues are applied only after that pull request is explicitly approved and merged.
+**Architecture:** Keep Pounce free of a package-manager install step and add only repository-native community files, GitHub Issue Forms, and a GitHub Actions workflow that runs the existing Node.js test suite. Content changes land through one pull request. After explicit user approval, enable and verify Discussions and private vulnerability reporting before merging; after merge, add topics, labels, and seed issues.
 
 **Tech Stack:** Markdown, GitHub Issue Forms YAML, GitHub Actions YAML, Node.js built-in test runner, GitHub CLI
 
@@ -21,7 +23,7 @@
 - Create `.github/ISSUE_TEMPLATE/config.yml`: security and discussion links; disable blank issues.
 - Create `.github/pull_request_template.md`: PR evidence and permission checklist.
 - Create `.github/workflows/test.yml`: Node.js 22/24 test matrix.
-- Modify `AGENTS.md`: document the actual automated test suite.
+- Modify `AGENTS.md`: document the actual automated test suite and commit guidance reflected in repository history.
 - Modify `README.md`: add community, contribution, roadmap, and security entry points.
 - Modify `README.zh-CN.md`: add equivalent Chinese entry points.
 - Modify `docs/superpowers/specs/2026-07-10-pounce-community-profile-design.md`: mark the reviewed design approved.
@@ -52,13 +54,14 @@ node --test tests/*.test.js
 
 Expected: `tests 128`, `pass 128`, `fail 0`.
 
-- [ ] **Step 3: Mark the design approved**
+- [ ] **Step 3: Record the design approval and implementation amendment separately**
 
 Apply:
 
 ```diff
 -**Status:** Pending user review
 +**Status:** Approved on 2026-07-10 via merged PR #9
++**Implementation amendment:** During PR #10, the CI matrix was corrected from Node.js 20/22 to 22/24 after verifying the [official Node.js release schedule](https://github.com/nodejs/Release/blob/main/schedule.json) showed Node.js 20 is end-of-life. This implementation amendment was not part of PR #9's design approval.
 ```
 
 - [ ] **Step 4: Commit the approval record with the implementation plans**
@@ -97,7 +100,7 @@ Thanks for helping improve Pounce. The project is intentionally conservative abo
 
 ## Local development
 
-Pounce is a dependency-free Manifest V3 extension built with plain HTML, CSS, and JavaScript.
+Pounce requires no package-manager install step and is built with plain HTML, CSS, and JavaScript.
 
 1. Clone the repository.
 2. Open `chrome://extensions` or `edge://extensions`.
@@ -269,7 +272,7 @@ For answers to common questions about this code of conduct, see the FAQ at [http
 Run:
 
 ```bash
-rg -n '861506831|qq\.com|guarantee|within [0-9]+ (hours|days)' CONTRIBUTING.md SECURITY.md CODE_OF_CONDUCT.md
+rg -n '[[:alnum:]._%+-]+@[[:alnum:].-]+\.[A-Za-z]{2,}|guarantee|within [0-9]+ (hours|days)' CONTRIBUTING.md SECURITY.md CODE_OF_CONDUCT.md
 ```
 
 Expected: no matches.
@@ -306,7 +309,7 @@ Use this complete content:
 
 ```yaml
 name: Bug report
-description: Report a reproducible problem in Pounce
+description: Report a reproducible problem in Pounce.
 title: "[Bug]: "
 labels:
   - bug
@@ -314,14 +317,21 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for helping improve Pounce. Do not include private URLs, browsing history, credentials, or security vulnerabilities. Report vulnerabilities through the Security tab.
+        Thanks for helping improve Pounce.
+
+        Reports may be submitted in English or 中文.
+
+        **Privacy and security:** Remove personal or sensitive information, including private URLs, browsing history, credentials, and access tokens, from logs, screenshots, and recordings. If this may be a security vulnerability, report it privately through [GitHub Security Advisories](https://github.com/TuYv/pounce/security/advisories/new) instead of opening a public Issue.
+
   - type: input
-    id: version
+    id: pounce-version
     attributes:
       label: Pounce version
-      placeholder: "For example: 1.6.1"
+      description: Find the version on the extension details page or in `manifest.json`.
+      placeholder: e.g. 1.2.3
     validations:
       required: true
+
   - type: dropdown
     id: browser
     attributes:
@@ -332,56 +342,65 @@ body:
         - Other Chromium browser
     validations:
       required: true
+
   - type: input
-    id: browser_version
+    id: browser-version
     attributes:
       label: Browser version
-      placeholder: "For example: Chrome 138"
+      placeholder: e.g. 126.0.6478.127
     validations:
       required: true
+
   - type: input
-    id: operating_system
+    id: operating-system
     attributes:
       label: Operating system
-      placeholder: "For example: macOS 15.5 or Windows 11"
+      placeholder: e.g. Windows 11, macOS 15, or Ubuntu 24.04
     validations:
       required: true
+
   - type: textarea
-    id: description
+    id: problem
     attributes:
       label: Problem
-      description: What happened?
+      description: What happened? Include any error messages and relevant context.
     validations:
       required: true
+
   - type: textarea
-    id: reproduction
+    id: steps-to-reproduce
     attributes:
       label: Steps to reproduce
+      description: Provide the smallest reliable sequence that triggers the problem.
       placeholder: |
-        1. Open ...
-        2. Press ...
+        1. Go to ...
+        2. Click ...
         3. Observe ...
     validations:
       required: true
+
   - type: textarea
-    id: expected
+    id: expected-behavior
     attributes:
       label: Expected behavior
+      description: What did you expect Pounce to do?
     validations:
       required: true
+
   - type: textarea
-    id: screenshots
+    id: screenshots-or-recordings
     attributes:
       label: Screenshots or recordings
-      description: Remove private information before uploading.
+      description: Optional. Drag files here if they help explain the problem. Remove personal or sensitive information, including private URLs, browsing history, credentials, and access tokens, before uploading.
+
   - type: checkboxes
-    id: checks
+    id: confirmation
     attributes:
-      label: Pre-submission checks
+      label: Confirmation
       options:
-        - label: I searched existing Issues and Discussions.
+        - label: I searched existing Issues and Discussions for similar reports.
           required: true
-        - label: This is not a security vulnerability.
+        - label: This report is not about a security vulnerability.
           required: true
 ```
 
@@ -391,7 +410,7 @@ Use this complete content:
 
 ```yaml
 name: Feature or improvement
-description: Propose a focused improvement to Pounce
+description: Propose a focused improvement to Pounce.
 title: "[Idea]: "
 labels:
   - enhancement
@@ -399,54 +418,70 @@ body:
   - type: markdown
     attributes:
       value: |
-        Pounce is maintained conservatively. Well-scoped improvements are welcome, but proposals may be declined to keep the extension focused and permissions minimal.
+        Pounce is conservatively maintained. Ideas may be declined to keep the project's scope and permissions focused.
+
+        Proposals may be submitted in English or 中文.
+
   - type: textarea
-    id: problem
+    id: problem-or-limitation
     attributes:
       label: Problem or limitation
-      description: Describe the user problem before proposing a solution.
+      description: What problem are you trying to solve, and who encounters it?
     validations:
       required: true
+
   - type: textarea
-    id: outcome
+    id: desired-outcome
     attributes:
       label: Desired outcome
-      description: What should become easier or possible?
+      description: Describe the result you want, without assuming a particular implementation.
     validations:
       required: true
+
   - type: textarea
-    id: proposal
+    id: proposed-approach
     attributes:
       label: Proposed approach
-      description: Include alternatives you considered.
+      description: Explain a focused way Pounce could address the problem, including alternatives you considered.
     validations:
       required: true
+
+  - type: textarea
+    id: scope-and-non-goals
+    attributes:
+      label: Scope and non-goals
+      description: What does this proposal include, and what does it intentionally exclude?
+    validations:
+      required: true
+
   - type: dropdown
     id: permissions
     attributes:
       label: Would this require new browser permissions?
       options:
-        - No
+        - "No"
         - Unsure
-        - Yes
+        - "Yes"
     validations:
       required: true
+
   - type: dropdown
-    id: contribution
+    id: willingness
     attributes:
-      label: Are you willing to contribute an implementation?
+      label: Would you be willing to contribute this change?
       options:
-        - Yes
-        - Maybe, with guidance
-        - No
+        - "Yes"
+        - Maybe with guidance
+        - "No"
     validations:
       required: true
+
   - type: checkboxes
-    id: checks
+    id: confirmation
     attributes:
-      label: Pre-submission check
+      label: Confirmation
       options:
-        - label: I searched existing Issues and Discussions for similar proposals.
+        - label: I searched existing Issues and Discussions for similar ideas.
           required: true
 ```
 
@@ -461,7 +496,7 @@ contact_links:
     url: https://github.com/TuYv/pounce/discussions
     about: Discuss an idea before turning it into a scoped feature request.
   - name: Security vulnerability
-    url: https://github.com/TuYv/pounce/security/advisories/new
+    url: https://github.com/TuYv/pounce/security/policy
     about: Report vulnerabilities privately. Do not open a public Issue.
 ```
 
@@ -472,39 +507,47 @@ Use this complete content:
 ```markdown
 ## Summary
 
-<!-- What problem does this PR solve? -->
+<!-- Concisely describe the problem and how this change addresses it. -->
 
-Closes #
+## Related work
+
+<!-- Link an Issue or Discussion; enter N/A if none. Use `Closes #...` when appropriate. -->
+
+Related Issue or Discussion:
 
 ## Verification
 
 - [ ] `node --test tests/*.test.js` passes locally.
-- [ ] I completed the relevant manual browser checks.
+- [ ] I completed the relevant manual browser checks in Chrome or Microsoft Edge.
 - [ ] I added or updated tests where practical.
 
-Manual checks performed:
+Automated test output:
 
-<!-- List browsers, operating systems, and flows checked. -->
+<!-- Paste or summarize the automated test command and result, including pass/fail counts. -->
+
+Manual check results:
+
+<!-- List the browsers, operating systems, flows checked, and results; enter N/A with a reason when no browser check applies. -->
 
 ## User-facing changes
 
-- [ ] No visible UI change.
-- [ ] Screenshots or GIFs are included below.
-- [ ] English and Simplified Chinese text are both updated where applicable.
+- [ ] I described the user-facing impact below and attached screenshots/GIFs for visible UI changes.
+- [ ] I updated both English and Simplified Chinese user-facing text where applicable.
+
+User-facing impact:
 
 ## Manifest and permissions
 
-- [ ] This PR does not change `manifest.json` or browser permissions.
-- [ ] This PR changes `manifest.json` or permissions, and the reason is explained below.
+- [ ] I declared manifest and browser-permission impact below.
 
-Permission or manifest explanation:
-
-<!-- Write "Not applicable" when unchanged. -->
+Impact: Unchanged / Changed — explanation:
 
 ## Scope
 
-- [ ] The change is focused and does not include unrelated refactoring.
-- [ ] Documentation is updated where needed.
+- [ ] This change is focused and avoids unrelated refactors.
+- [ ] I updated relevant documentation where needed.
+
+<!-- Note any intentionally deferred or out-of-scope work. -->
 ```
 
 - [ ] **Step 6: Validate YAML syntax**
@@ -526,7 +569,7 @@ git add .github/ISSUE_TEMPLATE .github/pull_request_template.md
 git commit -m "chore: add structured contribution templates"
 ```
 
-### Task 4: Add Dependency-Free CI and Correct Repository Guidance
+### Task 4: Add CI Without an npm Install Step and Correct Repository Guidance
 
 **Files:**
 - Create: `.github/workflows/test.yml`
@@ -554,6 +597,7 @@ jobs:
   node-tests:
     name: Node.js ${{ matrix.node-version }} tests
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     strategy:
       fail-fast: false
       matrix:
@@ -577,13 +621,13 @@ Replace the complete existing `## Testing Guidelines` section, stopping before `
 
 ````markdown
 ## Testing Guidelines
-Pounce uses Node.js's built-in test runner and has no npm dependencies. Run the complete suite with:
+Pounce uses Node.js's built-in test runner and has no npm dependencies. Run the full automated test suite with:
 
-```bash
+```sh
 node --test tests/*.test.js
 ```
 
-Add focused regression tests under `tests/` for shared JavaScript behavior. Treat manual browser checks as required for extension integration and UI changes:
+Add focused regression tests under `tests/` for shared JavaScript behavior. Manual browser checks remain required for extension integration and UI changes:
 
 - Verify URL add/remove/save flows in `options.html`.
 - Verify popup actions, especially “Open All” and search launch.
@@ -592,7 +636,15 @@ Add focused regression tests under `tests/` for shared JavaScript behavior. Trea
 - Confirm restricted pages fail gracefully.
 ````
 
-- [ ] **Step 3: Run the full test suite**
+- [ ] **Step 3: Correct the commit guidance**
+
+Replace the existing paragraph under `## Commit & Pull Request Guidelines` with:
+
+```markdown
+Follow the existing history's short, scoped commit subjects, such as `docs: ...` and `ci: ...`. Keep commits focused and use an imperative description after the scope. PRs should include a brief summary, manual test steps, linked issue or task if applicable, and screenshots or GIFs for popup, options, or overlay UI changes.
+```
+
+- [ ] **Step 4: Run the full test suite**
 
 Run:
 
@@ -602,7 +654,7 @@ node --test tests/*.test.js
 
 Expected: 128 tests pass and 0 fail.
 
-- [ ] **Step 4: Commit CI and guidance**
+- [ ] **Step 5: Commit CI and guidance**
 
 Run:
 
@@ -666,7 +718,7 @@ Pounce 会保持克制维护，以确保它快速、注重隐私且功能聚焦�
 Run:
 
 ```bash
-rg -n '1,000|1000|59 stars|core contributor|open-design|861506831|qq\.com' README.md README.zh-CN.md
+rg -n '1,000|1000|59 stars|core contributor|open-design|[[:alnum:]._%+-]+@[[:alnum:].-]+\.[A-Za-z]{2,}' README.md README.zh-CN.md
 ```
 
 Expected: no matches.
@@ -732,22 +784,34 @@ Run:
 ```bash
 gh pr create --repo TuYv/pounce --base master --head feat/oss-community-readiness --draft \
   --title "chore: make Pounce community-ready" \
-  --body "## Summary
+  --body "## Design
+
+- approved design: https://github.com/TuYv/pounce/pull/9
+- design spec: https://github.com/TuYv/pounce/blob/master/docs/superpowers/specs/2026-07-10-pounce-community-profile-design.md
+
+## Summary
 
 - add contribution, security, and conduct policies
-- replace the combined issue template with structured Issue Forms
-- add a dependency-free Node.js 22/24 CI matrix
+- add structured Issue Forms and a pull request template
+- add a Node.js 22/24 CI matrix with no npm install step
 - add bilingual community, roadmap, contribution, and security entry points
 
 ## Verification
 
-- node --test tests/*.test.js (128 passed)
-- Issue Form and workflow YAML parsed successfully
+- node --test tests/*.test.js: 128 passed, 0 failed
+- Issue Form and workflow YAML parsed successfully with Ruby
+- GitHub checks passed: Node.js 22, Node.js 24, and GitGuardian
+- manifest.json and browser permissions are unchanged
+- manual browser checks: not applicable because this PR changes documentation, templates, and CI only
 
-## Follow-up after explicit merge approval
+## Hard pre-merge gate
 
-- enable Discussions and private vulnerability reporting
-- add focused repository topics and contribution labels
+After explicit user approval, but before merge, enable and verify GitHub Discussions and private vulnerability reporting. Merge only after both settings are verified.
+
+## Post-merge follow-up
+
+- add focused repository topics
+- add accurate contribution labels
 - create five concrete starter issues"
 ```
 
@@ -763,15 +827,44 @@ gh pr checks --watch --repo TuYv/pounce
 
 Expected: both Node.js matrix jobs pass. Do not merge the PR.
 
-### Task 7: Apply Repository Settings After Explicit Merge Approval
+### Task 7: Enable Required Settings and Merge After Explicit Approval
 
-**Files:** None. This task changes GitHub repository settings only.
+**Files:** None. This task changes GitHub repository settings and merges the approved pull request.
 
 - [ ] **Step 1: Confirm the user explicitly approved merging**
 
 Do not infer approval from silence or from green CI. The user must explicitly say to merge.
 
-- [ ] **Step 2: Merge the Pounce pull request**
+- [ ] **Step 2: Enable Discussions**
+
+Run:
+
+```bash
+gh repo edit TuYv/pounce --enable-discussions
+```
+
+- [ ] **Step 3: Enable private vulnerability reporting**
+
+Run:
+
+```bash
+gh api --method PUT repos/TuYv/pounce/private-vulnerability-reporting
+```
+
+Expected: HTTP 204. If unavailable, report the exact API error and leave the security policy unchanged.
+
+- [ ] **Step 4: Verify both required settings**
+
+Run:
+
+```bash
+gh repo view TuYv/pounce --json hasDiscussionsEnabled --jq .hasDiscussionsEnabled
+gh api repos/TuYv/pounce/private-vulnerability-reporting
+```
+
+Expected: Discussions reports `true` and the private-vulnerability-reporting endpoint succeeds. Do not merge if either verification fails.
+
+- [ ] **Step 5: Merge the Pounce pull request**
 
 Resolve the pull request number from the current branch and merge it:
 
@@ -782,25 +875,11 @@ gh pr merge "$pr_number" --repo TuYv/pounce --squash --delete-branch
 
 Expected: PR state becomes `MERGED`.
 
-- [ ] **Step 3: Enable Discussions**
+### Task 8: Add Topics, Accurate Labels, and Seed Issues After Merge
 
-Run:
+**Files:** None. This task changes GitHub topics and creates GitHub labels and Issues.
 
-```bash
-gh repo edit TuYv/pounce --enable-discussions
-```
-
-- [ ] **Step 4: Enable private vulnerability reporting**
-
-Run:
-
-```bash
-gh api --method PUT repos/TuYv/pounce/private-vulnerability-reporting
-```
-
-Expected: HTTP 204. If unavailable, report the exact API error and leave the security policy unchanged.
-
-- [ ] **Step 5: Set repository topics**
+- [ ] **Step 1: Set repository topics**
 
 Run:
 
@@ -818,11 +897,7 @@ gh api --method PUT repos/TuYv/pounce/topics \
 
 Expected: the response lists all seven topics.
 
-### Task 8: Create Accurate Labels and Seed Issues After Merge
-
-**Files:** None. This task creates GitHub labels and Issues.
-
-- [ ] **Step 1: Create or update contribution labels**
+- [ ] **Step 2: Create or update contribution labels**
 
 Run:
 
@@ -835,7 +910,7 @@ gh label create accessibility --repo TuYv/pounce --color 1d76db --description "K
 gh label create localization --repo TuYv/pounce --color c5def5 --description "English and Simplified Chinese localization" --force
 ```
 
-- [ ] **Step 2: Create the test-coverage starter issue**
+- [ ] **Step 3: Create the test-coverage starter issue**
 
 Run:
 
@@ -863,7 +938,7 @@ EOF
 
 Expected: GitHub prints the new issue URL.
 
-- [ ] **Step 3: Create the accessibility audit issue**
+- [ ] **Step 4: Create the accessibility audit issue**
 
 Run:
 
@@ -887,7 +962,7 @@ EOF
 
 Expected: GitHub prints the new issue URL.
 
-- [ ] **Step 4: Create the contributor debugging documentation issue**
+- [ ] **Step 5: Create the contributor debugging documentation issue**
 
 Run:
 
@@ -904,14 +979,14 @@ Improve contributor documentation for loading, reloading, and debugging Pounce a
 
 - Document Chrome and Edge extension reload steps.
 - Explain how to inspect popup, options, background service worker, and page-overlay errors.
-- Keep the instructions dependency-free and consistent with `CONTRIBUTING.md`.
+- Keep the instructions free of package-manager install steps and consistent with `CONTRIBUTING.md`.
 - Do not add screenshots containing private browser data.
 EOF
 ```
 
 Expected: GitHub prints the new issue URL.
 
-- [ ] **Step 5: Create the localization review issue**
+- [ ] **Step 6: Create the localization review issue**
 
 Run:
 
@@ -935,7 +1010,7 @@ EOF
 
 Expected: GitHub prints the new issue URL.
 
-- [ ] **Step 6: Create the Edge compatibility issue**
+- [ ] **Step 7: Create the Edge compatibility issue**
 
 Run:
 
@@ -959,7 +1034,7 @@ EOF
 
 Expected: GitHub prints the new issue URL.
 
-- [ ] **Step 7: Verify the public community entry points**
+- [ ] **Step 8: Verify the public community entry points**
 
 Run:
 

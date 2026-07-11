@@ -34,7 +34,7 @@ Add focused regression tests under `tests/` for shared JavaScript behavior. Manu
 - Confirm restricted pages fail gracefully.
 
 ## Commit & Pull Request Guidelines
-Git history is not available in this workspace, so follow a conservative convention: short imperative commit subjects such as `Add empty-state validation`. Keep commits focused. PRs should include a brief summary, manual test steps, linked issue or task if applicable, and screenshots or GIFs for popup, options, or overlay UI changes.
+Follow the existing history's short, scoped commit subjects, such as `docs: ...` and `ci: ...`. Keep commits focused and use an imperative description after the scope. PRs should include a brief summary, manual test steps, linked issue or task if applicable, and screenshots or GIFs for popup, options, or overlay UI changes.
 
 ## Security & Configuration Tips
 Treat `manifest.json` changes carefully. Keep permissions minimal, explain any new permission in the PR, and note changes to commands, icons, or update metadata explicitly.

@@ -1,5 +1,7 @@
 # GitHub Profile README Implementation Plan
 
+> **Status:** Execution record (non-normative). The design spec and final repository files are authoritative.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Create a concise, evidence-based GitHub Profile README that highlights TuYv's maintained projects and verified merged external contributions without exposing private contact information.
@@ -149,7 +151,7 @@ Expected: all four PR URLs are printed.
 Run:
 
 ```bash
-rg -n 'core contributor|open-design|861506831|qq\.com|20x|Claude Max|1,000|1000|59 stars' README.md
+rg -n 'core contributor|open-design|20x|Claude Max|1,000|1000|59 stars|[[:alnum:]._%+-]+@[[:alnum:].-]+\.[A-Za-z]{2,}' README.md
 ```
 
 Expected: no matches.

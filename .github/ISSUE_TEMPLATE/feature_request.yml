@@ -9,6 +9,8 @@ body:
       value: |
         Pounce is conservatively maintained. Ideas may be declined to keep the project's scope and permissions focused.
 
+        Proposals may be submitted in English or 中文.
+
   - type: textarea
     id: problem-or-limitation
     attributes:
@@ -30,6 +32,14 @@ body:
     attributes:
       label: Proposed approach
       description: Explain a focused way Pounce could address the problem, including alternatives you considered.
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope-and-non-goals
+    attributes:
+      label: Scope and non-goals
+      description: What does this proposal include, and what does it intentionally exclude?
     validations:
       required: true
 

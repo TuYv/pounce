@@ -14,7 +14,13 @@ Related Issue or Discussion:
 - [ ] I completed the relevant manual browser checks in Chrome or Microsoft Edge.
 - [ ] I added or updated tests where practical.
 
-<!-- Describe the manual checks performed and their results. -->
+Automated test output:
+
+<!-- Paste or summarize the automated test command and result, including pass/fail counts. -->
+
+Manual check results:
+
+<!-- List the browsers, operating systems, flows checked, and results; enter N/A with a reason when no browser check applies. -->
 
 ## User-facing changes
 
