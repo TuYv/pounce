@@ -47,7 +47,9 @@ Keyboard-first, doesn't leave your current page.
 | Quick-pick result 1–9 | `⌥1`–`⌥9` | `Alt+1`–`Alt+9` |
 | Close overlay | `Esc` | `Esc` |
 
-> The overlay cannot be injected into `chrome://`, `chrome-extension://`, or `about:` pages. This is a Chrome-wide security restriction that applies to every extension.
+> The overlay cannot be injected into `chrome://`, `chrome-extension://`, `edge://`, or `about:` pages. This is a Chromium-wide security restriction that applies to every extension (Chrome and Microsoft Edge).
+
+See [docs/edge-compatibility.md](docs/edge-compatibility.md) for Edge load steps, code-level notes, and a manual smoke checklist.
 
 ## Permissions
 

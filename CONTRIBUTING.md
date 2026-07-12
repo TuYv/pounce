@@ -39,7 +39,8 @@ For behavior changes, verify the affected flows in an unpacked extension. Depend
 - Keyboard navigation, result selection, and Escape handling.
 - Popup actions and settings persistence.
 - Light, dark, and system theme behavior.
-- Restricted pages such as `chrome://` fail gracefully.
+- Restricted pages such as `chrome://` / `edge://` fail gracefully.
+- For Edge-specific verification, use [docs/edge-compatibility.md](docs/edge-compatibility.md).
 - Both English and Simplified Chinese UI text where applicable.
 
 ## Code style
