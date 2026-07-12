@@ -280,3 +280,29 @@ test('result icons fall back to letters when favicon loading fails', () => {
   img.onerror();
   assert.equal(icon.textContent, 'H');
 });
+
+test('ArrowDown/ArrowUp wrap selection via handleKeyDown', () => {
+  const overlay = createOverlayHarness();
+  overlay.isVisible = true;
+  overlay.isComposing = false;
+  overlay.compositionEndedAt = 0;
+  overlay.displayRows = [
+    { kind: 'result', type: 'history', title: 'A', url: 'https://a.example' },
+    { kind: 'result', type: 'history', title: 'B', url: 'https://b.example' },
+    { kind: 'result', type: 'history', title: 'C', url: 'https://c.example' }
+  ];
+  overlay.selectedIndex = 0;
+  overlay.updateSelection = () => {};
+
+  const down = { key: 'ArrowDown', keyCode: 40, preventDefault() {}, stopPropagation() {} };
+  overlay.handleKeyDown(down);
+  assert.equal(overlay.selectedIndex, 1);
+  overlay.handleKeyDown(down);
+  assert.equal(overlay.selectedIndex, 2);
+  overlay.handleKeyDown(down);
+  assert.equal(overlay.selectedIndex, 0, 'ArrowDown wraps to start');
+
+  const up = { key: 'ArrowUp', keyCode: 38, preventDefault() {}, stopPropagation() {} };
+  overlay.handleKeyDown(up);
+  assert.equal(overlay.selectedIndex, 2, 'ArrowUp wraps to end');
+});
