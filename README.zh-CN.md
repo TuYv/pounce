@@ -51,17 +51,20 @@
 
 ## 权限说明
 
-所有权限都只用于核心搜索功能。**数据全部在本地浏览器中处理，不会发送到任何服务器。**
+Pounce 没有自建后端，也不包含分析或遥测。用于 Pounce 内置结果的浏览器数据会在本地处理。Chrome 可能通过 Chrome 同步来同步已保存的 URL 和偏好设置；当你主动执行网页搜索时，Chrome 会将查询发送给你配置的搜索服务提供商；Chrome 也可能按照浏览器自身的机制获取网站图标。详情请参阅托管的[隐私政策](https://tuyv.github.io/pounce/privacy.html)。
 
 | 权限 | 用途 |
 |------|------|
-| `tabs` | 读取已打开标签的标题和 URL |
+| `storage` | 通过 Chrome 同步存储保存 URL 列表、主题、语言和搜索偏好 |
+| `tabs` | 读取已打开标签的标题和 URL，并为 Pounce 操作管理标签页 |
+| `notifications` | 显示安装、成功和错误通知 |
 | `bookmarks` | 搜索书签标题和 URL |
-| `history` | 让历史记录出现在搜索结果中 |
+| `history` | 让历史记录出现在搜索结果中，并移除 Pounce 临时中转页的历史条目 |
 | `topSites` | 让常用站点出现在搜索结果中 |
-| `storage` | 保存你的 URL 列表和主题偏好 |
 | `scripting` | 在当前页面注入搜索浮层 |
 | `activeTab` | 触发浮层时访问当前标签页 |
+| `search` | 将你主动发起的网页搜索交给 Chrome 配置的搜索服务提供商 |
+| `favicon` | 通过 Chrome 提供的浏览器图标接口显示网站图标 |
 
 ## 社区
 

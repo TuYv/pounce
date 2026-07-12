@@ -51,17 +51,20 @@ Keyboard-first, doesn't leave your current page.
 
 ## Permissions
 
-All permissions are used only for core search functionality. **No data ever leaves your browser.**
+Pounce has no custom backend and does not include analytics or telemetry. Browser data used for Pounce's built-in results is processed locally. Chrome may sync saved URLs and preferences through Chrome Sync; when you explicitly run a web search, Chrome sends the query to your configured search provider; and Chrome may retrieve favicons according to browser behavior. See the hosted [Privacy Policy](https://tuyv.github.io/pounce/privacy.html) for details.
 
 | Permission | Purpose |
 |------------|---------|
-| `tabs` | Read open tab titles and URLs |
+| `storage` | Save your URL list, theme, language, and search preferences with Chrome Sync storage |
+| `tabs` | Read open tab titles and URLs and manage tabs for Pounce actions |
+| `notifications` | Show install, success, and error notifications |
 | `bookmarks` | Search bookmark titles and URLs |
-| `history` | Include browser history in results |
+| `history` | Include browser history in results and remove Pounce's temporary bridge-page entry |
 | `topSites` | Include frequently visited sites |
-| `storage` | Save your URL list and theme preference |
 | `scripting` | Inject the search overlay into the current page |
 | `activeTab` | Access the current tab when you trigger the overlay |
+| `search` | Send a web search you explicitly trigger to Chrome's configured search provider |
+| `favicon` | Display site icons through Chrome's browser-provided favicon endpoint |
 
 ## Community
 

@@ -93,93 +93,101 @@
 <main>
   <header>
     <h1>Privacy Policy — Pounce</h1>
-    <p class="meta">Last updated: April 18, 2026</p>
+    <p class="meta">Last updated: July 12, 2026</p>
   </header>
 
   <div class="callout">
-    <strong>Short version:</strong> Pounce runs entirely in your browser. It does not collect, transmit, or sell any personal data. There is no server, no analytics, no tracking.
+    <strong>Short version:</strong> Pounce has no custom backend and includes no analytics or telemetry. Browser data used for Pounce's built-in results is processed locally. Chrome may sync saved URLs and preferences, user-triggered web searches are sent by Chrome to your configured search provider, and Chrome may retrieve favicons according to browser behavior.
   </div>
 
   <h2>1. What Pounce Does</h2>
   <p>
-    Pounce is an open-source Chrome extension that lets you search across your open tabs, bookmarks, browser history, and top sites from a single keyboard-triggered overlay (<code>⌘K</code> / <code>Alt+K</code>). All processing happens locally on your device.
+    Pounce is an open-source Chrome extension that lets you search across your open tabs, bookmarks, browser history, and top sites from a keyboard-triggered overlay (<code>⌘K</code> / <code>Alt+K</code>). Pounce builds and ranks those in-extension results on your device.
   </p>
 
-  <h2>2. Data We Access</h2>
-  <p>Pounce reads the following data from your browser <strong>only to display search results</strong>. It is never sent anywhere, stored on any server, or shared with third parties.</p>
+  <h2>2. Browser Permissions and Data Access</h2>
+  <p>Pounce requests the following ten permissions declared in its manifest:</p>
   <table>
     <thead>
-      <tr><th>Browser API</th><th>Purpose</th></tr>
+      <tr><th>Permission</th><th>Purpose</th></tr>
     </thead>
     <tbody>
-      <tr><td><code>tabs</code></td><td>Read titles and URLs of open tabs so you can switch to them.</td></tr>
+      <tr><td><code>storage</code></td><td>Read and save your URL list, theme, language, and search preferences with <code>chrome.storage.sync</code>.</td></tr>
+      <tr><td><code>tabs</code></td><td>Read open-tab titles, URLs, and available icon metadata; switch, create, duplicate, update, or close tabs for Pounce actions.</td></tr>
+      <tr><td><code>notifications</code></td><td>Show installation, success, and error notifications for extension actions.</td></tr>
       <tr><td><code>bookmarks</code></td><td>Search your bookmark titles and URLs.</td></tr>
-      <tr><td><code>history</code></td><td>Include recent browser history in search results.</td></tr>
+      <tr><td><code>history</code></td><td>Include browser history in results and remove Pounce's temporary bridge-page entry from browser history.</td></tr>
       <tr><td><code>topSites</code></td><td>Suggest frequently visited sites.</td></tr>
-      <tr><td><code>storage</code></td><td>Save your URL list and theme preference locally (via Chrome storage).</td></tr>
-      <tr><td><code>scripting</code> + <code>activeTab</code></td><td>Inject the search overlay into the current page when you trigger the shortcut.</td></tr>
+      <tr><td><code>scripting</code></td><td>Inject Pounce's scripts and search overlay into the current page after you trigger it.</td></tr>
+      <tr><td><code>activeTab</code></td><td>Access the active tab after a user-triggered Pounce action.</td></tr>
+      <tr><td><code>search</code></td><td>Submit a web search you explicitly trigger through Chrome to the browser's configured search provider.</td></tr>
+      <tr><td><code>favicon</code></td><td>Display site icons through Chrome's browser-provided favicon endpoint.</td></tr>
     </tbody>
   </table>
 
-  <h2>3. Data We Do NOT Collect</h2>
+  <h2>3. What Pounce Does Not Operate or Include</h2>
   <ul>
-    <li>We do not collect personal information of any kind.</li>
-    <li>We do not track which sites you visit or which results you click.</li>
-    <li>We do not use analytics, telemetry, or crash reporting.</li>
-    <li>We do not use cookies or any tracking technologies.</li>
-    <li>We do not transmit any data to any external server. Pounce makes no network calls.</li>
+    <li>Pounce does not operate a custom backend that receives your tabs, bookmarks, history, top sites, saved URLs, preferences, or in-extension search results.</li>
+    <li>Pounce does not include analytics, telemetry, advertising, or crash-reporting services.</li>
+    <li>Pounce does not create advertising profiles or sell browser data.</li>
   </ul>
-
-  <h2>4. Where Your Data Lives</h2>
-  <h3>Local storage</h3>
   <p>
-    Your saved URL list and theme preference are stored locally in Chrome via the <code>chrome.storage</code> API. This data never leaves your browser.
-  </p>
-  <h3>Chrome Sync</h3>
-  <p>
-    If you have Chrome Sync enabled in your Google account, Chrome may synchronize your saved URL list across your signed-in devices. This sync is handled entirely by Google. Pounce has no access to and no role in that synchronization.
+    These statements do not mean that all browser activity is offline. Chrome Sync, user-triggered web searches, favicon retrieval, extension installation, and extension updates can involve Chrome, your configured provider, or websites as described below.
   </p>
 
-  <h2>5. Third-Party Services</h2>
+  <h2>4. Storage and Chrome Sync</h2>
   <p>
-    Pounce integrates with no third-party services. It depends on the Chrome Extension APIs provided by your browser and nothing else.
+    Pounce stores your saved URL list and preferences, including theme, language, search settings, and result limits, with <code>chrome.storage.sync</code>. Chrome may synchronize this data across browsers signed in to the same Google account when Chrome Sync is enabled. Sync transport, account storage, retention, and security are controlled by Chrome and your Google account settings, not by a Pounce-operated server.
+  </p>
+  <p>
+    Open tabs, bookmarks, history, and top-site data are read from browser APIs to build results. Pounce does not upload that result index to a custom backend.
+  </p>
+
+  <h2>5. User-Triggered Searches and Favicons</h2>
+  <h3>Web searches</h3>
+  <p>
+    When you choose Pounce's web-search action, Pounce passes the query to <code>chrome.search</code>. Chrome then sends the query to the search provider configured in your browser. The provider may receive the query and ordinary request information under its own privacy policy. Pounce does not send a web-search query until you trigger that action.
+  </p>
+  <h3>Favicons</h3>
+  <p>
+    Pounce asks Chrome to display site icons through the browser-provided <code>_favicon</code> endpoint. Chrome may use cached icon data or may retrieve favicon resources according to its implementation and cache state. Any browser request to a website or browser service is governed by that browser or site's behavior; it is not sent to a Pounce-operated backend.
+  </p>
+  <h3>Chrome services</h3>
+  <p>
+    Pounce relies on Chrome Extension APIs, Chrome Sync when enabled, and Chrome Web Store infrastructure for installation and updates. Those browser services are governed by Chrome and Google account settings and policies.
   </p>
 
   <h2>6. Data Retention</h2>
   <p>
-    Pounce retains no data on our side (we have no servers). Data stored locally by Pounce remains on your device until you clear it from the extension's settings or uninstall the extension. Uninstalling Pounce removes all locally stored data created by it.
+    Pounce does not retain a server-side copy of your browser data because it has no custom backend. Saved URLs and preferences remain in Chrome storage until you change or clear them, or until Chrome removes them. Synchronized copies and their deletion are controlled by Chrome Sync and your Google account settings. Search providers and websites may retain information they receive according to their own policies.
   </p>
 
-  <h2>7. Your Rights</h2>
+  <h2>7. Your Controls</h2>
   <p>
-    Because Pounce does not collect or store any data outside your own browser, there is nothing for us to provide, export, or delete on request. You are in full control of all Pounce data — you can view, modify, or clear it directly from the extension at any time.
+    You can view and edit saved URLs and preferences in Pounce's settings. Chrome's settings control Chrome Sync, the default search provider, extension permissions, site data, and removal of the extension. Requests concerning data held by a search provider, website, Chrome, or a Google account should be directed to that service.
   </p>
 
-  <h2>8. Children's Privacy</h2>
+  <h2>8. Open Source and Verifiability</h2>
   <p>
-    Pounce is not directed to children under 13 and does not knowingly collect any information. It does not collect personal information from anyone.
-  </p>
-
-  <h2>9. Open Source &amp; Verifiability</h2>
-  <p>
-    Pounce is MIT-licensed and fully open source. Every claim in this policy can be independently verified by reading the source code at
+    Pounce is MIT-licensed and open source. You can review the extension's implementation at
     <a href="https://github.com/TuYv/pounce">github.com/TuYv/pounce</a>.
   </p>
 
-  <h2>10. Changes to This Policy</h2>
+  <h2>9. Changes to This Policy</h2>
   <p>
-    If this policy changes, the updated version will be published at this URL and the "Last updated" date above will be revised. Material changes will also be noted in the extension's release notes.
+    If this policy changes, the updated version will be published at this URL and the "Last updated" date above will be revised.
   </p>
 
-  <h2>11. Contact</h2>
+  <h2>10. Contact</h2>
   <p>
-    Questions or concerns: open an issue at
-    <a href="https://github.com/TuYv/pounce/issues">github.com/TuYv/pounce/issues</a>
-    or email <a href="mailto:ty861506831@gmail.com">ty861506831@gmail.com</a>.
+    For privacy questions or concrete problems, use
+    <a href="https://github.com/TuYv/pounce/issues">GitHub Issues</a>. For general questions or early discussion, use
+    <a href="https://github.com/TuYv/pounce/discussions">GitHub Discussions</a>. Do not include private browsing data, credentials, or other sensitive information in public posts. Report suspected security vulnerabilities privately by following the repository's
+    <a href="https://github.com/TuYv/pounce/security/policy">Security Policy</a>.
   </p>
 
   <footer>
-    Pounce is an independent open-source project. This policy complies with the Chrome Web Store Developer Program Policies and general principles of GDPR and CCPA applicable to a product that collects no personal data.
+    Pounce is an independent open-source project. This policy describes the behavior of the published extension and the browser services it uses.
   </footer>
 </main>
 </body>
