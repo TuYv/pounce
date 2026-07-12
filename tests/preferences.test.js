@@ -55,3 +55,19 @@ test('invalid resultsLimit falls back to default', () => {
     );
   }
 });
+
+test('non-object preference payloads fall back to defaults without throwing', () => {
+  for (const bad of [null, 'nope', 42, true, []]) {
+    assert.deepEqual(normalizeSearchPreferences(bad), DEFAULT_SEARCH_PREFERENCES);
+  }
+});
+
+test('unknown preference keys are not copied into the result', () => {
+  const out = normalizeSearchPreferences({
+    evil: true,
+    quickPickEnabled: false
+  });
+  assert.equal(out.quickPickEnabled, false);
+  assert.equal(Object.prototype.hasOwnProperty.call(out, 'evil'), false);
+  assert.deepEqual(Object.keys(out).sort(), Object.keys(DEFAULT_SEARCH_PREFERENCES).sort());
+});
