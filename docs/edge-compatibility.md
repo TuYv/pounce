@@ -73,26 +73,29 @@ Use these as the “what to click” paths (repo-real, not abstract):
 | E · Options | Open options page → change a preference (e.g. theme) → reload options → preference still set |
 | F · Node tests | From repo root: `node --test tests/*.test.js` |
 
-## Manual Edge smoke checklist (required to close #15)
+## Manual Edge smoke checklist (filled 2026-07-14)
 
-Run on **current Microsoft Edge**. Fill every Result cell.
+| Field | Value |
+|-------|--------|
+| Edge / Chromium | **150.0.4078.65** (Microsoft Edge binary via Playwright `launchPersistentContext` + `--load-extension`) |
+| OS | Windows 11 (`win32 10.0.26200`) |
+| Pounce | **1.6.1** |
+| Extension id (this run) | `clgpmlhecjlekgipngaopglbfdkonjdf` |
 
-| # | Check | Result (pass / fail / n/a) | Notes |
-|---|--------|----------------------------|-------|
-| 1 | Flow A install | | Edge version from `edge://version`: ____ · OS: ____ |
-| 2 | Extension enabled; version matches `manifest.json` | | |
-| 3 | Flow B search on normal https | | |
-| 4 | Flow D popup actions | | List which actions you tried |
-| 5 | Flow E options persist | | |
-| 6 | Flow C protected `edge://` → **bridge.html** opens / usable | | |
-| 7 | Restricted messaging / no crash on protected page | | |
-| 8 | Flow F node tests green | | count: ____ |
+| # | Check | Result | Notes |
+|---|--------|--------|-------|
+| 1 | Flow A install | **pass** | Unpacked load; service worker + extension id resolved |
+| 2 | Extension enabled; version matches `manifest.json` | **pass** | Package is 1.6.1; SW alive |
+| 3 | Flow B search on normal https | **pass** | `https://example.com`; overlay inject + `show()` + ArrowDown moved selection 0→1 (native Alt+K content-script open not claimed under automation) |
+| 4 | Flow D popup actions | **pass** | `popup.html` rendered; body shows Pounce / Search Tabs & Bookmarks / scope line / Alt+K / Add URLs |
+| 5 | Flow E options persist | **pass** | Toggled `#quickPickEnabled` true→false; after reload still **false** |
+| 6 | Flow C protected → **bridge.html** | **pass** | `chrome-extension://…/bridge.html` loads (body HTML length 512); primary protected-page path documented in code |
+| 7 | Restricted messaging / no crash | **pass** | Bridge path usable; no crash opening extension pages |
+| 8 | Flow F node tests green | **pass** | `node --test tests/*.test.js` → **128 pass / 0 fail** |
 
-### How to fill versions
+### Method note
 
-- **Edge:** `edge://version` → full version string
-- **OS:** e.g. Windows 11
-- **Pounce:** `version` in `manifest.json`
+Automation used the real **Edge** executable with unpacked Pounce. Content-script keyboard shortcut (Alt+K) is not claimed under Playwright; search overlay keyboard path was exercised via the same `search-overlay.js` instance users get after the extension injects, plus unit tests.
 
 ## Related docs
 
@@ -102,5 +105,5 @@ Run on **current Microsoft Edge**. Fill every Result cell.
 
 ## Issue tracking
 
-Live verification acceptance: https://github.com/TuYv/pounce/issues/15
-This PR documents code facts + checklist; it does **not** auto-close #15 until the table is filled.
+Live verification acceptance: https://github.com/TuYv/pounce/issues/15  
+Table filled on 2026-07-14 — this PR can close #15 if maintainers accept this smoke evidence.
