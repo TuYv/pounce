@@ -90,8 +90,8 @@ Run on **current Microsoft Edge**. Fill every Result cell.
 
 ### How to fill versions
 
-- **Edge:** `edge://version` → full version string  
-- **OS:** e.g. Windows 11  
+- **Edge:** `edge://version` → full version string
+- **OS:** e.g. Windows 11
 - **Pounce:** `version` in `manifest.json`
 
 ## Related docs
@@ -102,5 +102,5 @@ Run on **current Microsoft Edge**. Fill every Result cell.
 
 ## Issue tracking
 
-Live verification acceptance: https://github.com/TuYv/pounce/issues/15  
+Live verification acceptance: https://github.com/TuYv/pounce/issues/15
 This PR documents code facts + checklist; it does **not** auto-close #15 until the table is filled.
