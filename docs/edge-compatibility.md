@@ -1,75 +1,98 @@
 # Microsoft Edge compatibility
 
-This note records **what is confirmed in the Pounce codebase and Chromium/Edge docs**, plus a **manual Edge smoke checklist**. Live UI smoke on a specific Edge build is filled in by whoever runs the checklist (do not invent pass/fail).
+This note records **what is confirmed in the Pounce codebase and Chromium/Edge docs**, plus a **manual Edge smoke checklist**.
+
+**Issue #15 status:** this document alone does **not** close [#15](https://github.com/TuYv/pounce/issues/15). Closing that issue still requires a filled live Edge smoke table (exact Edge / OS / Pounce versions and pass/fail results). Until then, #15 stays open.
 
 | Field | Value |
 |-------|--------|
 | Pounce version | `1.6.1` (`manifest.json`) |
 | Manifest | **V3** (`manifest_version: 3`) + service worker (`background.service_worker`) |
-| Agent machine OS (doc author) | Windows |
-| Live Edge UI smoke | **untested on author machine** — use checklist below |
+| Doc author OS | Windows |
+| Live Edge UI smoke | **untested** on this branch — fill checklist below to satisfy #15 |
 
 ## Why Edge is in scope
 
-Microsoft Edge is Chromium-based and supports Manifest V3 extensions (service workers, same extension APIs Pounce uses). Microsoft documents MV3 for Edge independently of Chrome timelines; see [Overview and timelines for migrating to Manifest V3](https://learn.microsoft.com/en-us/microsoft-edge/extensions/developer-guide/manifest-v3).
+Microsoft Edge is Chromium-based and supports Manifest V3 extensions. Microsoft documents MV3 for Edge; see [Overview and timelines for migrating to Manifest V3](https://learn.microsoft.com/en-us/microsoft-edge/extensions/developer-guide/manifest-v3).
 
-Pounce is already written for Chromium MV3. There is no separate Firefox/Safari package.
+Pounce is a single Chromium MV3 package (no separate Edge fork).
 
 ## Confirmed in code (not speculation)
 
 ### Load unpacked
 
-[CONTRIBUTING.md](../CONTRIBUTING.md) already documents:
+[CONTRIBUTING.md](../CONTRIBUTING.md) / [AGENTS.md](../AGENTS.md):
 
 1. Open `edge://extensions` (or `chrome://extensions`)
 2. Developer Mode → **Load unpacked** → repository root
 3. Reload after changes
 
-### Restricted pages include Edge schemes
+### Protected / restricted URLs — actual behavior
 
-Injection / overlay is blocked on browser-internal URLs. The background restricted list includes **`edge://`** alongside `chrome://`, `chrome-extension://`, `about:`, etc. (`background.js`).
+Internal schemes are listed in `background.js` (includes `chrome://`, `edge://`, `chrome-extension://`, `about:`, `devtools://`, `view-source:`, `file://`, etc.).
 
-Popup active-tab handling also treats **`edge://`** like `chrome://` and shows the restricted-page message (`popup.js`).
+**Search launch on a protected tab (primary path):**
 
-### Overlay note
+1. Pounce detects the active tab URL is protected (cannot inject the content-script overlay).
+2. It **opens `bridge.html`** (extension page) in a new tab as a jump board (`chrome.runtime.getURL('bridge.html')`).
+3. The search UI runs on that bridge tab (scripts are built into `bridge.html`; no `executeScript` into the protected page).
+4. Opening a result may update the bridge tab URL or close the bridge tab when appropriate (`bridgeTabId` in background messaging).
 
-README states the overlay cannot be injected into `chrome://`, `chrome-extension://`, or `about:` pages (Chromium security model). **Same class of restriction applies on Edge** for `edge://` and related internal pages — already handled in code, not a Chrome-only branch.
+**Do not document this as “only an alert.”** The bridge overlay is the intentional design for protected pages. Alert-style restricted messaging is fallback / popup handling, not the only path.
+
+**Popup on restricted active tabs:** `popup.js` treats `edge://` like `chrome://` for restricted-page messaging when the popup cannot act on the protected page itself.
+
+**History:** old bridge URLs may be cleaned from history so `bridge.html` does not clutter search results.
 
 ### Commands / shortcuts
 
-Default shortcuts in `manifest.json` (Windows/Linux vs Mac) use standard Chromium command keys. Edge uses the same extension commands surface; if a shortcut collides with an Edge browser shortcut, users rebind under Edge extension keyboard shortcuts (Edge UI path may differ slightly from Chrome — record if you observe a real collision).
+Default shortcuts in `manifest.json` use Chromium extension commands. Edge may show them under Edge’s extension keyboard shortcuts UI. Record real collisions only if observed.
 
 ## Confirmed differences Chrome vs Edge (code-level)
 
 | Topic | Finding |
 |-------|---------|
 | Restricted scheme list | Code includes both `chrome://` and `edge://` |
-| Manifest | Single MV3 package; no Edge-only fork |
+| Protected search UX | Opens **`bridge.html`**, not inject into the protected page |
+| Manifest | Single MV3 package |
 | Permissions | Same Chromium permission names |
-| Live keyboard / popup / options UX | **Not claimed here** without running the checklist |
+| Live Edge UX | **Not claimed** without filled smoke table |
 
-Do **not** invent further differences without a reproducible observation. If a real Edge-only bug appears, open a **separate focused issue** (per issue #15) before code changes.
+Do **not** invent further differences without a reproducible observation. If a real Edge-only bug appears, open a **separate focused issue** before code changes (per #15).
 
-## Manual Edge smoke checklist
+## Concrete flows to exercise in Edge (for checklist)
 
-Run on **current Microsoft Edge** (record exact version from `edge://version`).
+Use these as the “what to click” paths (repo-real, not abstract):
+
+| Flow | Steps (unpacked extension) |
+|------|----------------------------|
+| A · Install | `edge://extensions` → Load unpacked → repo root → confirm version `1.6.1` |
+| B · Search on https | Open any `https://` page → launch search (`Alt+K` Windows default) → overlay appears → type → open a result |
+| C · Protected / Edge page | Open `edge://settings` (or `edge://extensions`) → launch search → **expect bridge tab** with search UI (not a silent crash) |
+| D · Popup | Click extension icon on an `https://` tab → primary popup actions work |
+| E · Options | Open options page → change a preference (e.g. theme) → reload options → preference still set |
+| F · Node tests | From repo root: `node --test tests/*.test.js` |
+
+## Manual Edge smoke checklist (required to close #15)
+
+Run on **current Microsoft Edge**. Fill every Result cell.
 
 | # | Check | Result (pass / fail / n/a) | Notes |
 |---|--------|----------------------------|-------|
-| 1 | Install: `edge://extensions` → Load unpacked → this repo | | Edge version: ____ |
-| 2 | Extension shows as enabled; version matches `manifest.json` | | |
-| 3 | Search launch (`Alt+K` on Windows) opens overlay on a normal `https://` page | | |
-| 4 | Popup actions (open URLs / primary controls) work | | |
-| 5 | Options page loads; theme/prefs persist after reload | | |
-| 6 | Restricted: open `edge://settings` (or similar) → search / overlay fails gracefully (no crash; restricted message if applicable) | | |
-| 7 | Restricted: `chrome://` URL in Edge (if any) or `edge://extensions` behaves as restricted | | |
-| 8 | `node --test tests/*.test.js` still green after any doc-only PR | | |
+| 1 | Flow A install | | Edge version from `edge://version`: ____ · OS: ____ |
+| 2 | Extension enabled; version matches `manifest.json` | | |
+| 3 | Flow B search on normal https | | |
+| 4 | Flow D popup actions | | List which actions you tried |
+| 5 | Flow E options persist | | |
+| 6 | Flow C protected `edge://` → **bridge.html** opens / usable | | |
+| 7 | Restricted messaging / no crash on protected page | | |
+| 8 | Flow F node tests green | | count: ____ |
 
 ### How to fill versions
 
-- **Edge:** `edge://version` → copy full version string  
+- **Edge:** `edge://version` → full version string  
 - **OS:** e.g. Windows 11  
-- **Pounce:** `version` field in `manifest.json`
+- **Pounce:** `version` in `manifest.json`
 
 ## Related docs
 
@@ -77,6 +100,7 @@ Run on **current Microsoft Edge** (record exact version from `edge://version`).
 - [README.md](../README.md) — shortcuts and restricted-page summary
 - [SECURITY.md](../SECURITY.md) — private vuln reports
 
-## Issue
+## Issue tracking
 
-Tracks acceptance for live verification + documentation: https://github.com/TuYv/pounce/issues/15
+Live verification acceptance: https://github.com/TuYv/pounce/issues/15  
+This PR documents code facts + checklist; it does **not** auto-close #15 until the table is filled.
