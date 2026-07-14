@@ -62,3 +62,17 @@ test('formatMessage: ignores tokens that have no placeholder definition', () => 
     'hi Rick, $unknown$ stays'
   );
 });
+
+test('notify_installedBody keeps named $search$/$batch$ tokens (locale)', () => {
+  const en = require('../_locales/en/messages.json');
+  const body = en.notify_installedBody;
+  assert.match(body.message, /\$search\$/);
+  assert.match(body.message, /\$batch\$/);
+  assert.doesNotMatch(body.message, /\\\$/);
+  const out = formatMessage(body.message, body.placeholders, ['Alt+K', 'Alt+O']);
+  assert.equal(
+    out,
+    'Press Alt+K to search tabs, history, bookmarks, and top sites. Use Alt+O to batch open URLs.'
+  );
+  assert.doesNotMatch(out, /\\\$/);
+});
