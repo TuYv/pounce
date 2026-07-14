@@ -1,8 +1,9 @@
 # Keyboard / a11y audit (issue #12)
 
-**Environment (this update):** Windows · code review of `search-overlay.js`, `popup.js`, `options.js`, `popup.html` · Node unit harness for overlay keys
-**Date:** 2026-07-14
-**Live unpacked-extension keyboard run:** **not completed on this machine** — issue #12 full acceptance still needs real popup / options / overlay runs in a browser with the extension loaded. This doc records code-confirmed behavior + one hard keyboard gap.
+**Environment:** Windows 10/11 (`win32 10.0.26200`) · Playwright Chromium **148.0.7778.96** (ms-playwright chromium-1223) · unpacked extension loaded via `--load-extension`  
+**Date:** 2026-07-14  
+**How:** `node scripts/a11y-keyboard-run.mjs` (live popup + options + overlay keyboard path)  
+**Extension id (this run):** `clgpmlhecjlekgipngaopglbfdkonjdf`
 
 No private browsing data included.
 
@@ -14,42 +15,41 @@ No private browsing data included.
 | Popup | Secondary | Click/actions; search injects into tab (no in-popup result list) |
 | Options | Light | Enter on URL field; shortcut labels only |
 
-## Overlay (confirmed in code + unit tests)
+## Live keyboard matrix (this run)
 
-| Key | Expected | Actual (code + tests) |
-|-----|----------|------------------------|
-| ArrowDown / ArrowUp | Move selection; wrap ends | `handleKeyDown` / `moveSelection`; wrap covered by unit test |
-| Enter | Open selected | `selectResult` |
-| Escape | Close | Document **keyup** (not keydown) — avoids macOS Space fullscreen hold-Esc |
-| Alt+1-9 | Quick pick | Uses `e.code` DigitN |
+| Surface | Browser / version | OS | Steps | Expected | Actual |
+|---------|-------------------|----|-------|----------|--------|
+| **Popup** | Chromium 148.0.7778.96 (Playwright) | win32 10.0.26200 | Open `chrome-extension://…/popup.html`; Tab ×10; try focus `#emptyHintBtn` | Interactive controls focusable; emptyHint focusable + Enter activates | **FAIL on emptyHint:** element is a `DIV`, `tabIndex: -1`, `role: null`. Tab lands on `.github-link` etc.; programmatic `focus()` does **not** activate emptyHint. |
+| **Options** | same | same | Open `options.html`; Tab ×12; type URL in `#urlInput` + Enter | Focus moves across form controls; Enter does not throw | **PASS.** Tab order includes shortcut buttons, feature checkboxes, `#resultsLimit`, `#urlInput`, Add / Open All / Clear All, theme radios, language select. Enter after typing `https://example.com` — no crash. |
+| **Overlay** on https://example.com | same | same | Try Alt+K (manifest `search-tabs-bookmarks`); then live inject `search-overlay.js` + `show()`; ArrowDown/Up wrap; Esc handler | Overlay opens; Arrow wraps; Esc path exists | **Native Alt+K** did not open overlay under automation (content-script shortcut). **Live inject:** `handleKeyDown` ArrowDown wraps 0→1→2→0; ArrowUp to end index 2; Esc keyup handler present. Unit test also covers wrap. |
+| **emptyHintBtn** | same | same | Tab to “Add URLs…”; Enter/Space | Focusable + activates options | **FAIL** — see Popup row. Fix is separate PR #22 (`button type="button"`). |
+
+## Overlay (code + unit tests + live inject)
+
+| Key | Expected | Actual |
+|-----|----------|--------|
+| ArrowDown / ArrowUp | Move selection; wrap ends | Confirmed live inject + unit test `ArrowDown/ArrowUp wrap selection via handleKeyDown` |
+| Enter | Open selected | `selectResult` (code) |
+| Escape | Close | Document **keyup** handler present on live instance |
+| Alt+1-9 | Quick pick | Uses `e.code` DigitN (code) |
 | Tab | Move focus (e.g. results limit) | Not intercepted; Esc still works when select focused (existing test) |
 
-## Gaps (code-confirmed)
+## Gaps (still open)
 
 1. Overlay root lacks `role="dialog"` / `aria-modal`.
 2. Results use div + `.selected`, not `listbox` / `option` / `aria-selected`.
 3. Close control is a `div` without role/label (Esc still works).
 4. Popup has no dedicated keyboard result navigation (by design of inject-to-tab).
-5. **`#emptyHintBtn` (popup empty state)** — in `popup.html` this is a **click-only `div`** (`class="empty-hint"`). It has a `click` listener in `popup.js` but **no `tabindex`, no `role="button"`, no keyboard handler**. Keyboard users cannot focus or activate “Add URLs for batch open.” **Reproducible from source without live smoke.** Fix should be a focused a11y PR (button element or role + keydown Enter/Space) — not done in this docs/test PR unless maintainers want it here.
+5. **`#emptyHintBtn` (popup empty state)** — **live FAIL:** click-only `div`. Keyboard users cannot focus or activate “Add URLs for batch open.” Tracked fix: **PR #22**.
 
 Recommend separate issues for ARIA if maintainers want full screen-reader parity — not drive-by refactors here.
 
 ## Changes in this PR
 
 - Unit test: ArrowDown/ArrowUp wrap via `handleKeyDown`.
-- This audit doc (updated: empty-state keyboard gap; no unrelated GitHub-page tooling notes).
-
-## Live keyboard matrix (still open for #12)
-
-Fill when running **unpacked Pounce** with keyboard only:
-
-| Surface | Browser / version | OS | Steps | Expected | Actual |
-|---------|-------------------|----|-------|----------|--------|
-| Overlay on https | | | | | |
-| Popup | | | | | |
-| Options | | | | | |
-| emptyHintBtn focus/activate | | | Tab to “Add URLs…” | Focusable + Enter activates | |
+- This audit doc with **filled live matrix** (popup / options / overlay / emptyHint).
+- Repro script: `scripts/a11y-keyboard-run.mjs` (optional; needs Playwright Chromium).
 
 ## Issue
 
-https://github.com/TuYv/pounce/issues/12 — full close needs filled live matrix above (or maintainer waive).
+https://github.com/TuYv/pounce/issues/12
