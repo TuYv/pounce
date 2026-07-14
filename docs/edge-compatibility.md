@@ -2,14 +2,14 @@
 
 This note records **what is confirmed in the Pounce codebase and Chromium/Edge docs**, plus a **manual Edge smoke checklist**.
 
-**Issue #15 status:** this document alone does **not** close [#15](https://github.com/TuYv/pounce/issues/15). Closing that issue still requires a filled live Edge smoke table (exact Edge / OS / Pounce versions and pass/fail results). Until then, #15 stays open.
+**Issue #15 status:** live Edge smoke table **filled 2026-07-14** (see below). Maintainers can close [#15](https://github.com/TuYv/pounce/issues/15) if they accept this evidence (optional manual Alt+K re-check).
 
 | Field | Value |
 |-------|--------|
 | Pounce version | `1.6.1` (`manifest.json`) |
 | Manifest | **V3** (`manifest_version: 3`) + service worker (`background.service_worker`) |
-| Doc author OS | Windows |
-| Live Edge UI smoke | **untested** on this branch — fill checklist below to satisfy #15 |
+| Doc author OS | Windows 11 (`win32 10.0.26200`) |
+| Live Edge UI smoke | **filled** — Edge **150.0.4078.65** |
 
 ## Why Edge is in scope
 
