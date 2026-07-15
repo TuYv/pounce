@@ -293,12 +293,16 @@
     .chip svg { flex-shrink: 0; }
     .chip .chip-num { font-family: var(--mono); }
 
-    /* Empty hint */
+    /* Empty hint — real <button> so keyboard users can reach “add URLs” */
     .empty-hint {
+      display: block;
+      width: calc(100% - 32px);
       margin: 8px 16px 0;
       padding: 11px 15px;
+      font: inherit;
       font-size: 12px;
       color: var(--muted);
+      background: transparent;
       border: 1px dashed var(--border-strong);
       border-radius: 11px;
       cursor: pointer;
@@ -306,10 +310,12 @@
       text-align: center;
     }
 
-    .empty-hint:hover {
+    .empty-hint:hover,
+    .empty-hint:focus-visible {
       background: var(--hover-bg);
       color: var(--fg);
       border-color: currentColor;
+      outline: none;
     }
 
     /* Footer */
@@ -490,7 +496,7 @@
       <span class="kbd-hint">⌘K</span>
     </button>
 
-    <div class="empty-hint" id="emptyHintBtn" data-i18n="popup_addUrls">+ Add URLs for batch open</div>
+    <button type="button" class="empty-hint" id="emptyHintBtn" data-i18n="popup_addUrls">+ Add URLs for batch open</button>
   </div>
 
   <!-- Footer -->
