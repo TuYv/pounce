@@ -5,7 +5,9 @@ const { performance } = require('node:perf_hooks');
 const {
   parsePackageFileList,
   validateArchiveEntries,
-  validateManifest
+  validateManifest,
+  validateLocales,
+  validatePrivacyPolicy
 } = require('../scripts/validate-release.js');
 
 function createValidManifest() {
@@ -342,4 +344,284 @@ test('manifest validation bounds adversarial wildcard matching time', () => {
     [`manifest references missing packaged file: ${wildcard}`]
   );
   assert.ok(elapsed < 1000, `wildcard matching took ${elapsed.toFixed(1)}ms`);
+});
+
+test('locale validation reports extra keys and broken placeholder references', () => {
+  const en = {
+    notify: {
+      message: 'Press $search$',
+      placeholders: {
+        search: { content: '$1' }
+      }
+    }
+  };
+  const zh_CN = {
+    notify: {
+      message: '按 \\$',
+      placeholders: {
+        search: { content: '$1' }
+      }
+    },
+    extra: { message: '额外' }
+  };
+
+  const errors = validateLocales({ en, zh_CN });
+
+  assert.ok(errors.includes('locale key only in zh_CN: extra'));
+  assert.ok(errors.includes(
+    'locale message does not reference declared placeholder zh_CN.notify: $search$'
+  ));
+});
+
+test('locale validation reports key parity in both directions', () => {
+  assert.deepEqual(
+    validateLocales({
+      en: { englishOnly: { message: 'English' } },
+      zh_CN: { chineseOnly: { message: '中文' } }
+    }),
+    [
+      'locale key only in en: englishOnly',
+      'locale key only in zh_CN: chineseOnly'
+    ]
+  );
+});
+
+test('locale validation reports placeholder name and content incompatibilities', () => {
+  const errors = validateLocales({
+    en: {
+      notify: {
+        message: '$englishOnly$ $shared$',
+        placeholders: {
+          englishOnly: { content: '$1' },
+          shared: { content: '$2' }
+        }
+      }
+    },
+    zh_CN: {
+      notify: {
+        message: '$chineseOnly$ $shared$',
+        placeholders: {
+          chineseOnly: { content: '$1' },
+          shared: { content: '$3' }
+        }
+      }
+    }
+  });
+
+  assert.deepEqual(errors, [
+    'locale placeholder content differs notify.shared',
+    'locale placeholder only in en notify: englishOnly',
+    'locale placeholder only in zh_CN notify: chineseOnly'
+  ]);
+});
+
+test('locale validation reports declared and undeclared named tokens per locale', () => {
+  const errors = validateLocales({
+    en: {
+      notify: {
+        message: 'Press $ghost$',
+        placeholders: { search: { content: '$1' } }
+      }
+    },
+    zh_CN: {
+      notify: {
+        message: '按 $other$',
+        placeholders: { search: { content: '$1' } }
+      }
+    }
+  });
+
+  assert.deepEqual(errors, [
+    'locale message does not reference declared placeholder en.notify: $search$',
+    'locale message does not reference declared placeholder zh_CN.notify: $search$',
+    'locale message references undeclared placeholder en.notify: $ghost$',
+    'locale message references undeclared placeholder zh_CN.notify: $other$'
+  ]);
+});
+
+test('locale validation recognizes only exact valid named placeholder tokens', () => {
+  const placeholders = { search: { content: '$1' } };
+
+  assert.deepEqual(
+    validateLocales({
+      en: {
+        notify: {
+          message: '$search$ $9ignored$ $dash-name$',
+          placeholders
+        }
+      },
+      zh_CN: {
+        notify: {
+          message: '$search$ $9ignored$ $dash-name$',
+          placeholders
+        }
+      }
+    }),
+    []
+  );
+
+  assert.deepEqual(
+    validateLocales({
+      en: {
+        notify: {
+          message: '$searching$',
+          placeholders
+        }
+      },
+      zh_CN: {
+        notify: {
+          message: '$search$',
+          placeholders
+        }
+      }
+    }),
+    [
+      'locale message does not reference declared placeholder en.notify: $search$',
+      'locale message references undeclared placeholder en.notify: $searching$'
+    ]
+  );
+});
+
+test('locale validation handles malformed locale and message values safely', () => {
+  assert.deepEqual(validateLocales({ en: null, zh_CN: [] }), []);
+  assert.deepEqual(
+    validateLocales({
+      en: { malformed: null },
+      zh_CN: { malformed: 'not a message object' }
+    }),
+    []
+  );
+});
+
+test('locale validation ignores inherited locale dictionaries', () => {
+  const locales = Object.create({
+    en: { inherited: { message: 'Inherited' } },
+    zh_CN: { inherited: { message: '继承' } }
+  });
+  locales.zh_CN = {};
+
+  assert.deepEqual(validateLocales(locales), []);
+});
+
+test('locale validation ignores inherited message and placeholders fields', () => {
+  const inheritedMessage = Object.create({ message: '$ghost$' });
+  const inheritedPlaceholders = Object.assign(
+    Object.create({
+      placeholders: { ghost: { content: '$1' } }
+    }),
+    { message: 'Plain' }
+  );
+
+  assert.deepEqual(
+    validateLocales({
+      en: {
+        inheritedMessage,
+        inheritedPlaceholders
+      },
+      zh_CN: {
+        inheritedMessage: {},
+        inheritedPlaceholders: { message: 'Plain' }
+      }
+    }),
+    []
+  );
+});
+
+test('locale validation ignores inherited placeholder names and content', () => {
+  const inheritedNames = Object.create({
+    ghost: { content: '$1' }
+  });
+  const enContent = Object.create({ content: '$1' });
+  const zhContent = Object.create({ content: '$2' });
+  inheritedNames.search = enContent;
+
+  assert.deepEqual(
+    validateLocales({
+      en: {
+        notify: {
+          message: '$search$',
+          placeholders: inheritedNames
+        }
+      },
+      zh_CN: {
+        notify: {
+          message: '$search$',
+          placeholders: { search: zhContent }
+        }
+      }
+    }),
+    []
+  );
+});
+
+test('privacy validation reports missing canonical source and packaged source', () => {
+  const errors = validatePrivacyPolicy({
+    readmeText: 'Privacy: https://example.com/privacy.html',
+    privacyFileExists: false,
+    archiveEntries: ['manifest.json', 'docs/privacy.html']
+  });
+
+  assert.deepEqual(errors, [
+    'canonical privacy policy URL is missing from README.md',
+    'docs/privacy.html is missing from the repository',
+    'privacy policy source must not be packaged: docs/privacy.html'
+  ]);
+});
+
+test('privacy validation accepts canonical repository-only policy metadata', () => {
+  assert.deepEqual(
+    validatePrivacyPolicy({
+      readmeText: 'Privacy policy: https://tuyv.github.io/pounce/privacy.html',
+      privacyFileExists: true,
+      archiveEntries: ['manifest.json', 'background.js']
+    }),
+    []
+  );
+});
+
+test('privacy validation normalizes archive entries before checking packaging', () => {
+  assert.deepEqual(
+    validatePrivacyPolicy({
+      readmeText: 'https://tuyv.github.io/pounce/privacy.html',
+      privacyFileExists: true,
+      archiveEntries: ['.\\docs\\privacy.html']
+    }),
+    ['privacy policy source must not be packaged: docs/privacy.html']
+  );
+});
+
+test('privacy validation canonicalizes safe internal archive path segments', () => {
+  for (const archiveEntry of [
+    'docs/./privacy.html',
+    'docs//privacy.html',
+    '.\\docs\\.\\privacy.html'
+  ]) {
+    assert.deepEqual(
+      validatePrivacyPolicy({
+        readmeText: 'https://tuyv.github.io/pounce/privacy.html',
+        privacyFileExists: true,
+        archiveEntries: [archiveEntry]
+      }),
+      ['privacy policy source must not be packaged: docs/privacy.html']
+    );
+  }
+});
+
+test('privacy validation does not collapse unsafe parent traversal segments', () => {
+  const unsafeEntry = 'docs/../docs/privacy.html';
+
+  assert.deepEqual(
+    validatePrivacyPolicy({
+      readmeText: 'https://tuyv.github.io/pounce/privacy.html',
+      privacyFileExists: true,
+      archiveEntries: [unsafeEntry]
+    }),
+    []
+  );
+  assert.ok(
+    validateArchiveEntries(
+      ['manifest.json', unsafeEntry],
+      ['manifest.json']
+    ).includes(`unsafe archive entry: ${unsafeEntry}`)
+  );
 });

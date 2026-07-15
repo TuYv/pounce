@@ -1,5 +1,8 @@
 const path = require('node:path');
 
+const CANONICAL_PRIVACY_POLICY_URL =
+  'https://tuyv.github.io/pounce/privacy.html';
+
 function normalizePathSeparators(entry) {
   return entry.replace(/\\/g, '/');
 }
@@ -76,6 +79,13 @@ function validateArchiveEntries(rawEntries, packagePaths) {
 
 function isNonArrayObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function getOwnPropertyValue(value, property) {
+  return isNonArrayObject(value) &&
+    Object.prototype.hasOwnProperty.call(value, property)
+    ? value[property]
+    : undefined;
 }
 
 function isValidChromeVersion(version) {
@@ -222,8 +232,159 @@ function validateManifest(manifest, rawArchiveEntries, defaultLocaleMessages) {
   return [...errors].sort();
 }
 
+function getLocaleMessages(locale) {
+  return isNonArrayObject(locale) ? locale : {};
+}
+
+function getMessagePlaceholders(message) {
+  const placeholders = getOwnPropertyValue(message, 'placeholders');
+  return isNonArrayObject(placeholders)
+    ? placeholders
+    : {};
+}
+
+function collectNamedPlaceholderTokens(message) {
+  const tokens = new Set();
+  const messageText = getOwnPropertyValue(message, 'message');
+  if (typeof messageText !== 'string') {
+    return tokens;
+  }
+
+  for (const match of messageText.matchAll(
+    /\$([A-Za-z_][A-Za-z0-9_]*)\$/g
+  )) {
+    tokens.add(match[1]);
+  }
+  return tokens;
+}
+
+function validateMessagePlaceholderReferences(localeName, key, message, errors) {
+  const placeholders = getMessagePlaceholders(message);
+  const declaredNames = Object.keys(placeholders);
+  const referencedNames = collectNamedPlaceholderTokens(message);
+
+  for (const name of declaredNames) {
+    if (!referencedNames.has(name)) {
+      errors.push(
+        `locale message does not reference declared placeholder ${localeName}.${key}: $${name}$`
+      );
+    }
+  }
+
+  for (const name of referencedNames) {
+    if (!Object.prototype.hasOwnProperty.call(placeholders, name)) {
+      errors.push(
+        `locale message references undeclared placeholder ${localeName}.${key}: $${name}$`
+      );
+    }
+  }
+}
+
+function validateLocales(locales) {
+  const localeMap = isNonArrayObject(locales) ? locales : {};
+  const en = getLocaleMessages(getOwnPropertyValue(localeMap, 'en'));
+  const zh_CN = getLocaleMessages(getOwnPropertyValue(localeMap, 'zh_CN'));
+  const enKeys = Object.keys(en);
+  const zhKeys = Object.keys(zh_CN);
+  const enKeySet = new Set(enKeys);
+  const zhKeySet = new Set(zhKeys);
+  const errors = [];
+
+  for (const key of enKeys) {
+    if (!zhKeySet.has(key)) {
+      errors.push(`locale key only in en: ${key}`);
+    }
+  }
+  for (const key of zhKeys) {
+    if (!enKeySet.has(key)) {
+      errors.push(`locale key only in zh_CN: ${key}`);
+    }
+  }
+
+  for (const key of enKeys) {
+    if (!zhKeySet.has(key)) {
+      continue;
+    }
+
+    const enPlaceholders = getMessagePlaceholders(en[key]);
+    const zhPlaceholders = getMessagePlaceholders(zh_CN[key]);
+    const enNames = Object.keys(enPlaceholders);
+    const zhNames = Object.keys(zhPlaceholders);
+    const enNameSet = new Set(enNames);
+    const zhNameSet = new Set(zhNames);
+
+    for (const name of enNames) {
+      if (!zhNameSet.has(name)) {
+        errors.push(`locale placeholder only in en ${key}: ${name}`);
+      } else if (getOwnPropertyValue(enPlaceholders[name], 'content') !==
+        getOwnPropertyValue(zhPlaceholders[name], 'content')) {
+        errors.push(`locale placeholder content differs ${key}.${name}`);
+      }
+    }
+    for (const name of zhNames) {
+      if (!enNameSet.has(name)) {
+        errors.push(`locale placeholder only in zh_CN ${key}: ${name}`);
+      }
+    }
+  }
+
+  for (const [localeName, messages] of [['en', en], ['zh_CN', zh_CN]]) {
+    for (const key of Object.keys(messages)) {
+      validateMessagePlaceholderReferences(
+        localeName,
+        key,
+        messages[key],
+        errors
+      );
+    }
+  }
+
+  return errors.sort();
+}
+
+function canonicalizeSafeArchiveEntry(entry) {
+  const normalized = normalizeArchiveEntry(entry);
+  if (isUnsafePath(normalized)) {
+    return normalized;
+  }
+
+  return normalized
+    .split('/')
+    .filter(segment => segment && segment !== '.')
+    .join('/');
+}
+
+function validatePrivacyPolicy(options) {
+  const values = isNonArrayObject(options) ? options : {};
+  const errors = [];
+
+  if (typeof values.readmeText !== 'string' ||
+    !values.readmeText.includes(CANONICAL_PRIVACY_POLICY_URL)) {
+    errors.push('canonical privacy policy URL is missing from README.md');
+  }
+  if (!values.privacyFileExists) {
+    errors.push('docs/privacy.html is missing from the repository');
+  }
+
+  const archiveEntries = Array.isArray(values.archiveEntries)
+    ? values.archiveEntries
+    : [];
+  if (archiveEntries
+    .filter(entry => typeof entry === 'string')
+    .map(canonicalizeSafeArchiveEntry)
+    .includes('docs/privacy.html')) {
+    errors.push(
+      'privacy policy source must not be packaged: docs/privacy.html'
+    );
+  }
+
+  return errors.sort();
+}
+
 module.exports = {
   parsePackageFileList,
   validateArchiveEntries,
-  validateManifest
+  validateManifest,
+  validateLocales,
+  validatePrivacyPolicy
 };
