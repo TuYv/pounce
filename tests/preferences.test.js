@@ -55,3 +55,9 @@ test('invalid resultsLimit falls back to default', () => {
     );
   }
 });
+
+test('non-object preference payloads fall back to defaults without throwing', () => {
+  for (const value of [null, 'oops', 42, true, false, []]) {
+    assert.deepEqual(normalizeSearchPreferences(value), DEFAULT_SEARCH_PREFERENCES);
+  }
+});
