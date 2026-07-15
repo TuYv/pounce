@@ -16,7 +16,7 @@
     "description": "Description of the batch-open keyboard command"
   },
   "cmd_search": {
-    "message": "Search open tabs and bookmarks",
+    "message": "Search open tabs, bookmarks, history, and top sites",
     "description": "Description of the search keyboard command"
   },
   "cmd_duplicate_tab": {
@@ -24,7 +24,7 @@
     "description": "Description of the duplicate-current-tab keyboard command"
   },
   "popup_searchTabsBookmarks": {
-    "message": "Search Tabs & Bookmarks",
+    "message": "Search tabs, bookmarks, history, and top sites",
     "description": "Primary search button label in popup (both has-URLs and empty states)"
   },
   "popup_searchSources": {
@@ -494,7 +494,11 @@
   "overlay_tabCount": {
     "message": "$count$ tabs",
     "description": "Group header label: number of tabs in a domain group",
-    "placeholders": { "count": { "content": "$1" } }
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   },
   "overlay_tabsUnit": {
     "message": "tabs",

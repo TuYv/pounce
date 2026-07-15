@@ -62,3 +62,16 @@ test('formatMessage: ignores tokens that have no placeholder definition', () => 
     'hi Rick, $unknown$ stays'
   );
 });
+
+test('en and zh_CN locale catalogs share the same keys and placeholders', () => {
+  const en = require('../_locales/en/messages.json');
+  const zh = require('../_locales/zh_CN/messages.json');
+  const enKeys = Object.keys(en).sort();
+  const zhKeys = Object.keys(zh).sort();
+  assert.deepEqual(zhKeys, enKeys, 'locale files must keep matching message keys');
+  for (const key of enKeys) {
+    const ep = Object.keys(en[key].placeholders || {}).sort();
+    const zp = Object.keys(zh[key].placeholders || {}).sort();
+    assert.deepEqual(zp, ep, `placeholder keys must match for ${key}`);
+  }
+});

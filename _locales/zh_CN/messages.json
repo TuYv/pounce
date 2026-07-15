@@ -16,7 +16,7 @@
     "description": "Description of the batch-open keyboard command"
   },
   "cmd_search": {
-    "message": "搜索打开的标签页和书签",
+    "message": "搜索打开的标签页、书签、历史记录和常用站点",
     "description": "Description of the search keyboard command"
   },
   "cmd_duplicate_tab": {
@@ -24,11 +24,11 @@
     "description": "复制当前 tab 快捷键的描述"
   },
   "popup_searchTabsBookmarks": {
-    "message": "搜索标签页与书签",
+    "message": "搜索标签页、书签、历史记录和常用站点",
     "description": "Primary search button label in popup (both has-URLs and empty states)"
   },
   "popup_searchSources": {
-    "message": "标签页 · 书签 · 历史 · 常用网站",
+    "message": "标签页 · 书签 · 历史记录 · 常用网站",
     "description": "Sub-label under the primary search button listing searched sources"
   },
   "popup_chipTabs": {
@@ -494,7 +494,11 @@
   "overlay_tabCount": {
     "message": "$count$ 个标签页",
     "description": "分组头标签:该域名下的标签页数量",
-    "placeholders": { "count": { "content": "$1" } }
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   },
   "overlay_tabsUnit": {
     "message": "标签",
