@@ -1,5 +1,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { execFileSync, spawnSync } = require('node:child_process');
 const { performance } = require('node:perf_hooks');
 
 const {
@@ -53,6 +57,601 @@ const validDefaultMessages = {
   action_title: { message: 'Pounce' }
 };
 
+function requireArchiveTools(t) {
+  for (const tool of ['zip', 'unzip']) {
+    const result = spawnSync(tool, ['-v'], { stdio: 'ignore' });
+    if (result.error && result.error.code === 'ENOENT') {
+      t.skip(`required integration-test tool is unavailable: ${tool}`);
+      return false;
+    }
+  }
+  return true;
+}
+
+function archiveTest(name, fn) {
+  test(name, t => {
+    if (requireArchiveTools(t)) {
+      fn(t);
+    }
+  });
+}
+
+function createReleaseFixture(t, options = {}) {
+  const fixtureRoot = fs.mkdtempSync(
+    path.join(os.tmpdir(), 'pounce-package-validation-')
+  );
+  t.after(() => {
+    fs.rmSync(fixtureRoot, { recursive: true, force: true });
+  });
+  const packageRoot = path.join(fixtureRoot, 'package');
+  const zipPath = path.join(fixtureRoot, 'release.zip');
+  const manifest = options.manifest ?? {
+    manifest_version: 3,
+    version: '1.0.0',
+    default_locale: 'en'
+  };
+
+  fs.mkdirSync(path.join(fixtureRoot, 'scripts'), { recursive: true });
+  fs.mkdirSync(path.join(fixtureRoot, 'docs'), { recursive: true });
+  fs.mkdirSync(path.join(packageRoot, '_locales', 'en'), {
+    recursive: true
+  });
+  fs.mkdirSync(path.join(packageRoot, '_locales', 'zh_CN'), {
+    recursive: true
+  });
+  fs.writeFileSync(
+    path.join(fixtureRoot, 'scripts', 'package-files.txt'),
+    options.packageFileList ?? 'manifest.json\n_locales/\n'
+  );
+  fs.writeFileSync(
+    path.join(fixtureRoot, 'README.md'),
+    options.readmeText ?? 'https://tuyv.github.io/pounce/privacy.html\n'
+  );
+  fs.writeFileSync(path.join(fixtureRoot, 'docs', 'privacy.html'), 'Privacy');
+  fs.writeFileSync(
+    path.join(packageRoot, 'manifest.json'),
+    options.manifestText ?? JSON.stringify(manifest)
+  );
+  fs.writeFileSync(
+    path.join(packageRoot, '_locales', 'en', 'messages.json'),
+    options.enText ?? JSON.stringify(options.en ?? {})
+  );
+  fs.writeFileSync(
+    path.join(packageRoot, '_locales', 'zh_CN', 'messages.json'),
+    options.zhText ?? JSON.stringify(options.zh_CN ?? {})
+  );
+  execFileSync(
+    'zip',
+    ['-r', zipPath, 'manifest.json', '_locales'],
+    { cwd: packageRoot, stdio: 'ignore' }
+  );
+
+  return { fixtureRoot, packageRoot, zipPath };
+}
+
+function renameArchiveEntry(zipPath, originalName, replacementName) {
+  const original = Buffer.from(originalName);
+  const replacement = Buffer.from(replacementName);
+  assert.equal(replacement.length, original.length);
+
+  const archive = fs.readFileSync(zipPath);
+  let offset = 0;
+  let replacements = 0;
+  while ((offset = archive.indexOf(original, offset)) !== -1) {
+    replacement.copy(archive, offset);
+    offset += original.length;
+    replacements += 1;
+  }
+
+  assert.equal(replacements, 2);
+  fs.writeFileSync(zipPath, archive);
+}
+
+function addRenamedArchiveEntry(
+  zipPath,
+  packageRoot,
+  originalName,
+  replacementName,
+  contents = 'runtime'
+) {
+  const originalPath = path.join(packageRoot, ...originalName.split('/'));
+  fs.mkdirSync(path.dirname(originalPath), { recursive: true });
+  fs.writeFileSync(originalPath, contents);
+  execFileSync(
+    'zip',
+    ['-g', zipPath, originalName],
+    { cwd: packageRoot, stdio: 'ignore' }
+  );
+  if (originalName !== replacementName) {
+    renameArchiveEntry(zipPath, originalName, replacementName);
+  }
+}
+
+function writeRepositoryMetadata(fixtureRoot, manifest, en = {}, zh_CN = {}) {
+  fs.mkdirSync(path.join(fixtureRoot, '_locales', 'en'), {
+    recursive: true
+  });
+  fs.mkdirSync(path.join(fixtureRoot, '_locales', 'zh_CN'), {
+    recursive: true
+  });
+  fs.writeFileSync(
+    path.join(fixtureRoot, 'manifest.json'),
+    JSON.stringify(manifest)
+  );
+  fs.writeFileSync(
+    path.join(fixtureRoot, '_locales', 'en', 'messages.json'),
+    JSON.stringify(en)
+  );
+  fs.writeFileSync(
+    path.join(fixtureRoot, '_locales', 'zh_CN', 'messages.json'),
+    JSON.stringify(zh_CN)
+  );
+}
+
+function runValidator(zipPath, fixtureRoot) {
+  return spawnSync(
+    process.execPath,
+    [
+      'scripts/validate-release.js',
+      zipPath,
+      '--repo-root',
+      fixtureRoot
+    ],
+    { cwd: path.resolve(__dirname, '..'), encoding: 'utf8' }
+  );
+}
+
+archiveTest('CLI validates manifest references against files in a real ZIP', t => {
+  const { fixtureRoot, zipPath } = createReleaseFixture(t, {
+    manifest: {
+      manifest_version: 3,
+      version: '1.0.0',
+      default_locale: 'en',
+      background: { service_worker: 'background.js' }
+    }
+  });
+
+  const result = runValidator(zipPath, fixtureRoot);
+
+  assert.equal(result.status, 1);
+  assert.equal(
+    result.stderr,
+    'release package validation failed:\n' +
+      '- manifest references missing packaged file: background.js\n'
+  );
+  assert.equal(result.stdout, '');
+});
+
+archiveTest('CLI enforces package-files.txt for runtime files in a real ZIP', t => {
+  const { fixtureRoot, zipPath } = createReleaseFixture(t, {
+    packageFileList: 'manifest.json\npopup.js\n_locales/\n'
+  });
+
+  const result = runValidator(zipPath, fixtureRoot);
+
+  assert.equal(result.status, 1);
+  assert.equal(
+    result.stderr,
+    'release package validation failed:\n' +
+      '- missing packaged path: popup.js\n'
+  );
+  assert.equal(result.stdout, '');
+});
+
+archiveTest('CLI rejects canonical path collisions in a real ZIP', t => {
+  const { fixtureRoot, packageRoot, zipPath } = createReleaseFixture(t, {
+    en: { archiveOnly: { message: 'Archive' } }
+  });
+  addRenamedArchiveEntry(
+    zipPath,
+    packageRoot,
+    'x/manifest.json',
+    './manifest.json',
+    JSON.stringify({ manifest_version: 2 })
+  );
+
+  const result = runValidator(zipPath, fixtureRoot);
+
+  assert.equal(result.status, 1);
+  assert.equal(
+    result.stderr,
+    'release package validation failed:\n' +
+      '- duplicate archive entry: manifest.json\n' +
+      '- locale key only in en: archiveOnly\n' +
+      '- noncanonical archive entry: ./manifest.json\n'
+  );
+  assert.equal(result.stdout, '');
+});
+
+archiveTest('CLI rejects a backslash runtime alias as missing', t => {
+  const { fixtureRoot, packageRoot, zipPath } = createReleaseFixture(t, {
+    packageFileList: 'manifest.json\nvendor/runtime.js\n_locales/\n'
+  });
+  addRenamedArchiveEntry(
+    zipPath,
+    packageRoot,
+    'vendor/runtime.js',
+    'vendor\\runtime.js'
+  );
+
+  const result = runValidator(zipPath, fixtureRoot);
+
+  assert.equal(result.status, 1);
+  assert.equal(
+    result.stderr,
+    'release package validation failed:\n' +
+      '- missing packaged path: vendor/runtime.js\n' +
+      '- noncanonical archive entry: vendor\\runtime.js\n'
+  );
+  assert.equal(result.stdout, '');
+});
+
+archiveTest('CLI rejects a terminal-dot runtime alias as missing', t => {
+  const { fixtureRoot, packageRoot, zipPath } = createReleaseFixture(t, {
+    packageFileList: 'manifest.json\npopup.js\n_locales/\n'
+  });
+  addRenamedArchiveEntry(
+    zipPath,
+    packageRoot,
+    'x/popup.js',
+    'popup.js/.'
+  );
+
+  const result = runValidator(zipPath, fixtureRoot);
+
+  assert.equal(result.status, 1);
+  assert.equal(
+    result.stderr,
+    'release package validation failed:\n' +
+      '- missing packaged path: popup.js\n' +
+      '- noncanonical archive entry: popup.js/.\n'
+  );
+  assert.equal(result.stdout, '');
+});
+
+archiveTest('CLI rejects a leading-dot manifest as missing', t => {
+  const { fixtureRoot, packageRoot, zipPath } = createReleaseFixture(t);
+  execFileSync('zip', ['-d', zipPath, 'manifest.json'], { stdio: 'ignore' });
+  addRenamedArchiveEntry(
+    zipPath,
+    packageRoot,
+    'x/manifest.json',
+    './manifest.json',
+    JSON.stringify({
+      manifest_version: 3,
+      version: '1.0.0',
+      default_locale: 'en'
+    })
+  );
+
+  const result = runValidator(zipPath, fixtureRoot);
+
+  assert.equal(result.status, 1);
+  assert.equal(
+    result.stderr,
+    'release package validation failed:\n' +
+      '- archive is missing required file: manifest.json\n' +
+      '- manifest.json must be at the archive root\n' +
+      '- missing packaged path: manifest.json\n' +
+      '- noncanonical archive entry: ./manifest.json\n'
+  );
+  assert.equal(result.stdout, '');
+});
+
+archiveTest('CLI rejects an internal-dot locale alias as missing', t => {
+  const { fixtureRoot, packageRoot, zipPath } = createReleaseFixture(t);
+  execFileSync(
+    'zip',
+    ['-d', zipPath, '_locales/en/messages.json'],
+    { stdio: 'ignore' }
+  );
+  addRenamedArchiveEntry(
+    zipPath,
+    packageRoot,
+    '_locales/x/en/messages.json',
+    '_locales/en/./messages.json',
+    '{}'
+  );
+
+  const result = runValidator(zipPath, fixtureRoot);
+
+  assert.equal(result.status, 1);
+  assert.equal(
+    result.stderr,
+    'release package validation failed:\n' +
+      '- archive is missing required file: _locales/en/messages.json\n' +
+      '- manifest default locale directory is missing: _locales/en/\n' +
+      '- noncanonical archive entry: _locales/en/./messages.json\n'
+  );
+  assert.equal(result.stdout, '');
+});
+
+archiveTest('CLI parses metadata despite an unrelated runtime collision', t => {
+  const { fixtureRoot, packageRoot, zipPath } = createReleaseFixture(t, {
+    manifestText: '{ invalid manifest JSON',
+    packageFileList: 'manifest.json\nbackground.js\n_locales/\n'
+  });
+  addRenamedArchiveEntry(
+    zipPath,
+    packageRoot,
+    'background.js',
+    'background.js'
+  );
+  addRenamedArchiveEntry(
+    zipPath,
+    packageRoot,
+    'x/background.js',
+    './background.js'
+  );
+
+  const result = runValidator(zipPath, fixtureRoot);
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /duplicate archive entry: background\.js/);
+  assert.match(result.stderr, /invalid JSON in manifest\.json:/);
+  assert.match(
+    result.stderr,
+    /noncanonical archive entry: \.\/background\.js/
+  );
+});
+
+archiveTest('CLI accepts a valid real ZIP with repo root before the archive', t => {
+  const { fixtureRoot, zipPath } = createReleaseFixture(t);
+
+  const result = spawnSync(
+    process.execPath,
+    [
+      'scripts/validate-release.js',
+      '--repo-root',
+      fixtureRoot,
+      zipPath
+    ],
+    { cwd: path.resolve(__dirname, '..'), encoding: 'utf8' }
+  );
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(
+    result.stdout,
+    `release package validation passed: ${zipPath}\n`
+  );
+  assert.equal(result.stderr, '');
+});
+
+archiveTest('CLI uses messages from the manifest default locale', t => {
+  const { fixtureRoot, zipPath } = createReleaseFixture(t, {
+    manifest: {
+      manifest_version: 3,
+      version: '1.0.0',
+      default_locale: 'zh_CN',
+      name: '__MSG_zh_name__'
+    },
+    zh_CN: {
+      zh_name: { message: '灵扑' }
+    }
+  });
+
+  const result = runValidator(zipPath, fixtureRoot);
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /locale key only in zh_CN: zh_name/);
+  assert.doesNotMatch(
+    result.stderr,
+    /manifest message key is missing from default locale: zh_name/
+  );
+});
+
+archiveTest('CLI reports a corrupt archive integrity failure', t => {
+  const { fixtureRoot, zipPath } = createReleaseFixture(t);
+
+  fs.writeFileSync(zipPath, 'not a ZIP archive');
+
+  const result = runValidator(zipPath, fixtureRoot);
+
+  assert.equal(result.status, 1);
+  assert.match(
+    result.stderr,
+    new RegExp(
+      `archive integrity check failed: ${zipPath.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        '\\$&'
+      )}`
+    )
+  );
+});
+
+archiveTest('CLI labels invalid JSON read from the archive', t => {
+  const { fixtureRoot, zipPath } = createReleaseFixture(t, {
+    manifestText: '{ invalid manifest JSON'
+  });
+
+  const result = runValidator(zipPath, fixtureRoot);
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /invalid JSON in manifest\.json:/);
+});
+
+archiveTest('CLI aggregates JSON errors from each archived metadata file', t => {
+  const { fixtureRoot, zipPath } = createReleaseFixture(t, {
+    manifestText: '{ invalid manifest JSON',
+    enText: '{ invalid English JSON',
+    zhText: '{ invalid Chinese JSON'
+  });
+
+  const result = runValidator(zipPath, fixtureRoot);
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /invalid JSON in manifest\.json:/);
+  assert.match(
+    result.stderr,
+    /invalid JSON in _locales\/en\/messages\.json:/
+  );
+  assert.match(
+    result.stderr,
+    /invalid JSON in _locales\/zh_CN\/messages\.json:/
+  );
+});
+
+archiveTest('CLI aggregates invalid manifest JSON with a missing locale', t => {
+  const { fixtureRoot, zipPath } = createReleaseFixture(t, {
+    manifestText: '{ invalid manifest JSON'
+  });
+  execFileSync(
+    'zip',
+    ['-d', zipPath, '_locales/zh_CN/messages.json'],
+    { stdio: 'ignore' }
+  );
+
+  const result = runValidator(zipPath, fixtureRoot);
+
+  assert.equal(result.status, 1);
+  assert.match(
+    result.stderr,
+    /archive is missing required file: _locales\/zh_CN\/messages\.json/
+  );
+  assert.match(result.stderr, /invalid JSON in manifest\.json:/);
+  assert.ok(
+    result.stderr.indexOf('archive is missing required file:') <
+      result.stderr.indexOf('invalid JSON in manifest.json:')
+  );
+});
+
+archiveTest('CLI validates a parsed manifest when a locale is missing', t => {
+  const { fixtureRoot, zipPath } = createReleaseFixture(t, {
+    manifest: {
+      manifest_version: 3,
+      version: '1.0.0',
+      default_locale: 'zh_CN',
+      name: '__MSG_missing_name__',
+      background: { service_worker: 'background.js' }
+    }
+  });
+  execFileSync(
+    'zip',
+    ['-d', zipPath, '_locales/zh_CN/messages.json'],
+    { stdio: 'ignore' }
+  );
+
+  const result = runValidator(zipPath, fixtureRoot);
+
+  assert.equal(result.status, 1);
+  assert.equal(
+    result.stderr,
+    'release package validation failed:\n' +
+      '- archive is missing required file: ' +
+      '_locales/zh_CN/messages.json\n' +
+      '- manifest default locale directory is missing: ' +
+      '_locales/zh_CN/\n' +
+      '- manifest message key is missing from default locale: ' +
+      'missing_name\n' +
+      '- manifest references missing packaged file: background.js\n'
+  );
+});
+
+archiveTest('CLI validates parsed locales when the manifest is invalid', t => {
+  const { fixtureRoot, zipPath } = createReleaseFixture(t, {
+    manifestText: '{ invalid manifest JSON',
+    en: { archiveOnly: { message: 'Archive' } }
+  });
+
+  const result = runValidator(zipPath, fixtureRoot);
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /invalid JSON in manifest\.json:/);
+  assert.match(result.stderr, /locale key only in en: archiveOnly/);
+});
+
+archiveTest('CLI validates manifest and locales from the ZIP instead of the repo', t => {
+  const { fixtureRoot, zipPath } = createReleaseFixture(t, {
+    manifest: {
+      manifest_version: 3,
+      version: '1.0.0',
+      default_locale: 'en',
+      background: { service_worker: 'background.js' }
+    },
+    en: { archiveOnly: { message: 'Archive' } }
+  });
+
+  writeRepositoryMetadata(fixtureRoot, {
+    manifest_version: 3,
+    version: '1.0.0',
+    default_locale: 'en'
+  });
+
+  const result = runValidator(zipPath, fixtureRoot);
+
+  assert.equal(result.status, 1);
+  assert.match(
+    result.stderr,
+    /manifest references missing packaged file: background\.js/
+  );
+  assert.match(result.stderr, /locale key only in en: archiveOnly/);
+});
+
+archiveTest('CLI names a required metadata file missing from the ZIP', t => {
+  const { fixtureRoot, zipPath } = createReleaseFixture(t);
+
+  writeRepositoryMetadata(fixtureRoot, {
+    manifest_version: 3,
+    version: '1.0.0',
+    default_locale: 'en'
+  });
+  execFileSync(
+    'zip',
+    ['-d', zipPath, '_locales/zh_CN/messages.json'],
+    { stdio: 'ignore' }
+  );
+
+  const result = runValidator(zipPath, fixtureRoot);
+
+  assert.equal(result.status, 1);
+  assert.equal(
+    result.stderr,
+    'release package validation failed:\n' +
+      '- archive is missing required file: ' +
+      '_locales/zh_CN/messages.json\n'
+  );
+  assert.equal(result.stdout, '');
+});
+
+archiveTest('CLI reports clear argument errors', t => {
+  const { fixtureRoot, zipPath } = createReleaseFixture(t);
+  const cases = [
+    { args: [], message: 'missing release ZIP path' },
+    { args: [''], message: 'missing release ZIP path' },
+    {
+      args: [zipPath, '--repo-root'],
+      message: 'missing value for --repo-root'
+    },
+    {
+      args: [zipPath, '--repo-root', '--bogus'],
+      message: 'missing value for --repo-root'
+    },
+    {
+      args: [zipPath, '--repo-root', ''],
+      message: 'missing value for --repo-root'
+    },
+    {
+      args: [zipPath, '--repo-root', fixtureRoot, 'extra'],
+      message: 'unexpected argument: extra'
+    }
+  ];
+
+  for (const fixture of cases) {
+    const result = spawnSync(
+      process.execPath,
+      ['scripts/validate-release.js', ...fixture.args],
+      { cwd: path.resolve(__dirname, '..'), encoding: 'utf8' }
+    );
+
+    assert.equal(result.status, 1, fixture.message);
+    assert.equal(
+      result.stderr,
+      `release package validation failed:\n- ${fixture.message}\n`
+    );
+    assert.equal(result.stdout, '');
+  }
+});
+
 test('parsePackageFileList ignores comments and blank lines', () => {
   assert.deepEqual(
     parsePackageFileList('manifest.json\n\n# assets\nicons/\n'),
@@ -96,6 +695,53 @@ test('archive coverage reports missing allowlisted paths and unexpected files', 
   ]);
 });
 
+test('archive coverage rejects duplicate and colliding canonical entries', () => {
+  assert.deepEqual(
+    validateArchiveEntries(
+      [
+        'manifest.json',
+        './manifest.json',
+        'background.js',
+        'background.js',
+        'icons/icon16.png',
+        'icons\\icon16.png',
+        'scripts/runtime.js',
+        'scripts/./runtime.js',
+        'scripts//runtime.js'
+      ],
+      [
+        'manifest.json',
+        'background.js',
+        'icons/icon16.png',
+        'scripts/runtime.js'
+      ]
+    ),
+    [
+      'duplicate archive entry: background.js',
+      'duplicate archive entry: icons/icon16.png',
+      'duplicate archive entry: manifest.json',
+      'duplicate archive entry: scripts/runtime.js',
+      'noncanonical archive entry: ./manifest.json',
+      'noncanonical archive entry: icons\\icon16.png',
+      'noncanonical archive entry: scripts/./runtime.js',
+      'noncanonical archive entry: scripts//runtime.js'
+    ]
+  );
+});
+
+test('archive coverage detects duplicate empty canonical paths', () => {
+  assert.deepEqual(
+    validateArchiveEntries(
+      ['manifest.json', './', './'],
+      ['manifest.json']
+    ),
+    [
+      'duplicate archive entry: <empty>',
+      'noncanonical archive entry: ./'
+    ]
+  );
+});
+
 test('archive coverage rejects parent traversal and a nested package root', () => {
   const traversalErrors = validateArchiveEntries(
     ['manifest.json', '../secret.txt'],
@@ -110,23 +756,35 @@ test('archive coverage rejects parent traversal and a nested package root', () =
   assert.ok(nestedErrors.includes('manifest.json must be at the archive root'));
 });
 
-test('archive coverage normalizes backslashes and leading dot segments', () => {
+test('archive coverage rejects backslashes and leading dot segments', () => {
   assert.deepEqual(
     validateArchiveEntries(
       ['.\\manifest.json', '.\\icons\\icon16.png'],
       ['manifest.json', 'icons/']
     ),
-    []
+    [
+      'manifest.json must be at the archive root',
+      'missing packaged path: icons',
+      'missing packaged path: manifest.json',
+      'noncanonical archive entry: .\\icons\\icon16.png',
+      'noncanonical archive entry: .\\manifest.json'
+    ]
   );
 });
 
-test('archive coverage ignores safe directories but rejects unsafe directories', () => {
+test('archive coverage rejects noncanonical and unsafe directories', () => {
   assert.deepEqual(
     validateArchiveEntries(
       ['./manifest.json', './icons/'],
       ['manifest.json', 'icons/']
     ),
-    ['missing packaged path: icons']
+    [
+      'manifest.json must be at the archive root',
+      'missing packaged path: icons',
+      'missing packaged path: manifest.json',
+      'noncanonical archive entry: ./icons/',
+      'noncanonical archive entry: ./manifest.json'
+    ]
   );
 
   assert.deepEqual(
@@ -135,6 +793,11 @@ test('archive coverage ignores safe directories but rejects unsafe directories',
       ['manifest.json']
     ),
     [
+      'manifest.json must be at the archive root',
+      'missing packaged path: manifest.json',
+      'noncanonical archive entry: ./icons/',
+      'noncanonical archive entry: ./manifest.json',
+      'noncanonical archive entry: C:\\private\\',
       'unsafe archive entry: ../secret/',
       'unsafe archive entry: C:/private/'
     ]
@@ -163,7 +826,6 @@ test('archive coverage returns errors in stable sorted order', () => {
     'manifest.json must be at the archive root',
     'missing packaged path: background.js',
     'missing packaged path: manifest.json',
-    'unexpected archive entry: ../secret.txt',
     'unexpected archive entry: nested/manifest.json',
     'unexpected archive entry: z.txt',
     'unsafe archive entry: ../secret.txt'
@@ -228,7 +890,7 @@ test('manifest validation enforces manifest metadata and the default locale dire
   );
 });
 
-test('manifest validation accepts any normalized file in the default locale directory', () => {
+test('manifest validation rejects noncanonical default locale entries', () => {
   const archiveEntries = [
     ...validArchiveEntries.filter(entry => entry !== '_locales/en/messages.json'),
     '.\\_locales\\en\\placeholder.txt'
@@ -240,7 +902,7 @@ test('manifest validation accepts any normalized file in the default locale dire
       archiveEntries,
       validDefaultMessages
     ),
-    []
+    ['manifest default locale directory is missing: _locales/en/']
   );
 });
 
@@ -278,7 +940,10 @@ test('manifest validation matches packaged wildcards and only exempts exact _fav
 
   assert.deepEqual(
     validateManifest(manifest, archiveEntries, validDefaultMessages),
-    ['manifest references missing packaged file: _favicon/icon.png']
+    [
+      'manifest references missing packaged file: _favicon/icon.png',
+      'manifest references missing packaged file: assets/*.js'
+    ]
   );
 
   assert.deepEqual(
