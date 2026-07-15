@@ -86,6 +86,18 @@ node --test tests/*.test.js
 
 Run the full suite before opening a pull request.
 
+## Release package validation
+
+Build and validate the same release package checked in CI:
+
+```bash
+VERSION="$(node -p "require('./manifest.json').version")"
+rm -f "pounce-${VERSION}.zip"
+./build.sh "$VERSION" && node scripts/validate-release.js "pounce-${VERSION}.zip"
+```
+
+Passing the version explicitly prevents `build.sh` from creating a local Git tag. Generated ZIP files are ignored by Git.
+
 ## Manual checks
 
 For behavior changes, verify the affected flows in an unpacked extension. Depending on the change, check:

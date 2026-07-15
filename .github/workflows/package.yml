@@ -1,0 +1,43 @@
+name: Package
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  package-validation:
+    name: Package validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Use Node.js 24
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Build and validate release package
+        id: package
+        shell: bash
+        run: |
+          VERSION="$(node -p "require('./manifest.json').version")"
+          ARCHIVE="pounce-${VERSION}.zip"
+          ./build.sh "$VERSION"
+          node scripts/validate-release.js "$ARCHIVE"
+          echo "archive=$ARCHIVE" >> "$GITHUB_OUTPUT"
+      - name: Upload release package
+        uses: actions/upload-artifact@v4
+        with:
+          name: pounce-package-${{ github.sha }}
+          path: ${{ steps.package.outputs.archive }}
+          if-no-files-found: error
+          retention-days: 7
