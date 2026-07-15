@@ -7,28 +7,21 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-FILES=(
-  manifest.json
-  background.js
-  popup.html
-  popup.js
-  options.html
-  options.js
-  options-theme-sync.js
-  theme-manager.js
-  preferences.js
-  i18n.js
-  _locales
-  search-overlay.js
-  search-overlay.css
-  search-ranking.js
-  tab-grouping.js
-  pinyin-index.js
-  pinyin-matcher.js
-  vendor
-  bridge.html
-  icons
-)
+PACKAGE_FILES="scripts/package-files.txt"
+FILES=()
+while IFS= read -r file || [[ -n "$file" ]]; do
+  file="${file#"${file%%[![:space:]]*}"}"
+  file="${file%"${file##*[![:space:]]}"}"
+  if [[ -z "$file" || "$file" == \#* ]]; then
+    continue
+  fi
+  FILES+=("$file")
+done < "$PACKAGE_FILES"
+
+if [[ ${#FILES[@]} -eq 0 ]]; then
+  echo "error: $PACKAGE_FILES contains no package files" >&2
+  exit 1
+fi
 
 for f in "${FILES[@]}"; do
   if [[ ! -e "$f" ]]; then
@@ -42,16 +35,18 @@ done
 # "Could not load file" (this is what broke ⌘K in 1.6.0).
 python3 - "${FILES[@]}" <<'PYEOF'
 import re, sys
-packaged = set(sys.argv[1:])
+packaged = sys.argv[1:]
 src = open('background.js').read()
 injected = set()
 for block in re.findall(r'files:\s*\[(.*?)\]', src, re.DOTALL):
     injected |= set(re.findall(r"""['"]([^'"]+\.(?:js|css))['"]""", block))
-missing = [p for p in sorted(injected)
-           if p not in packaged and p.split('/')[0] not in packaged]
+missing = [path for path in sorted(injected)
+           if not any(path == item or (item.endswith('/') and path.startswith(item))
+                      for item in packaged)]
 if missing:
-    sys.stderr.write("error: background.js injects files missing from build.sh FILES: "
-                     + ", ".join(missing) + "\n        add them to the FILES array.\n")
+    sys.stderr.write("error: background.js injects files missing from "
+                     "scripts/package-files.txt: " + ", ".join(missing)
+                     + "\n        add them to the package allowlist.\n")
     sys.exit(1)
 print(f"inject-coverage check: {len(injected)} injected file(s), all packaged")
 PYEOF

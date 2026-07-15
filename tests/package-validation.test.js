@@ -129,6 +129,52 @@ function createReleaseFixture(t, options = {}) {
   return { fixtureRoot, packageRoot, zipPath };
 }
 
+function createBuildFixture(t) {
+  const repositoryRoot = path.resolve(__dirname, '..');
+  const fixtureRoot = fs.mkdtempSync(
+    path.join(os.tmpdir(), 'pounce-build-validation-')
+  );
+  t.after(() => {
+    fs.rmSync(fixtureRoot, { recursive: true, force: true });
+  });
+
+  const packageFileListPath = path.join(
+    repositoryRoot,
+    'scripts',
+    'package-files.txt'
+  );
+  const packagePaths = parsePackageFileList(
+    fs.readFileSync(packageFileListPath, 'utf8')
+  );
+  const fixtureScripts = path.join(fixtureRoot, 'scripts');
+  fs.mkdirSync(fixtureScripts, { recursive: true });
+  fs.copyFileSync(
+    path.join(repositoryRoot, 'build.sh'),
+    path.join(fixtureRoot, 'build.sh')
+  );
+
+  for (const filename of [
+    'CHANGELOG.md',
+    'CHANGELOG.zh-CN.md',
+    'README.md',
+    'docs/privacy.html'
+  ]) {
+    const destination = path.join(fixtureRoot, filename);
+    fs.mkdirSync(path.dirname(destination), { recursive: true });
+    fs.copyFileSync(path.join(repositoryRoot, filename), destination);
+  }
+
+  for (const packagePath of packagePaths) {
+    const relativePath = packagePath.replace(/\/$/, '');
+    const source = path.join(repositoryRoot, relativePath);
+    const destination = path.join(fixtureRoot, relativePath);
+    fs.mkdirSync(path.dirname(destination), { recursive: true });
+    fs.cpSync(source, destination, { recursive: true });
+  }
+
+  return { fixtureRoot, packagePaths };
+}
+
 function renameArchiveEntry(zipPath, originalName, replacementName) {
   const original = Buffer.from(originalName);
   const replacement = Buffer.from(replacementName);
@@ -200,6 +246,45 @@ function runValidator(zipPath, fixtureRoot) {
     { cwd: path.resolve(__dirname, '..'), encoding: 'utf8' }
   );
 }
+
+archiveTest('build trims package allowlist whitespace like release validation', t => {
+  const { fixtureRoot, packagePaths } = createBuildFixture(t);
+  const version = JSON.parse(
+    fs.readFileSync(path.join(fixtureRoot, 'manifest.json'), 'utf8')
+  ).version;
+  const packageFileList = [
+    '   # package payload   ',
+    ' \t ',
+    ...packagePaths.map(packagePath => ` \t${packagePath}\t `),
+    ''
+  ].join('\r\n');
+  fs.writeFileSync(
+    path.join(fixtureRoot, 'scripts', 'package-files.txt'),
+    packageFileList
+  );
+
+  const buildResult = spawnSync(
+    'bash',
+    ['build.sh', version],
+    { cwd: fixtureRoot, encoding: 'utf8' }
+  );
+
+  assert.equal(
+    buildResult.status,
+    0,
+    `build stdout:\n${buildResult.stdout}\nbuild stderr:\n${buildResult.stderr}`
+  );
+  const zipPath = path.join(fixtureRoot, `pounce-${version}.zip`);
+  assert.ok(fs.existsSync(zipPath));
+
+  const validationResult = runValidator(zipPath, fixtureRoot);
+  assert.equal(validationResult.status, 0, validationResult.stderr);
+  assert.equal(
+    validationResult.stdout,
+    `release package validation passed: ${zipPath}\n`
+  );
+  assert.equal(validationResult.stderr, '');
+});
 
 archiveTest('CLI validates manifest references against files in a real ZIP', t => {
   const { fixtureRoot, zipPath } = createReleaseFixture(t, {
